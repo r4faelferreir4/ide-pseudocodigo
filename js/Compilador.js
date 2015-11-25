@@ -4,7 +4,7 @@
 //
 
 function programa(){
- //VARIÁVEIS CONSTANTES
+//VARIÁVEIS CONSTANTES
     var nkw = 27;		//Nº de palavras chave
     var alng = 10;		//Nº de caracteres significativos nos identificadores
     var llng = 120;		//Tamanho da linha de entrada
@@ -43,5 +43,32 @@ function programa(){
       x : new Array[lmax*2];    //Intervalo -lmax .. +lmax
       y : new Array[nmax*2];    //Intervalo -nmax .. +lmax
     }
+
+//DECLARAÇÃO DE VARIÁVEIS
+
+    var InputFile;
+    var sy = symbol;
+    var id = alfa;
+    var inum;
+    var rnum;
+    var sleng;
+    var ch;
+    var line;
+    var cc;
+    var lc;
+    var ll;
+    var errs;
+    var errpos;
+    var progname;
+    var iflag;
+    var oflag;
+    var constbegsys;
+    var typebegsys;
+    var blockbegsys;
+    var facbegsys;
+    var statbegsys;
+    var key = new Array(nkw);
+    var ksy = new Array(nkw);
+    var sps = new Array()
 
 }

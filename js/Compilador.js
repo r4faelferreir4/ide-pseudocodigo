@@ -1,69 +1,47 @@
-/*Codigo inicial: Jacons Morais e Rafael Ferreira.
-	Palavras reservadas a serem trabalhadas.
-	se fimse;
-	para, de, ate, faca, fimpara;
-	enquanto, fimenquanto;
-	funcao, variavel, leia, escreva, algoritimo
+﻿//INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
+//Alunos: Jacons Morais e Rafael Ferreira
+//Orientador: Prof. Dr. Welllington Lima dos Santos
+//
 
-Tipos de variáveis:
-	real, caracter, inteiro, logico.
-Operadores:
-	e, ou, nao, +, -, /, *, >, <, <>, >=, <=
-*/
+function programa(){
+ //VARIÁVEIS CONSTANTES
+    var nkw = 27;		//Nº de palavras chave
+    var alng = 10;		//Nº de caracteres significativos nos identificadores
+    var llng = 120;		//Tamanho da linha de entrada
+    var emax = 322;		//Exponente máximo para numeros reais
+    var emin = -292;	//Exponente minimo para numeros reais
+    var kmax = 15;		//Numero maximos de digitos significativos
+    var tmax = 100;		//Tamanho da tabela
+    var bmax = 20;		//Tamanho da tabela de blocos
+    var amax = 30;		//Tamanho da tabela de arranjos
+    var c2max = 20		//Tamanho  da tabela de numeros constantes
+    var csmax = 30; 	//Numero máximo de casos
+    var cmax = 850;		//Tamanho do código
+    var lmax = 7;		//Nível máximo
+    var smax = 600;		//Tamanho da tabela de strings
+    var ermax = 58;		//Nº máximo de erros
+    var omax = 63;		//Ordem do código de alto nível
+    var xmax = 1000;	//131071 2**17 - 1
+    var nmax = 32767	//281474976710655 2**48-1
+    var lineleng = 136;	//Tamanho da linha de saída
+    var linelimit = 200;
+    var stacksize = 1500;
 
-var iniciaCompilador = function iniciaCompilador(codbox){
-	var cont_for; 						//contador para o laço for que será usado para andar caracter a caracter.
-	var linha = 0;
-	var logico = false;
-	var lista_var = "";
-	var codigo_final="";					//A variável codigo final irá receber a string contendo os comandos que o intertepretador deverá executar.
-	var cod_linha, comando = "";		//Variável comando armazena a palavra que está sendo lida.
-	var codigo = codbox.split("\n");			//O comando split vai dividir o codigo pelas suas linhas e atribuir cada uma a uma posição do arranjo.
-	var i = 0;			//variável i irá percorrer o vetor de string com os nomes da váriaveis declaradas.						
-	for (cont_for = 0; cont_for < codigo[linha].length; cont_for++){
-		if (codigo[linha].substring(0,2) == "//"]){//Verifica linha de comentário.
-			linha++;
-			cont_for = 0;		//Caso seja um comentário, existe a quebra de linha e cont_for recebe zero para o primeiro caracter da próxima linha ser tratado.
-			continue}		
-		
-		if (codigo[linha].substring(cont_for, cont_for++) == " "){
-				if(comando == "")		continue;		//Após encontrado um espaço o sistema verifica se ja existe algum caracter em análise, caso contrário entende-se que é o primeiro espaço na linha e ignora-o
-				else{											//Caso ja exista algum caracter em análise, significa que alguma palavra foi formada, e então começa a análise da palavra.
-					if(lista_var != ""){
-						i = 0;
-						while(lista_var[i] != NULL]){
-								if(lista_var[i] == comando]){		//Caso a palavra encontrada seja igual a id de uma variável, entende-se que é um possível comando de atribuição.
-									var tokens = comandoAtrib(codigo[linha], lista_var);				//Chama a função comandoAtrib que irá receber a linha inteira, analisar e construir o comando para o compilador caso esteja correto.	
-										if(tokens != 0)	codigo_final = codigo_final+tokens;	
-										else	alert("Problema ao gerar um codigo de atribuição.");
-								}						
-							}
-						}
-		comando = comando+codigo[linha].substring(cont_for, cont_for++);	
-	}
+//TIPOS DEFINIDOS
+
+    var xstring;  //Não é necessário atribuir uma string com tamanho definido
+    var symbol = {intcon, realcon, charcon, stringsy, notsy, plus, minus, times, idiv, rdiv, imod, andsy, orsy, eql, neq, gtr, geq, lss, leq, lparent, rparent, lbrack, rbrack, comma, semicolon, period, colon, becomes, contsy, typesy, varsy, funcionsy, proceduresy, arraysy, recordsy, programsy, ident, beginsy, ifsy, casesy, repeatsy, whilesy, forsy, endsy, elsesy, untilsy, ofsy, dosy, tosy, downtosy, thensy};
+    var index = new Array(xmax*2);    //Intervalo entre -xmax e +xmax
+    var alfa = new Array(alng);
+    var object2 = {konstant, variable, type1, prozedure, funktion};
+    var types = {notyp, ints, reals, bools, chars, arrays, records};
+    var symset;
+    var typeset;
+    var item = {typ: types, ref: index};
+    var order = {
+      f : new Array[omax*2];    //Intervalo -omax .. +omax
+      x : new Array[lmax*2];    //Intervalo -lmax .. +lmax
+      y : new Array[nmax*2];    //Intervalo -nmax .. +lmax
+    }
+
 }
-var comparaToken = function(codigo){
-		var id, contador;
-		for(contador = 0; contador < codigo.length; contador++){
-			if 	()
-		}
-}
-var comandoAtrib = function(linha_comando, lista_var){
-	var contador=0		//A variável contador irá percorrer a linha de comando.
-	var resultadoCodigo 	//A variavel resultadoCodigo irá armazenar os tokens para retornar a função principal
-	var temp;
-	while (true)){
-		temp = geraToken(contador, linha_comando);
-		if (lista_var.indexOf(temp) != -1 && contador == 0){
-			resultadoCodigo = "77("+lista_var.indexOf(temp)","	};
-		contador = linha_comando.indexOf("=");
-		if (contador == -1){
-			return 0;}
-		else{
-			temp = geraToken()}
-		
-		
-		}
-			
-	}
-

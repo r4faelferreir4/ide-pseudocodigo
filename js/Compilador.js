@@ -34,7 +34,7 @@ function programa(){
     var index = new Array(xmax*2);    //Intervalo entre -xmax e +xmax
     var alfa = new Array(alng+1);
     var object2 = {"konstant", "variable", "type1", "prozedure", "funktion"};
-    var types = {notyp, ints, reals, bools, chars, arrays, records};
+    var types = {"notyp", "ints", "reals", "bools", "chars", "arrays", "records"};
     var symset;
     var typeset;
     var item = {typ: types, ref: index};
@@ -66,8 +66,12 @@ function programa(){
     var blockbegsys;
     var facbegsys;
     var statbegsys;
-    var key[nkw][alfa.length];
-    var ksy[nkw][symbol.length];
-    var sps = new Array(symbol);
+    var key = new Array(nkw);   //Tipo alfa não especificado, lembrar de tratar isso depois
+    var ksy = new Array(nkw);   //Tipo symbol não especificado, lembrar de tratar isso depois
+    var sps = new Array();      //Simbolos especiais, tipo symbol não especificado
     var xname;
+    var t, a, b, sx, c1, c2;    //Indices para tabelas
+    var stantyps;
+    var display = new Array(lmax);
+    var tab = new Array(tmax);  //Identificador de tabela
 }

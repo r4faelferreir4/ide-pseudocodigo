@@ -30,10 +30,10 @@ function programa(){
 //TIPOS DEFINIDOS
 
     var xstring;  //Não é necessário atribuir uma string com tamanho definido
-    var symbol = {intcon, realcon, charcon, stringsy, notsy, plus, minus, times, idiv, rdiv, imod, andsy, orsy, eql, neq, gtr, geq, lss, leq, lparent, rparent, lbrack, rbrack, comma, semicolon, period, colon, becomes, contsy, typesy, varsy, funcionsy, proceduresy, arraysy, recordsy, programsy, ident, beginsy, ifsy, casesy, repeatsy, whilesy, forsy, endsy, elsesy, untilsy, ofsy, dosy, tosy, downtosy, thensy};
+    var symbol = {"intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq", "lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy", "casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"};
     var index = new Array(xmax*2);    //Intervalo entre -xmax e +xmax
-    var alfa = new Array(alng);
-    var object2 = {konstant, variable, type1, prozedure, funktion};
+    var alfa = new Array(alng+1);
+    var object2 = {"konstant", "variable", "type1", "prozedure", "funktion"};
     var types = {notyp, ints, reals, bools, chars, arrays, records};
     var symset;
     var typeset;
@@ -47,28 +47,27 @@ function programa(){
 //DECLARAÇÃO DE VARIÁVEIS
 
     var InputFile;
-    var sy = symbol;
-    var id = alfa;
-    var inum;
-    var rnum;
-    var sleng;
-    var ch;
-    var line;
-    var cc;
-    var lc;
-    var ll;
-    var errs;
-    var errpos;
-    var progname;
-    var iflag;
-    var oflag;
+    var sy = symbol;  //Ultimo simbolo lido por insymbol
+    var id = alfa;    //Identificador de insymbol
+    var inum;         //Inteiro de insymbol
+    var rnum;         //Real de insymbol
+    var sleng;        //Tamanho da string de insymbol
+    var ch;           //Ultimo caracter lido do código fonte
+    var line = new Array(llng+1);
+    var cc;           //Contagem de caracteres
+    var lc;           //Contador do programa
+    var ll;           //Tamanho da linha atual
+    var errs = new Array(ermax);    //Lista de erros
+    var errpos;       //Posição do erro
+    var progname = alfa;
+    var iflag, oflag;
     var constbegsys;
     var typebegsys;
     var blockbegsys;
     var facbegsys;
     var statbegsys;
-    var key = new Array(nkw);
-    var ksy = new Array(nkw);
-    var sps = new Array()
-
+    var key[nkw][alfa.length];
+    var ksy[nkw][symbol.length];
+    var sps = new Array(symbol);
+    var xname;
 }

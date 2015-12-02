@@ -167,11 +167,12 @@ function NextCh(){
 
 //Função Error
 function Error(n){
-  if (errpos === 0) {
+  if (errpos == 0) {
     console.log(" ****");
   }
   if(cc > errpos){
-    console.log( '' + cc - errpos );
+    console.log( '' + cc - errpos );//write(' ': cc - errpos, '^', n: 2);
+    errpos = cc + 3; //errpos := cc + 3;
+    errs = errs + n;//errs := errs + [n]
   }
-
 }

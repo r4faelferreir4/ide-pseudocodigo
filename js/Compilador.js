@@ -26,6 +26,7 @@ var lineleng = 136;	//Tamanho da linha de saída
 var linelimit = 200;
 var stacksize = 1500;
 
+
 //TIPOS DEFINIDOS
 
 var xstring;  //Não é necessário atribuir uma string com tamanho definido
@@ -47,7 +48,7 @@ var order = {
 
 //DECLARAÇÃO DE VARIÁVEIS
 
-var InputFile;
+var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
 var sy = symbol;  //Ultimo simbolo lido por insymbol
 var id = alfa;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
@@ -80,8 +81,19 @@ var btab[bmax] = {last: index, lastpar: index, psize: index, vsize: index}
 var stab = [smax];
 var rconst = [c2max];
 var kode[xmax];
+var indexfile = 0;  //Índice para navegar na string do código
+var indexline = 0; //Índice para navegar entre as linhas
+var indexmax;  //Tamanho total do código
 
 function compiladorPascalS(){
+
+  indexmax = InputFile.length()
+  InputFile.split("\n");    //Dividindo o código pelas linhas
+
+  AppEnd:
+  console.log("Aplicação finalizada!");
+  return;
+
 
 
 
@@ -133,14 +145,14 @@ function ErrorMsg(){
 
 }
 
-//FUNÇÃO DE BUSCA DE caracteres
+//FUNÇÃO DE BUSCA DE CARACTERES
 function NextCh(){
   if (cc == ll){
-    if (eof(InputFile)) {
+    if (indexline == InputFile.length() && indexfile == InputFile[InputFile.length()].length()) {    //Verifica se chegou ao final do texto
       console.log('');
-      console.log('programa incompleto');
-      ErrorMsg(); //  { goto 99;} vai para linha 99?
-      //Halt ???
+      console.log(' programa incompleto');
+      ErrorMsg(); //  { goto 99;} vai para linha 99? - Não, está em um comentário
+      continue AppEnd;//Retorna para a função principal e encerra a aplicação
     }
     if (errpos != 0) {
       console.log('');
@@ -150,14 +162,16 @@ function NextCh(){
     console.log(lc:5)//write(lc: 5, '  ');
     ll = 0;//ll := 0;
     cc = 0;//cc := 0;
-    while (!eoln(InputFile)) {
+    while (InputFile.charAt(indexfile) != "\n") {   //Verifica se chegou ao final da linha
       ll += 1;//ll := ll + 1;
-      //read(InputFile, ch);
+      ch = InputFile.charAt(indexfile);     //Lê um caracter
+      indexfile++;                //Incrementa o contador de caracteres
       console.log(ch);//      write(ch);
-      line[ll] += ch;//line[ll] := ch
+      line[ll] = ch;//line[ll] := ch
     }
     console.log('');//  writeln;
-    //readln(InputFile);
+    indexline++;      //Vai para a próxima linha do código.
+    indexfile = 0;    //Zera o contador de caracteres da linha
     ll += 1;//ll := ll + 1;
     line[ll] = ' ';//line[ll] := ' ';
   }
@@ -171,8 +185,68 @@ function Error(n){
     console.log(" ****");
   }
   if(cc > errpos){
-    console.log( '' + cc - errpos );//write(' ': cc - errpos, '^', n: 2);
+    console.log( '' + cc - errpos +"^"+ n );//write(' ': cc - errpos, '^', n: 2);
     errpos = cc + 3; //errpos := cc + 3;
     errs = errs + n;//errs := errs + [n]
+  }
+}
+
+function fatal(n){
+  Msg = alfa;
+  Msg[0] = "identificador";   Msg[1] = "identificador";
+  Msg[2] = "procedimentos";   Msg[3] = "reais";
+  Msg[4] = "arranjos";   Msg[5] = "niveis";
+  Msg[6] = "código";   Msg[7] = "strings";
+  console.log("Tabela do compilador para"+ Msg[n] +"é muito pequena");
+  continue AppEnd;    //Termina compilação.
+}
+
+function insymbol(){      //Lê o próximo simbolo
+  var i, j, k, e;
+
+  function readscale(){
+    var s, sign;
+    NextCh();
+    sign = 1;
+    s = 0;
+    if (ch == "+")
+      NextCh();
+    else {
+      if (ch == "-"){
+        NextCh();
+        sign = -1;
+      }
+    }
+    while (ch >= 0 && ch <= 9){
+      var temp = "0";
+      s = 10 * s + ch.charCodeAt() - temp.charCodeAt();
+      NextCh();
+    }
+    e = s * sign + e;
+  }
+
+
+  function AdjustScale(){
+    var s, d, t;
+
+    if ((k+e) > emax){
+      Error(21);          //Erro maximo expoente para numero real
+    }
+    else{
+      if ((k+e) < emin)
+         rnum = 0;
+      else{
+        s = Math.abs(e);
+        t = 1.0;
+        d = 10.0;
+        do{
+          while(){
+            s = s / 2;
+            d = Math.pow(d, 2);
+          }
+        }
+      }
+
+    }
   }
 }

@@ -30,13 +30,13 @@ var stacksize = 1500;
 //TIPOS DEFINIDOS
 
 var xstring;  //Não é necessário atribuir uma string com tamanho definido
-var symbol = {"intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
+var symbol = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
 "lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
-"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"};
+"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
 var index = [xmax*2];    //Intervalo entre -xmax e +xmax
 var alfa = [alng+1];
-var object2 = {"konstant", "variable", "type1", "prozedure", "funktion"};
-var types = {"notyp", "ints", "reals", "bools", "chars", "arrays", "records"};
+var object2 = ["konstant", "variable", "type1", "prozedure", "funktion"];
+var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
 var symset;
 var typeset;
 var item = {typ: types, ref: index};
@@ -68,9 +68,9 @@ var typebegsys;
 var blockbegsys;
 var facbegsys;
 var statbegsys;
-var key = [nkw];   //Tipo alfa não especificado, lembrar de tratar isso depois
+var key[alfa.length()][nkw.length()];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [nkw];   //Tipo symbol não especificado, lembrar de tratar isso depois
-var sps = [];      //Simbolos especiais, tipo symbol não especificado
+var sps = symbol;      //Simbolos especiais, tipo symbol não especificado
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
@@ -240,13 +240,165 @@ function insymbol(){      //Lê o próximo simbolo
         t = 1.0;
         d = 10.0;
         do{
-          while(){
+          while((s%2) == 0){      //Verifica se é par
             s = s / 2;
-            d = Math.pow(d, 2);
+            d = d ** 2;
           }
-        }
+          s--;
+          t = d * t;
+        }while(s == 0);
+        if(e >= 0)
+          rnum = rnum * t;
+        else
+          rnum = rnum / t;
       }
 
     }
   }
+
+  1: while(ch == " ")
+    NextCh();
+    if(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z"){
+      k = 0;
+      id = "          ";      //Seta a variavel id com espaços em branco
+      do{
+        if (k < alng){
+          k++;
+          id[k] = ch;
+        }
+        NextCh();
+      }while(!(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z" || ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"));
+      i = 1;      //Busca binaria
+      j = nkw;
+      do{
+        k = (i+j)/2
+        if ((i+j)%2 != 0) k = Math.floor(k);
+        if (id.charAt(0) <= key[k])     //VERIFICAR SE ESTÁ CORRETO
+          j = k - 1;
+        if(id.charAt(0) >= key[k])
+          i = K + 1;
+      }while(i > j);
+      if ((i - 1) > j)
+        sy = ksy[k];
+      else
+        sy = "ident";
+    }
+    else {
+      if (ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9){
+        k = 0;
+        inum = 0;
+        sy = "intcon";
+        do{
+          inum = inum * 10 + ch.charCodeAt(0) - "0".charCodeAt();
+          k++;
+          NextCh();
+        }while(!(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9));
+        if(k > kmax || inum > nmax){
+          Error(21);
+          inum = 0;
+          k = 0;
+        }
+        if (ch == "."){
+          NextCh();
+          if (ch == ".")
+            ch = ":";
+          else{
+            sy = "realcon";
+            rnum = inum;
+            e = 0;
+            while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"){
+              e--;
+              rnum = 10 * rnum + (ch.charCodeAt(0) - "0".charCodeAt(0));
+              NextCh();
+            }
+            if (ch == "e")
+              readscale();
+            if (e != 0)
+              AdjustScale();
+          }
+        }
+        else {
+          if (ch == "e"){
+            sy = "realcon";
+            rnum = inum;
+            e = 0;
+            readscale();
+            if (e != 0)
+              AdjustScale();
+          }
+        }
+      }
+      else {
+        switch (ch) {
+          case ":":
+            NextCh();
+            if (ch == "="){
+              sy = "becomes";
+              NextCh();
+            }
+            else
+              sy = "colon";
+            break;
+          case "<":
+              NextCh();
+              if (ch == "="){
+                sy = "leq";
+                NextCh();
+              }
+              else
+                if (ch == ">"){
+                  sy = "neq";
+                  NextCh();
+                }
+                else
+                  sy = "lss";
+            break;
+          case ">":
+            NextCh();
+            if (ch == "="){
+              sy = "geq";
+              NextCh();
+            }
+            else
+              sy = "gtr";
+          break;
+        case ".":
+            NextCh();
+            if(ch == "."){
+              sy = "colon";
+              NextCh();
+            }
+            else
+              sy = "period";
+          break;
+          case "\"\"":
+              k = 0;
+              2:
+              NextCh();
+            if (ch == "\"\""){
+              NextCh();
+              if (ch != "\"\"")
+                goto 3;
+            }
+            if ((sx + k) == smax)
+              fatal(7);
+            stab[sx+k] = ch;
+            k++;
+            if (cc == 1)    //fim da linha
+              k = 0;
+            else
+              goto 2;
+            3:
+              if (k == 1){
+                sy = "charcon";
+                inum = stab[sx].charCodeAt(0);
+              }
+            break;
+          default:
+
+        }
+      }
+
+    }
+
 }

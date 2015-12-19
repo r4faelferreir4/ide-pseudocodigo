@@ -315,7 +315,8 @@ begin {insymbol}
       k := 0;
       inum := 0;
       sy := intcon;
-      repeat inum := inum * 10 + ord(ch) - ord('0');
+      repeat
+        inum := inum * 10 + ord(ch) - ord('0');
         k := k + 1; NextCh
       until not (ch in ['0'..'9']);
       if (k > kmax) or (inum > nmax) then

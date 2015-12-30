@@ -1,0 +1,22 @@
+Tipos Enumerados em javascript:
+
+O compilador utiliza tipos enumerados em pascal, por exemplo :
+47:   object2 = (konstant, variable, type1, prozedure, funktion);
+48:   types = (notyp, ints, reals, bools, chars, arrays, records);
+
+Javascript não possui um tipo enumerado nativo.
+Durante a execução, o programa faz a busca utilizando a função "ord"
+da posição no enumerado do valor adicionado.
+Para resolver isso, vamos utilizar uma variável que não será alterado seu valor.
+
+var object2 = ["konstant", "variable", "type1", "prozedure", "funktion"];
+var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
+var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
+var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
+
+Quando houver no código a utilização da função ord, para encontrar a posição no enumerado do valor da variável
+utilizaremos a função indexOf() para isso.
+
+object1.indexOf(object2)
+
+A variável object2, armazena durante a execução strings, que depois serão utilizadas para a comparação.

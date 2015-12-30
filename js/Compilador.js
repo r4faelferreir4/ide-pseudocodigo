@@ -36,7 +36,9 @@ var symbol = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minu
 var index = [xmax*2];    //Intervalo entre -xmax e +xmax
 var alfa = [alng+1];
 var object2 = ["konstant", "variable", "type1", "prozedure", "funktion"];
+var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
+var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
 var symset;
 var typeset;
 var item = {typ: types, ref: index};
@@ -50,6 +52,9 @@ var order = {
 
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
 var sy = symbol;  //Ultimo simbolo lido por insymbol
+var sy1 = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
+"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
+"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
 var id = alfa;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
 var rnum;         //Real de insymbol
@@ -246,7 +251,7 @@ function insymbol(){      //Lê o próximo simbolo
           }
           s--;
           t = d * t;
-        }while(s == 0);
+        }while(s != 0);
         if(e >= 0)
           rnum = rnum * t;
         else
@@ -276,8 +281,8 @@ function insymbol(){      //Lê o próximo simbolo
         if (id.charAt(0) <= key[k])     //VERIFICAR SE ESTÁ CORRETO
           j = k - 1;
         if(id.charAt(0) >= key[k])
-          i = K + 1;
-      }while(i > j);
+          i = k + 1;
+      }while(i < j);
       if ((i - 1) > j)
         sy = ksy[k];
       else
@@ -292,7 +297,7 @@ function insymbol(){      //Lê o próximo simbolo
           inum = inum * 10 + ch.charCodeAt(0) - "0".charCodeAt();
           k++;
           NextCh();
-        }while(!(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9));
+        }while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9);
         if(k > kmax || inum > nmax){
           Error(21);
           inum = 0;
@@ -393,12 +398,162 @@ function insymbol(){      //Lê o próximo simbolo
                 sy = "charcon";
                 inum = stab[sx].charCodeAt(0);
               }
+              else
+                if (k == 0){
+                  Error(38);
+                  sy = "charcon";
+                  inum = 0;
+                }
+                else {
+                  sy = "stringsy";
+                  inum = sx;
+                  sleng = k;
+                  sx += k;
+                }
+            break;
+            case "(":
+              NextCh();
+              if (ch != "*")
+                sy = "lparent";
+              else {    //Comentário
+                NextCh();
+                do{
+                  while (ch != "*")
+                    NextCh();
+                  NextCh();
+                }while(ch != ")");
+                NextCh();
+                goto 1;
+              }
+            break;
+            case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
+              sy = sps[ch];
+              NextCh();
             break;
           default:
-
+            Error(24);]
+            NextCh();
+            goto 1;
         }
       }
-
     }
+}
+
+function enter (x0, x1, x2, x3){
+  t++;
+  tab[t].name = x0;
+  tab[t].link = t - 1;
+  tab[t].obj = x1;
+  tab[t].typ = x2;
+  tab[t].ref = 0;
+  tab[t].normal = true;
+  tab[t].lev = 0;
+  tab[t].adr = x3
+}
+
+function EnterArray(tp, l, h){
+  if (l > h)
+    Error(27);
+  if (Math.abs(l) > xmax || Math.abs(h) > xmax){
+    Error(27);
+    l = 0;
+    h = 0;
+  }
+  if (a == amax)
+    fatal(4);
+  else{
+    a++;
+    atab[a].inxtyp = tp;
+    atab[a].low = l;
+    atab[a].high = h;
+  }
+}
+
+function EnterBlock(){
+  if (b == bmax)
+    fatal(2);
+  else {
+    b++;
+    btab[b].last = 0;
+    btab[b].lastpar = 0;
+  }
+}
+
+function EnterReal(){
+  if(c2 == c2max-1)
+    fatal(3);
+  else {
+    rconst[c2+1] = x;
+    c1 = 1;
+    while(rconst[c1] != x)
+      c1++;
+    if(c1 > c2)
+      c2 = c1;
+  }
+}
+
+function emit(fct){
+  if (lc == cmax)
+    fatal(6);
+  kode[lc].f = fct;
+  lc++;
+}
+
+function emit1(fct, b){
+  if (lc == cmax)
+    fatal(6);
+  kode[lc].f = fct;
+  kode[lc].y = b;
+  lc++;
+}
+
+function emit2(fct, a, b){
+  if (lc == cmax)
+    fatal(6);
+  kode[lc].f = fct;
+  kode[lc].x = a;
+  kode[lc].y = b;
+  lc++;
+}
+
+function printtables(){
+  var i;
+  var o = order;
+  console.log("");
+  console.log("identificadores    link obj typ ref nrm lev adr");
+  for (i = btab[1].last+1; i < t; i++){
+    console.log(i+"       "+tab[i].name+"  "+tab[i].link+"      "+object1.indexOf(tab[i].obj)+"     "+type1.indexOf(tab[i].typ)+"     "+tab[i].ref+"     "+ tab[i].normal.toString()+"     "+tab[i].lev+"     "+tab[i].adr);
+  }
+  console.log("");
+  console.log("blocos       last  lpar  psze  vsze");
+  for(i = 1; i < b; i++)
+    console.log(i+"       "+btab[i].last+"     "+btab[i].lastpar+"     "+btab[i].psize+"     "+btab[i].vsize);
+  console.log("");
+  console.log("arranjos     xtyp  etyp  eref  low  high  elsz  size");
+  for(i = 1; i < a; i++)
+    console.log(i+"       "+type1.indexOf(atab[i].inxtyp)+"     "+type1.indexOf(atab[i].eltyp)+"     "+atab[i].elref+"     "+atab[i].low+"     "+atab[i].high+"     "+atab[i].elsize+"     "+ atab[i].size);
+  console.log("");
+  console.log("código: ");
+  for(i = 0; i < lc-1; i++){
+    if ((i % 5) == 0){
+      console.log("");
+      console.log("      "+i);
+    }
+    o = kode[i];
+    console.log("     "o.f);
+    if (o.f < 31)
+      if(o.f < 4)
+        console.log("  "+o.x+"     "+o.y);
+      else
+        console.log("       "+o.y);
+    else
+      console.log("        ");
+    console.log(",");
+  }
+  console.log("");
+}
+
+function block(fsys, isfun, level){
+  var 
 
 }

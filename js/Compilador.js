@@ -30,12 +30,15 @@ var stacksize = 1500;
 //TIPOS DEFINIDOS
 
 var xstring;  //Não é necessário atribuir uma string com tamanho definido
-var symbol = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
+var symbol;// = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
+//"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
+//"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
+var symbol1 =  ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
 "lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
 "casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
 var index = [xmax*2];    //Intervalo entre -xmax e +xmax
 var alfa = [alng+1];
-var object2 = ["konstant", "variable", "type1", "prozedure", "funktion"];
+var object2;// = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
 var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
@@ -554,6 +557,21 @@ function printtables(){
 }
 
 function block(fsys, isfun, level){
-  var 
+  //var conrec;
+
+  var dx;   //Índice de alocação de dados
+  var prt;  //Índice T deste procedimento
+  var prb;  //Índice B deste procedimento
+  var x;
+
+  function skip(fsys, n){
+    Error(n);
+    while(fsys.indexOf(sy) == -1)
+      insymbol();
+  }
+  function test(s1, s2, n){
+    if (s1.indexOf(sy) == -1)
+      skip(s1+s2, n);
+  }
 
 }

@@ -557,7 +557,7 @@ function printtables(){
 }
 
 function block(fsys, isfun, level){
-  //var conrec;
+  var conrec = {tp: 1, i: 2, r: 2.4};
 
   var dx;   //Índice de alocação de dados
   var prt;  //Índice T deste procedimento
@@ -570,8 +570,421 @@ function block(fsys, isfun, level){
       insymbol();
   }
   function test(s1, s2, n){
-    if (s1.indexOf(sy) == -1)
-      skip(s1+s2, n);
+    if (s1.indexOf(sy) == -1){
+      skip([s1, s2], n);
+    }
+  }
+  function TestSemicolon(){
+    if(sy == "semicolon")
+      insymbol();
+    else {
+      Error(14);
+      if (sy == "comma" || sy == "colon")
+        insymbol();
+    }
+    test(["ident", blockbegsys], fsys, 6);
+  }
+  function enter(id, k){
+    var j, l;
+    if (t == tmax)
+      fatal(1);
+    else {
+      tab[0].name - id;
+      j = btab[display[level]].last;
+      l = j;
+      while(tab[j].name != id)
+        j = tab[j].link;
+      if (j != 0)
+        Error(1);
+      else {
+        t++;
+        tab[t].name = id;
+        tab[t].link = l;
+        tab[t].obj = k;
+        tab[t].typ = "notyp";
+        tab[t].ref = 0;
+        tab[t].lev = level;
+        tab[t].adr = 0;
+        btab[display[level]].last = t;
+      }
+    }
+  }//enter
+
+  function loc(id){
+    var i, j;//Loalizador de ID na tabela
+    i = level;
+    tab[0].name = id;
+    do{
+      j = btab[display[i]].last;
+      while(tab[j].name != id)
+        j = tab[j].link;
+      i--;
+    }while(i > 0 || j == 0);
+    if (j == 0)
+      Error(0);
+    return j;
+  }//loc
+
+  function entervariable(){
+    if (sy == "ident"){
+      enter(id, "variable");
+      insymbol();
+    }
+    else
+      Error(2);
+  }//entervariable
+
+  function constant(fsys, c){
+    var x, sign;
+    c.tp = "notyp"
+    c.i = 0;
+    test(constbegsys, fsys, 50);
+    if(constbegsys.indexOf(sy) != -1){
+      if (sy == "charcon"){
+        c.tp = "chars";
+        c.i = inum;
+        insymbol();
+      }
+      else {
+        sign = 1;
+        if (sy == "plus" || sy == "minus"){
+          if (sy == "minus")
+            sign = -1;
+          insymbol();
+        }
+        if (sy == "ident"){
+          x = loc(id);
+          if (x != 0)
+            if (tab[x].obj != "konstant")
+              Error(25);
+            else{
+              c.tp = tab[x].typ;
+              if (c.tp == "reals")
+                c.r = sign * rconst[tab[x].adr];
+              else
+                c.i = sign * tab[x].adr;
+            }
+            insymbol();
+        }
+        else
+          if (sy == "intcon"){
+            c.tp = "ints";
+            c.i = sign * inum;
+            insymbol();
+          }
+          else
+            if (sy == "realcon"){
+              c.tp = "reals";
+              c.r = sign * rnum;
+              insymbol();
+            }
+            else
+              skip(fsys, 50);
+      }
+      test(fsys, "", 6)
+    }
+  }//constant
+
+  function typ(fsys, tp, rf, sz){
+    var x, eltp, elrf, eldz, offset, t0, t1;
+    function arraytyp(aref, arsz){
+      var eltp, low, high, elrf, elsz;
+      constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
+      if (low.tp == "reals"){
+        Error(27);
+        low.tp = "ints";
+        low.i = 0;
+      }
+      if (sy == "colon")
+        insymbol();
+      else
+        Error(13);
+      constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
+      if (high.tp != low.tp){
+        Error(27);
+        high.i = low.i;
+      }
+      EnterArray(low.tp, low.i, high.i);
+      aref = a;
+      if (sy == "comma"){
+        insymbol();
+        eltp = "arrays";
+        arraytyp(elrf, elsz);
+      }
+      else {
+        if (sy == "rbrack")
+          insymbol();
+        else {
+          Error(12);
+          if (sy == "rparent")
+            insymbol();
+        }
+        if (sy == "ofsy")
+          insymbol();
+        else
+          Error(8);
+        typ(fsys, eltp, elrf, elsz);
+      }
+      arsz = (atab[aref].high - atab[aref].low + 1)*elsz;
+      atab[aref].size = arsz;
+      atab[aref].eltyp = eltp;
+      atab[aref].elref = elrf;
+      atab[aref].elsize = elsz;
+    }//arraytyp
+
+    tp = "notyp";
+    rf = 0;
+    sz = 0;
+    test(typebegsys, fsys, 10);
+    if (typebegsys.indexOf(sy) != -1){
+      if (sy == "ident"){
+        x = loc(id);
+        if (x != 0)
+          if (tab[x].obj != "type1")
+            Error(29);
+          else {
+            tp = tab[x].typ;
+            rf = tab[x].ref;
+            sz = tab[x].adr;
+            if(tp == "notyp")
+              Error(30);
+          }
+        insymbol();
+      }
+      else
+        if (sy = "arraysy"){
+          insymbol();
+          if (sy = "lbrack")
+            insymbol();
+          else {
+            Error(11);
+            if (sy == "lparent")
+              insymbol();
+          }
+          tp = "arrays";
+          arraytyp(rf, sz);
+        }
+        else{
+          insymbol();
+          EnterBlock();
+          tp = "records";
+          rf = b;
+          if (level == lmax)
+            fatal(5);
+          level++;
+          display[level] = b;
+          offset = 0;
+          while(sy != endsy){
+            if (sy == "ident"){
+              t0 = t;
+              entervariable();
+              if (sy == "colon")
+                insymbol();
+                else
+                Error(5);
+                t1 = t;
+                typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), eltp, elrf, elsz);
+                while (t0 < t1){
+                  t0++;
+                  tab[t0].typ = eltp;
+                  tab[t0].ref = elrf;
+                  tab[t0].normal = true;
+                  tab[t0].adr = offset;
+                  offset += elsz;
+                }
+            }
+            if (sy == "endsy"){
+              if (sy == "semicolon")
+                insymbol();
+              else {
+                Error(14);
+                if (sy == "comma")
+                  insymbol();
+              }
+              test(["ident", "endsy","semicolon"], fsys, 6);
+            }
+          }
+          btab[rf].vsize = offset;
+          sz = offset;
+          btab[rf].psize = 0;
+          insymbol();
+          level--;
+        }
+        test(fsys, "", 6);
+      }
+  }//typ
+
+  function parameterlist(){
+    var tp, rf, sz, x, t0, valpar;
+    insymbol();
+    tp = "notyp";
+    rf = 0;
+    sz = 0;
+    test(["ident", "varsy"], fsys.concat(["rparent"]), 7);
+    while (sy == "ident" || sy == "varsy"){
+      if (sy != "varsy")
+        valpar = true;
+      else {
+        insymbol();
+        valpar =  false;
+      }
+      t0 = t;
+      entervariable();
+      while (sy == "comma"){
+        insymbol();
+        entervariable();
+      }
+      if (sy == "colon"){
+        insymbol();
+        if (sy != "ident")
+          Error(2);
+        else {
+          x = loc(id);
+          insymbol();
+          if (x != 0)
+            if (tab[x].obj != "type1")
+              Error(29);
+            else {
+              tp = tab[x].typ;
+              rf = tab[x].ref;
+              if (valpar)
+                sz = tab[x].adr;
+              else
+                sz = 1;
+            }
+
+        }
+        test(["semicolon", "rparent"], ["comma", "ident"].concat(fsys), 14);
+      }
+      else
+        Error(5);
+      while(t0 < t){
+        t0++;
+        tab[t0].typ = tp;
+        tab[t0].ref = rf;
+        tab[t0].normal = valpar;
+        tab[t0].adr = dx;
+        tab[t0].lev = level;
+        dx += sz;
+      }
+      if (sy == "rparent"){
+        if (sy == "semicolon")
+          insymbol();
+        else {
+          Error(14);
+          if (sy == "comma")
+            insymbol();
+        }
+        test(["ident", "varsy"], ["rparent"].concat(fsys), 6);
+      }
+    }
+    if (sy == "rparent"){
+      insymbol();
+      test(["semicolon", "colon"], fsys, 6);
+    }
+    else
+      Error(4);
   }
 
+  function constantdeclaration(){
+    var c = conrec;
+    insymbol();
+    test(["ident"], blockbegsys, 2);
+    whie(sy == "ident"){
+      enter(id, "konstant");
+      insymbol();
+      if (sy == "eql" )
+        insymbol();
+      else {
+        Error(16);
+        if (sy == "becomes")
+          insymbol();
+      }
+      constant(["semicolon", "comma", "ident"].concat(fsys), c);
+      tab[t].typ = c.tp;
+      tab[t].ref = 0;
+      if (c.tp == "reals"){
+        EnterReal(c.r);
+        tab[t].adr = c1;
+      }
+      else
+        tab[t].adr = c.i;
+      TestSemicolon();
+    }
+  }
+
+  function typedeclaration(){
+    var tp, rf, sz, t1;
+    insymbol();
+    test(["ident"], blockbegsys, 2);
+    while (sy == "ident"){
+      enter(id, "type1");
+      t1 = t;
+      insymbol();
+      if (sy == "eql")
+        insymbol();
+      else {
+        Error(16);
+        if (sy == "becomes")
+          insymbol();
+      }
+      typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
+      tab[t1].typ = tp;
+      tab[t1].ref = rf;
+      tab[t1].adr = sz;
+      TestSemicolon();
+    }
+  }
+
+  function variabledeclaration(){
+    var t0, t1, rf, sz, tp;
+    insymbol();
+    while(sy == "ident"){
+      t0 = t;
+      entervariable();
+      while(sy == "comma"){
+        insymbol();
+        entervariable();
+      }
+    if (sy == "colon")
+      insymbol();
+    else
+      Error(5);
+    t1 = t;
+    typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
+    while(t0 < t1){
+      t0++;
+      tab[t0].typ = tp;
+      tab[t0].ref = rf;
+      tab[t0].lev = level;
+      tab[t0].adr = dx;
+      tab[t0].normal = true;
+      dx += sz;
+    }
+    TestSemicolon();
+  }
 }
+
+function procdeclaration(){
+  var isfun;
+  isfun = sy == "functionsy";
+  insymbol();
+  if (sy != "ident"){
+    Error(2);
+    id = "          ";
+  }
+  if (isfun)
+    enter(id, "funktion");
+  else
+    enter(id, "prozedure");
+  tab[t].normal = true;
+  insymbol();
+  block(["semicolon"].concat(fsys), isfun, level+1);
+  if (sy == "semicolon")
+    insymbol();
+  else
+    Error(14);
+  
+}
+
+}//block

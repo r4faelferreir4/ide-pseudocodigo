@@ -218,7 +218,7 @@ function insymbol(){      //Lê o próximo simbolo
     sign = 1;
     s = 0;
     if (ch == "+")
-      NextCh();
+    NextCh();
     else {
       if (ch == "-"){
         NextCh();
@@ -242,7 +242,7 @@ function insymbol(){      //Lê o próximo simbolo
     }
     else{
       if ((k+e) < emin)
-         rnum = 0;
+      rnum = 0;
       else{
         s = Math.abs(e);
         t = 1.0;
@@ -256,190 +256,190 @@ function insymbol(){      //Lê o próximo simbolo
           t = d * t;
         }while(s != 0);
         if(e >= 0)
-          rnum = rnum * t;
+        rnum = rnum * t;
         else
-          rnum = rnum / t;
+        rnum = rnum / t;
       }
 
     }
   }
 
   1: while(ch == " ")
-    NextCh();
-    if(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z"){
+  NextCh();
+  if(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z"){
+    k = 0;
+    id = "          ";      //Seta a variavel id com espaços em branco
+    do{
+      if (k < alng){
+        k++;
+        id[k] = ch;
+      }
+      NextCh();
+    }while(!(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z" || ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"));
+    i = 1;      //Busca binaria
+    j = nkw;
+    do{
+      k = (i+j)/2
+      if ((i+j)%2 != 0) k = Math.floor(k);
+      if (id.charAt(0) <= key[k])     //VERIFICAR SE ESTÁ CORRETO
+      j = k - 1;
+      if(id.charAt(0) >= key[k])
+      i = k + 1;
+    }while(i < j);
+    if ((i - 1) > j)
+    sy = ksy[k];
+    else
+    sy = "ident";
+  }
+  else {
+    if (ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9){
       k = 0;
-      id = "          ";      //Seta a variavel id com espaços em branco
+      inum = 0;
+      sy = "intcon";
       do{
-        if (k < alng){
-          k++;
-          id[k] = ch;
-        }
+        inum = inum * 10 + ch.charCodeAt(0) - "0".charCodeAt();
+        k++;
         NextCh();
-      }while(!(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z" || ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"));
-      i = 1;      //Busca binaria
-      j = nkw;
-      do{
-        k = (i+j)/2
-        if ((i+j)%2 != 0) k = Math.floor(k);
-        if (id.charAt(0) <= key[k])     //VERIFICAR SE ESTÁ CORRETO
-          j = k - 1;
-        if(id.charAt(0) >= key[k])
-          i = k + 1;
-      }while(i < j);
-      if ((i - 1) > j)
-        sy = ksy[k];
-      else
-        sy = "ident";
-    }
-    else {
-      if (ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9){
-        k = 0;
+      }while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9);
+      if(k > kmax || inum > nmax){
+        Error(21);
         inum = 0;
-        sy = "intcon";
-        do{
-          inum = inum * 10 + ch.charCodeAt(0) - "0".charCodeAt();
-          k++;
-          NextCh();
-        }while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9);
-        if(k > kmax || inum > nmax){
-          Error(21);
-          inum = 0;
-          k = 0;
-        }
-        if (ch == "."){
-          NextCh();
-          if (ch == ".")
-            ch = ":";
-          else{
-            sy = "realcon";
-            rnum = inum;
-            e = 0;
-            while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"){
-              e--;
-              rnum = 10 * rnum + (ch.charCodeAt(0) - "0".charCodeAt(0));
-              NextCh();
-            }
-            if (ch == "e")
-              readscale();
-            if (e != 0)
-              AdjustScale();
+        k = 0;
+      }
+      if (ch == "."){
+        NextCh();
+        if (ch == ".")
+        ch = ":";
+        else{
+          sy = "realcon";
+          rnum = inum;
+          e = 0;
+          while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"){
+            e--;
+            rnum = 10 * rnum + (ch.charCodeAt(0) - "0".charCodeAt(0));
+            NextCh();
           }
-        }
-        else {
-          if (ch == "e"){
-            sy = "realcon";
-            rnum = inum;
-            e = 0;
-            readscale();
-            if (e != 0)
-              AdjustScale();
-          }
+          if (ch == "e")
+          readscale();
+          if (e != 0)
+          AdjustScale();
         }
       }
       else {
-        switch (ch) {
-          case ":":
-            NextCh();
-            if (ch == "="){
-              sy = "becomes";
-              NextCh();
-            }
-            else
-              sy = "colon";
-            break;
-          case "<":
-              NextCh();
-              if (ch == "="){
-                sy = "leq";
-                NextCh();
-              }
-              else
-                if (ch == ">"){
-                  sy = "neq";
-                  NextCh();
-                }
-                else
-                  sy = "lss";
-            break;
-          case ">":
-            NextCh();
-            if (ch == "="){
-              sy = "geq";
-              NextCh();
-            }
-            else
-              sy = "gtr";
-          break;
-        case ".":
-            NextCh();
-            if(ch == "."){
-              sy = "colon";
-              NextCh();
-            }
-            else
-              sy = "period";
-          break;
-          case "\"\"":
-              k = 0;
-              2:
-              NextCh();
-            if (ch == "\"\""){
-              NextCh();
-              if (ch != "\"\"")
-                goto 3;
-            }
-            if ((sx + k) == smax)
-              fatal(7);
-            stab[sx+k] = ch;
-            k++;
-            if (cc == 1)    //fim da linha
-              k = 0;
-            else
-              goto 2;
-            3:
-              if (k == 1){
-                sy = "charcon";
-                inum = stab[sx].charCodeAt(0);
-              }
-              else
-                if (k == 0){
-                  Error(38);
-                  sy = "charcon";
-                  inum = 0;
-                }
-                else {
-                  sy = "stringsy";
-                  inum = sx;
-                  sleng = k;
-                  sx += k;
-                }
-            break;
-            case "(":
-              NextCh();
-              if (ch != "*")
-                sy = "lparent";
-              else {    //Comentário
-                NextCh();
-                do{
-                  while (ch != "*")
-                    NextCh();
-                  NextCh();
-                }while(ch != ")");
-                NextCh();
-                goto 1;
-              }
-            break;
-            case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
-              sy = sps[ch];
-              NextCh();
-            break;
-          default:
-            Error(24);]
-            NextCh();
-            goto 1;
+        if (ch == "e"){
+          sy = "realcon";
+          rnum = inum;
+          e = 0;
+          readscale();
+          if (e != 0)
+          AdjustScale();
         }
       }
     }
+    else {
+      switch (ch) {
+        case ":":
+        NextCh();
+        if (ch == "="){
+          sy = "becomes";
+          NextCh();
+        }
+        else
+        sy = "colon";
+        break;
+        case "<":
+        NextCh();
+        if (ch == "="){
+          sy = "leq";
+          NextCh();
+        }
+        else
+        if (ch == ">"){
+          sy = "neq";
+          NextCh();
+        }
+        else
+        sy = "lss";
+        break;
+        case ">":
+        NextCh();
+        if (ch == "="){
+          sy = "geq";
+          NextCh();
+        }
+        else
+        sy = "gtr";
+        break;
+        case ".":
+        NextCh();
+        if(ch == "."){
+          sy = "colon";
+          NextCh();
+        }
+        else
+        sy = "period";
+        break;
+        case "\"\"":
+        k = 0;
+        2:
+        NextCh();
+        if (ch == "\"\""){
+          NextCh();
+          if (ch != "\"\"")
+          goto 3;
+        }
+        if ((sx + k) == smax)
+        fatal(7);
+        stab[sx+k] = ch;
+        k++;
+        if (cc == 1)    //fim da linha
+        k = 0;
+        else
+        goto 2;
+        3:
+        if (k == 1){
+          sy = "charcon";
+          inum = stab[sx].charCodeAt(0);
+        }
+        else
+        if (k == 0){
+          Error(38);
+          sy = "charcon";
+          inum = 0;
+        }
+        else {
+          sy = "stringsy";
+          inum = sx;
+          sleng = k;
+          sx += k;
+        }
+        break;
+        case "(":
+        NextCh();
+        if (ch != "*")
+        sy = "lparent";
+        else {    //Comentário
+          NextCh();
+          do{
+            while (ch != "*")
+            NextCh();
+            NextCh();
+          }while(ch != ")");
+          NextCh();
+          goto 1;
+        }
+        break;
+        case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
+        sy = sps[ch];
+        NextCh();
+        break;
+        default:
+        Error(24);]
+        NextCh();
+        goto 1;
+      }
+    }
+  }
 }
 
 function enter (x0, x1, x2, x3){
@@ -456,14 +456,14 @@ function enter (x0, x1, x2, x3){
 
 function EnterArray(tp, l, h){
   if (l > h)
-    Error(27);
+  Error(27);
   if (Math.abs(l) > xmax || Math.abs(h) > xmax){
     Error(27);
     l = 0;
     h = 0;
   }
   if (a == amax)
-    fatal(4);
+  fatal(4);
   else{
     a++;
     atab[a].inxtyp = tp;
@@ -474,7 +474,7 @@ function EnterArray(tp, l, h){
 
 function EnterBlock(){
   if (b == bmax)
-    fatal(2);
+  fatal(2);
   else {
     b++;
     btab[b].last = 0;
@@ -484,27 +484,27 @@ function EnterBlock(){
 
 function EnterReal(){
   if(c2 == c2max-1)
-    fatal(3);
+  fatal(3);
   else {
     rconst[c2+1] = x;
     c1 = 1;
     while(rconst[c1] != x)
-      c1++;
+    c1++;
     if(c1 > c2)
-      c2 = c1;
+    c2 = c1;
   }
 }
 
 function emit(fct){
   if (lc == cmax)
-    fatal(6);
+  fatal(6);
   kode[lc].f = fct;
   lc++;
 }
 
 function emit1(fct, b){
   if (lc == cmax)
-    fatal(6);
+  fatal(6);
   kode[lc].f = fct;
   kode[lc].y = b;
   lc++;
@@ -512,7 +512,7 @@ function emit1(fct, b){
 
 function emit2(fct, a, b){
   if (lc == cmax)
-    fatal(6);
+  fatal(6);
   kode[lc].f = fct;
   kode[lc].x = a;
   kode[lc].y = b;
@@ -530,11 +530,11 @@ function printtables(){
   console.log("");
   console.log("blocos       last  lpar  psze  vsze");
   for(i = 1; i < b; i++)
-    console.log(i+"       "+btab[i].last+"     "+btab[i].lastpar+"     "+btab[i].psize+"     "+btab[i].vsize);
+  console.log(i+"       "+btab[i].last+"     "+btab[i].lastpar+"     "+btab[i].psize+"     "+btab[i].vsize);
   console.log("");
   console.log("arranjos     xtyp  etyp  eref  low  high  elsz  size");
   for(i = 1; i < a; i++)
-    console.log(i+"       "+type1.indexOf(atab[i].inxtyp)+"     "+type1.indexOf(atab[i].eltyp)+"     "+atab[i].elref+"     "+atab[i].low+"     "+atab[i].high+"     "+atab[i].elsize+"     "+ atab[i].size);
+  console.log(i+"       "+type1.indexOf(atab[i].inxtyp)+"     "+type1.indexOf(atab[i].eltyp)+"     "+atab[i].elref+"     "+atab[i].low+"     "+atab[i].high+"     "+atab[i].elsize+"     "+ atab[i].size);
   console.log("");
   console.log("código: ");
   for(i = 0; i < lc-1; i++){
@@ -545,12 +545,12 @@ function printtables(){
     o = kode[i];
     console.log("     "o.f);
     if (o.f < 31)
-      if(o.f < 4)
-        console.log("  "+o.x+"     "+o.y);
-      else
-        console.log("       "+o.y);
+    if(o.f < 4)
+    console.log("  "+o.x+"     "+o.y);
     else
-      console.log("        ");
+    console.log("       "+o.y);
+    else
+    console.log("        ");
     console.log(",");
   }
   console.log("");
@@ -567,7 +567,7 @@ function block(fsys, isfun, level){
   function skip(fsys, n){
     Error(n);
     while(fsys.indexOf(sy) == -1)
-      insymbol();
+    insymbol();
   }
   function test(s1, s2, n){
     if (s1.indexOf(sy) == -1){
@@ -576,26 +576,26 @@ function block(fsys, isfun, level){
   }
   function TestSemicolon(){
     if(sy == "semicolon")
-      insymbol();
+    insymbol();
     else {
       Error(14);
       if (sy == "comma" || sy == "colon")
-        insymbol();
+      insymbol();
     }
     test(["ident", blockbegsys], fsys, 6);
   }
   function enter(id, k){
     var j, l;
     if (t == tmax)
-      fatal(1);
+    fatal(1);
     else {
       tab[0].name - id;
       j = btab[display[level]].last;
       l = j;
       while(tab[j].name != id)
-        j = tab[j].link;
+      j = tab[j].link;
       if (j != 0)
-        Error(1);
+      Error(1);
       else {
         t++;
         tab[t].name = id;
@@ -617,11 +617,11 @@ function block(fsys, isfun, level){
     do{
       j = btab[display[i]].last;
       while(tab[j].name != id)
-        j = tab[j].link;
+      j = tab[j].link;
       i--;
     }while(i > 0 || j == 0);
     if (j == 0)
-      Error(0);
+    Error(0);
     return j;
   }//loc
 
@@ -631,7 +631,7 @@ function block(fsys, isfun, level){
       insymbol();
     }
     else
-      Error(2);
+    Error(2);
   }//entervariable
 
   function constant(fsys, c){
@@ -649,37 +649,37 @@ function block(fsys, isfun, level){
         sign = 1;
         if (sy == "plus" || sy == "minus"){
           if (sy == "minus")
-            sign = -1;
+          sign = -1;
           insymbol();
         }
         if (sy == "ident"){
           x = loc(id);
           if (x != 0)
-            if (tab[x].obj != "konstant")
-              Error(25);
-            else{
-              c.tp = tab[x].typ;
-              if (c.tp == "reals")
-                c.r = sign * rconst[tab[x].adr];
-              else
-                c.i = sign * tab[x].adr;
-            }
-            insymbol();
+          if (tab[x].obj != "konstant")
+          Error(25);
+          else{
+            c.tp = tab[x].typ;
+            if (c.tp == "reals")
+            c.r = sign * rconst[tab[x].adr];
+            else
+            c.i = sign * tab[x].adr;
+          }
+          insymbol();
         }
         else
-          if (sy == "intcon"){
-            c.tp = "ints";
-            c.i = sign * inum;
-            insymbol();
-          }
-          else
-            if (sy == "realcon"){
-              c.tp = "reals";
-              c.r = sign * rnum;
-              insymbol();
-            }
-            else
-              skip(fsys, 50);
+        if (sy == "intcon"){
+          c.tp = "ints";
+          c.i = sign * inum;
+          insymbol();
+        }
+        else
+        if (sy == "realcon"){
+          c.tp = "reals";
+          c.r = sign * rnum;
+          insymbol();
+        }
+        else
+        skip(fsys, 50);
       }
       test(fsys, "", 6)
     }
@@ -696,9 +696,9 @@ function block(fsys, isfun, level){
         low.i = 0;
       }
       if (sy == "colon")
-        insymbol();
+      insymbol();
       else
-        Error(13);
+      Error(13);
       constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
       if (high.tp != low.tp){
         Error(27);
@@ -713,16 +713,16 @@ function block(fsys, isfun, level){
       }
       else {
         if (sy == "rbrack")
-          insymbol();
+        insymbol();
         else {
           Error(12);
           if (sy == "rparent")
-            insymbol();
+          insymbol();
         }
         if (sy == "ofsy")
-          insymbol();
+        insymbol();
         else
-          Error(8);
+        Error(8);
         typ(fsys, eltp, elrf, elsz);
       }
       arsz = (atab[aref].high - atab[aref].low + 1)*elsz;
@@ -740,78 +740,78 @@ function block(fsys, isfun, level){
       if (sy == "ident"){
         x = loc(id);
         if (x != 0)
-          if (tab[x].obj != "type1")
-            Error(29);
-          else {
-            tp = tab[x].typ;
-            rf = tab[x].ref;
-            sz = tab[x].adr;
-            if(tp == "notyp")
-              Error(30);
-          }
+        if (tab[x].obj != "type1")
+        Error(29);
+        else {
+          tp = tab[x].typ;
+          rf = tab[x].ref;
+          sz = tab[x].adr;
+          if(tp == "notyp")
+          Error(30);
+        }
         insymbol();
       }
       else
-        if (sy = "arraysy"){
+      if (sy = "arraysy"){
+        insymbol();
+        if (sy = "lbrack")
+        insymbol();
+        else {
+          Error(11);
+          if (sy == "lparent")
           insymbol();
-          if (sy = "lbrack")
-            insymbol();
-          else {
-            Error(11);
-            if (sy == "lparent")
-              insymbol();
-          }
-          tp = "arrays";
-          arraytyp(rf, sz);
         }
-        else{
-          insymbol();
-          EnterBlock();
-          tp = "records";
-          rf = b;
-          if (level == lmax)
-            fatal(5);
-          level++;
-          display[level] = b;
-          offset = 0;
-          while(sy != endsy){
-            if (sy == "ident"){
-              t0 = t;
-              entervariable();
-              if (sy == "colon")
-                insymbol();
-                else
-                Error(5);
-                t1 = t;
-                typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), eltp, elrf, elsz);
-                while (t0 < t1){
-                  t0++;
-                  tab[t0].typ = eltp;
-                  tab[t0].ref = elrf;
-                  tab[t0].normal = true;
-                  tab[t0].adr = offset;
-                  offset += elsz;
-                }
-            }
-            if (sy == "endsy"){
-              if (sy == "semicolon")
-                insymbol();
-              else {
-                Error(14);
-                if (sy == "comma")
-                  insymbol();
-              }
-              test(["ident", "endsy","semicolon"], fsys, 6);
-            }
-          }
-          btab[rf].vsize = offset;
-          sz = offset;
-          btab[rf].psize = 0;
-          insymbol();
-          level--;
-        }
-        test(fsys, "", 6);
+        tp = "arrays";
+        arraytyp(rf, sz);
       }
+      else{
+        insymbol();
+        EnterBlock();
+        tp = "records";
+        rf = b;
+        if (level == lmax)
+        fatal(5);
+        level++;
+        display[level] = b;
+        offset = 0;
+        while(sy != endsy){
+          if (sy == "ident"){
+            t0 = t;
+            entervariable();
+            if (sy == "colon")
+            insymbol();
+            else
+            Error(5);
+            t1 = t;
+            typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), eltp, elrf, elsz);
+            while (t0 < t1){
+              t0++;
+              tab[t0].typ = eltp;
+              tab[t0].ref = elrf;
+              tab[t0].normal = true;
+              tab[t0].adr = offset;
+              offset += elsz;
+            }
+          }
+          if (sy == "endsy"){
+            if (sy == "semicolon")
+            insymbol();
+            else {
+              Error(14);
+              if (sy == "comma")
+              insymbol();
+            }
+            test(["ident", "endsy","semicolon"], fsys, 6);
+          }
+        }
+        btab[rf].vsize = offset;
+        sz = offset;
+        btab[rf].psize = 0;
+        insymbol();
+        level--;
+      }
+      test(fsys, "", 6);
+    }
   }//typ
 
   function parameterlist(){
@@ -823,7 +823,7 @@ function block(fsys, isfun, level){
     test(["ident", "varsy"], fsys.concat(["rparent"]), 7);
     while (sy == "ident" || sy == "varsy"){
       if (sy != "varsy")
-        valpar = true;
+      valpar = true;
       else {
         insymbol();
         valpar =  false;
@@ -837,27 +837,27 @@ function block(fsys, isfun, level){
       if (sy == "colon"){
         insymbol();
         if (sy != "ident")
-          Error(2);
+        Error(2);
         else {
           x = loc(id);
           insymbol();
           if (x != 0)
-            if (tab[x].obj != "type1")
-              Error(29);
-            else {
-              tp = tab[x].typ;
-              rf = tab[x].ref;
-              if (valpar)
-                sz = tab[x].adr;
-              else
-                sz = 1;
-            }
+          if (tab[x].obj != "type1")
+          Error(29);
+          else {
+            tp = tab[x].typ;
+            rf = tab[x].ref;
+            if (valpar)
+            sz = tab[x].adr;
+            else
+            sz = 1;
+          }
 
         }
         test(["semicolon", "rparent"], ["comma", "ident"].concat(fsys), 14);
       }
       else
-        Error(5);
+      Error(5);
       while(t0 < t){
         t0++;
         tab[t0].typ = tp;
@@ -869,11 +869,11 @@ function block(fsys, isfun, level){
       }
       if (sy == "rparent"){
         if (sy == "semicolon")
-          insymbol();
+        insymbol();
         else {
           Error(14);
           if (sy == "comma")
-            insymbol();
+          insymbol();
         }
         test(["ident", "varsy"], ["rparent"].concat(fsys), 6);
       }
@@ -883,7 +883,7 @@ function block(fsys, isfun, level){
       test(["semicolon", "colon"], fsys, 6);
     }
     else
-      Error(4);
+    Error(4);
   }
 
   function constantdeclaration(){
@@ -894,11 +894,11 @@ function block(fsys, isfun, level){
       enter(id, "konstant");
       insymbol();
       if (sy == "eql" )
-        insymbol();
+      insymbol();
       else {
         Error(16);
         if (sy == "becomes")
-          insymbol();
+        insymbol();
       }
       constant(["semicolon", "comma", "ident"].concat(fsys), c);
       tab[t].typ = c.tp;
@@ -908,7 +908,7 @@ function block(fsys, isfun, level){
         tab[t].adr = c1;
       }
       else
-        tab[t].adr = c.i;
+      tab[t].adr = c.i;
       TestSemicolon();
     }
   }
@@ -922,11 +922,11 @@ function block(fsys, isfun, level){
       t1 = t;
       insymbol();
       if (sy == "eql")
-        insymbol();
+      insymbol();
       else {
         Error(16);
         if (sy == "becomes")
-          insymbol();
+        insymbol();
       }
       typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
       tab[t1].typ = tp;
@@ -946,45 +946,667 @@ function block(fsys, isfun, level){
         insymbol();
         entervariable();
       }
-    if (sy == "colon")
+      if (sy == "colon")
       insymbol();
-    else
+      else
       Error(5);
-    t1 = t;
-    typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
-    while(t0 < t1){
-      t0++;
-      tab[t0].typ = tp;
-      tab[t0].ref = rf;
-      tab[t0].lev = level;
-      tab[t0].adr = dx;
-      tab[t0].normal = true;
-      dx += sz;
+      t1 = t;
+      typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
+      while(t0 < t1){
+        t0++;
+        tab[t0].typ = tp;
+        tab[t0].ref = rf;
+        tab[t0].lev = level;
+        tab[t0].adr = dx;
+        tab[t0].normal = true;
+        dx += sz;
+      }
+      TestSemicolon();
     }
-    TestSemicolon();
   }
-}
 
-function procdeclaration(){
-  var isfun;
-  isfun = sy == "functionsy";
-  insymbol();
-  if (sy != "ident"){
-    Error(2);
-    id = "          ";
-  }
-  if (isfun)
-    enter(id, "funktion");
-  else
-    enter(id, "prozedure");
-  tab[t].normal = true;
-  insymbol();
-  block(["semicolon"].concat(fsys), isfun, level+1);
-  if (sy == "semicolon")
+  function procdeclaration(){
+    var isfun;
+    isfun = sy == "functionsy";
     insymbol();
-  else
+    if (sy != "ident"){
+      Error(2);
+      id = "          ";
+    }
+    if (isfun)
+    enter(id, "funktion");
+    else
+    enter(id, "prozedure");
+    tab[t].normal = true;
+    insymbol();
+    block(["semicolon"].concat(fsys), isfun, level+1);
+    if (sy == "semicolon")
+    insymbol();
+    else
     Error(14);
-  
-}
+
+  }
 
 }//block
+
+function interpret(){
+  var ir; //buffer de instrução
+  var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
+  var ps = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
+  "lngchk", "redchk"];
+  var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
+  "lngchk", "redchk"];
+  var t; //index do top da pilha
+  var b: //index base
+  h1, h2, h3, h4: integer;
+  var fld = new Array(4);//tamano padrão dos campos
+  var display = new Array(lmax);
+  var s = new Array(stacksize);
+  var record = function() {
+    this.i = 0;
+    this.r = 0.0;
+    this.b = false;
+    this.c = "";
+  };
+  //inicializa array com objetos do tipo record
+  for (var i = 0; i < s.length; i++){
+    s[i] = new record();
+  }
+
+  s[1].i = 0;
+  s[2].i = 0;
+  s[3].i = -1;
+  s[4].i = btab[1].last;
+  b = 0;
+  display[1] = 0;
+  t = btab[2].vsize - 1;
+  pc = tab[s[4].i].adr;
+  ps = run;
+  lncnt = 0;
+  ocnt = 0;
+  chrcnt = 0;
+  fld[1] = 10;
+  fld[2] = 22;
+  fld[3] = 10;
+  fld[4] = 1;
+  do {
+    ir = kode[pc];
+    pc = pc + 1;
+    ocnt = ocnt + 1;
+    switch(ir.f){
+      case 0:
+      t = t + 1;
+      if (t > stacksize){
+        ps = stkchk;
+      }
+      else{
+        s[t].i = display[ir.x] + ir.y;
+      }
+      break;
+
+      case 1:
+      t = t + 1;
+      if (t > stacksize){
+        ps = stkchk;
+      }
+      else{
+        s[t] = s[display[ir.x] + ir.y];
+
+      }
+      break;
+
+      case 2:
+      t = t + 1;
+      if (t > stacksize){
+        ps = stkchk;
+      }
+      else{
+        s[t] = s[s[display[ir.x] + ir.y].i];
+      }
+      break;
+
+      case 3:
+      h1 = ir.y;
+      h2 = ir.x;
+      h3 = b;
+      do{
+        display[h1] = h3;
+        h1 = h1 - 1;
+        h3 = s[h3 + 2].i
+      }
+      while( h1 == h2);
+      break;
+
+      case 8:
+      switch (ir.y) {
+        case 0: s[t].i = abs(s[t].i); break;
+        case 1: s[t].r = abs(s[t].r); break;
+        case 2: s[t].i = sqr(s[t].i); break;
+        case 3: s[t].r = sqr(s[t].r); break;
+        case 4: s[t].b = odd(s[t].i); break;
+        case 5:
+        if (s[t].i < 0) or (s[t].i > 63){
+          ps = inxchk;
+        }
+        break;
+        case 6: s[t].i = ord(s[t].c);  break;
+        case 7: s[t].c = succ(s[t].c); break;
+        case 8: s[t].c = pred(s[t].c); break;
+        case 9: s[t].i = round(s[t].r); break;
+        case 10: s[t].i = trunc(s[t].r); break;
+        case 11: s[t].r = sin(s[t].r) break;
+        case 12: s[t].r = cos(s[t].r); break;
+        case 13: s[t].r = exp(s[t].r); break;
+        case 14: s[t].r = ln(s[t].r); break;
+        case 15: s[t].r = sqrt(s[t].r) break;
+        case 16: s[t].r = arctan(s[t].r); break;
+        case 17:
+        if (t > stacksize){
+          ps = stkchk;
+        }
+        else{
+          s[t].b = eof(InputFile);
+        }
+        break;
+
+        case 18:
+        t = t + 1;
+        if (t > stacksize){
+          ps = stkchk;
+        }
+        else
+        {
+          s[t].b = eoln(InputFile);
+        }
+        break;
+
+      }//switch case 8
+
+      case 9: s[t].i = s[t].i + ir.y; break;
+      case 10: pc = ir.y; //jump
+      case 11:
+      if (!s[t].b){
+        pc = ir.y;
+        t = t - 1;
+      }
+      break;
+
+      case 12:
+      h1 = s[t].i;
+      t = t - 1;
+      h2 = ir.y;
+      h3 = 0;
+      do {
+        if (kode[h2].f <> 13){
+          h3 = 1;
+          ps = caschk;
+        }
+        else{
+          if (kode[h2].y = h1){
+            h3 = 1;
+            pc = kode[h2 + 1].y
+          }
+          else{
+            h2 = h2 + 2;
+          }
+        }
+      } while (until h3 <> 0);
+      break;
+
+      case 14:
+      h1 = s[t - 1].i;
+      if(h1 <= s[t].i){
+        s[s[t - 2].i].i = h1;
+      }
+      else{
+        t = t - 3;
+        pc = ir.y;
+      }
+      break;
+
+      case 15:
+      h2 = s[t - 2].i;
+      h1 = s[h2].i + 1;
+      if (h1 <= s[t].i){
+        s[h2].i = h1;
+        pc = ir.y;
+      }
+      else{
+        t = t - 3;
+      }
+      break;
+
+      case 16:
+      h1 = s[t - 1].i;
+      if (h1 >= s[t].i){
+        s[s[t - 2].i].i = h1;
+      }
+      else{
+        pc = ir.y;
+        t = t - 3;
+      }
+      break;
+
+      case 17:
+      h2 = s[t - 2].i;
+      h1 = s[h2].i - 1;
+      if (h1 >= s[t].i){
+        s[h2].i = h1;
+        pc = ir.y
+      }
+      else{
+        t = t - 3;
+      }
+      break;
+
+      case 18:
+      h1 = btab[tab[ir.y].ref].vsize;
+      if (t + h1 > stacksize){
+        ps = stkchk;
+      }
+      else{
+        t = t + 5;
+        s[t - 1].i = h1 - 1;
+        s[t].i = ir.y;
+      }
+      break;
+
+      case 19:
+      h1 = t - ir.y; //{h1 points to base}
+      h2 = s[h1 + 4].i; //{h2 points to tab}
+      h3 = tab[h2].lev;
+      display[h3 + 1] = h1;
+      h4 = s[h1 + 3].i + h1;
+      s[h1 + 1].i = pc;
+      s[h1 + 2].i = display[h3];
+      s[h1 + 3].i = b;
+
+      for (h3;  i < h4;  h3 = t + 1) {
+        s[h3].i = 0;
+      }
+
+      b = h1;
+      t = h4;
+      pc = tab[h2].adr
+      break;
+
+      case 20:
+      h1 = ir.y; //{h1 points to atab}
+      h2 = atab[h1].low;
+      h3 = s[t].i;
+      if (h3 < h2){
+        ps = inxchk;
+      }
+      else{
+        if (h3 > atab[h1].high){
+          ps = inxchk;
+        }
+        else{
+          t = t - 1;
+          s[t].i = s[t].i + (h3 - h2);
+        }
+      }
+      break;
+
+      case 21:
+      h1 = ir.y; //{h1 points to atab}
+      h2 = atab[h1].low;
+      h3 = s[t].i;
+      if (h3 < h2) {
+        ps = inxchk;
+      }
+      else{
+        if (h3 > atab[h1].high){
+          ps = inxchk;
+        }
+        else{
+          t = t - 1;
+          s[t].i = s[t].i + (h3 - h2) * atab[h1].elsize;
+        }
+      }
+      break;
+      case 22:
+      h1 = s[t].i;
+      t = t - 1;
+      h2 = ir.y + t;
+      if(h2 > stacksize){
+        ps = stkchk;
+      }
+      else
+      while (t < h2) {
+        t = t + 1;
+        s[t] = s[h1];
+        h1 = h1 + 1;
+      }
+      break;
+
+      case 23:
+      h1 = s[t - 1].i;
+      h2 = s[t].i;
+      h3 = h1 + ir.y;
+      while (h1 < h3){
+        s[h1] = s[h2];
+        h1 = h1 + 1;
+        h2 = h2 + 1;
+      }
+      t = t - 2;
+      break;
+
+      case 24:
+      t = t + 1;
+      if (t > stacksize){
+        ps = stkchk;
+      }
+      else{
+        s[t].i = ir.y;
+      }
+      break;
+
+      case 25:
+      t = t + 1;
+      if (t > stacksize){
+        ps = stkchk;
+      }
+      else{
+        s[t].r = rconst[ir.y];
+      }
+      break;
+
+      case 26:
+      h1 = t - ir.y;
+      s[h1].r = s[h1].i;
+      break;
+
+      case 27:
+      if (eof(InputFile)){
+        ps = redchk;
+      }
+      else{
+        switch (ir.y) {
+          case 1: read(InputFile, s[s[t].i].i); break;
+          case 2: read(InputFile, s[s[t].i].r); break;
+          case 4: read(InputFile, s[s[t].i].c); break;
+        }
+      }
+      t = t - 1;
+      break;
+
+      case 28:
+      h1 = s[t].i;
+      h2 = ir.y;
+      t = t - 1;
+      chrcnt = chrcnt + h1;
+      if (chrcnt > lineleng){
+        ps = lngchk;
+      }
+      do {
+        write(stab[h2]);
+        h1 = h1 - 1;
+        h2 = h2 + 1;
+      } while (h1 = 0);
+      break;
+
+      case 29:
+      chrcnt = chrcnt + fld[ir.y];
+      if (chrcnt > lineleng){
+        ps = lngchk;
+      }
+      else
+      switch (ir.y) {
+        case 1: write(s[t].i: fld[1]); break;
+        case 2: write(s[t].r: fld[2]); break;
+        case 3: write(s[t].b: fld[3]); break;
+        case 4: write(s[t].c);         break;
+      }
+      t = t - 1;
+      break;
+
+      case 30:
+      chrcnt = chrcnt + s[t].i;
+      if (chrcnt > lineleng){
+        ps = lngchk;
+      }
+      else{
+        switch (ir.y) {
+          case 1: write(s[t - 1].i: s[t].i); break;
+          case 2: write(s[t - 1].r: s[t].i); break;
+          case 3: write(s[t - 1].b: s[t].i); break;
+          case 4: write(s[t - 1].c: s[t].i); break;
+        }
+      }
+      t = t - 2;
+      break;
+      case 31:
+      ps = fin;
+      break;
+
+      case 32:
+      t = b - 1;
+      pc = s[b + 1].i;
+      b = s[b + 3].i
+      break;
+
+      case 33:
+      t = b;
+      pc = s[b + 1].i;
+      b = s[b + 3].i;
+      break;
+
+      case 34: s[t] = s[s[t].i]; break;
+      case 35: s[t].b = !s[t].b; break;
+      case 36: s[t].i = -s[t].i; break;
+
+      case 37:
+      chrcnt = chrcnt + s[t - 1].i;
+      if (chrcnt > lineleng) {
+        ps = lngchk;
+      }
+      else{
+        write(s[t - 2].r: s[t - 1].i: s[t].i);
+      }
+      t = t - 3;
+      break;
+
+      case 38:
+      s[s[t - 1].i] = s[t];
+      t = t - 2;
+      break;
+
+      case 39
+      t = t - 1;
+      s[t].b = s[t].r = s[t + 1].r;
+      break;
+
+      case 40:
+      t = t - 1;
+      s[t].b = s[t].r == s[t + 1].r;
+      break;
+
+      case 41:
+      t = t - 1;
+      s[t].b = s[t].r < s[t + 1].r;
+      break;
+
+      case 42:
+      t = t - 1;
+      s[t].b = s[t].r <= s[t + 1].r;
+      break;
+
+      case 43:
+      t = t - 1;
+      s[t].b = s[t].r > s[t + 1].r;
+      break;
+
+      case 44:
+      t = t - 1;
+      s[t].b = s[t].r >= s[t + 1].r;
+      break;
+
+      case 45:
+      t = t - 1;
+      s[t].b = s[t].i = s[t + 1].i;
+      break;
+
+      case 46:
+      t = t - 1;
+      s[t].b = s[t].i != s[t + 1].i;
+      break;
+
+      case 47:
+      t = t - 1;
+      s[t].b = s[t].i < s[t + 1].i;
+      break;
+
+      case 48:
+      t = t - 1;
+      s[t].b = s[t].i <= s[t + 1].i;
+      break;
+
+      case 49:
+      t = t - 1;
+      s[t].b = s[t].i > s[t + 1].i;
+      break;
+
+      case 50:
+      t = t - 1;
+      s[t].b = s[t].i >= s[t + 1].i;
+      break;
+
+      case 51:
+      t = t - 1;
+      s[t].b = s[t].b || s[t + 1].b;
+      break;
+
+      case 52:
+      t = t - 1;
+      s[t].i = s[t].i + s[t + 1].i;
+      break;
+
+      case 53:
+      t = t - 1;
+      s[t].i = s[t].i - s[t + 1].i;
+      break;
+
+      case 54:
+      t = t - 1;
+      s[t].r = s[t].r + s[t + 1].r;
+      break;
+
+      case 55:
+      t = t - 1;
+      s[t].r = s[t].r - s[t + 1].r;
+      break;
+
+      case 56:
+      t = t - 1;
+      s[t].b = s[t].b && s[t + 1].b;
+      break;
+
+      case 57:
+      t = t - 1;
+      s[t].i = s[t].i * s[t + 1].i;
+      break;
+
+      case 58:
+      t = t - 1;
+      if (s[t + 1].i = 0){
+        ps = divchk;
+      }
+      else{
+        s[t].i = s[t].i / s[t + 1].i;
+      }
+      break;
+
+      case 59:
+      t = t - 1;
+      if(s[t + 1].i = 0){
+        ps = divchk;
+      }
+      else{
+        s[t].i = s[t].i % s[t + 1].i;
+      }
+      break;
+
+      case 60:
+      t = t - 1;
+      s[t].r = s[t].r * s[t + 1].r;
+      break;
+
+      61:
+      t = t - 1;
+      s[t].r = s[t].r / s[t + 1].r;
+      break;
+
+      case 62:
+      if (eof(InputFile)){
+        ps = redchk;
+      }
+      else{
+        readln(InputFile);
+      }
+
+      case 63:
+      //      writeln;
+      lncnt = lncnt + 1;
+      chrcnt = 0;
+      if (lncnt > linelimit){
+        ps = linchk;
+      }
+    }//primeiro switch
+  }
+ while (ps != run);
+
+  if (ps <> fin){
+    //writeln;
+    //writeln;
+    write('halt at', pc: 5, ' because of ');
+    switch (ps) {
+      caschk: writeln('undefined case');   break;
+      divchk: writeln('division by 0');    break;
+      inxchk: writeln('invalid index');    break;
+      stkchk: writeln('storage overflow'); break;
+      linchk: writeln('too much output');  break;
+      lngchk: writeln('line too long');    break;
+      redchk: writeln('reading past end of file'); break;
+    }
+    h1 = b; blkcnt = 10; //{post mortem dump}
+    do {
+      //writeln;
+      blkcnt = blkcnt - 1;
+      if(blkcnt = 0){
+        h1 = 0;
+        h2 = s[h1 + 4].i;
+      }
+      if (h1 <> 0) {
+        writeln(' ', tab[h2].name, ' called at ', s[h1 + 1].i: 5);
+      }
+      h2 = btab[tab[h2].ref].last;
+      while (h2 <> 0) {
+        //  with tab[h2] do
+        if (obj == variable){
+          if (typ in stantyps){
+            write('    ', name, ' = ');
+            if (normal){
+              h3 = h1 + adr;
+            }
+            else{
+              h3 = s[h1 + adr].i;
+            }
+
+            switch (typ) {
+              case ints: writeln(s[h3].i: 10); break;
+              reals: writeln(s[h3].r);break
+              bools: writeln(s[h3].b: 10);break
+              chars: writeln(s[h3].c: 10);break
+            }
+          }
+        }
+        h2 = link;
+      }
+      h1 = s[h1 + 3].i;
+    } while (h1 < 0);
+  }
+
+  //writeln;
+  writeln(ocnt: 10, ' steps');
+ }

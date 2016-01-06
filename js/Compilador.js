@@ -1662,3 +1662,57 @@ function assignment(lv, ad);{
     }
   }
 }
+
+function compoundstatement(){
+  insymbol();
+  statement([semicolon, endsy] + fsys);
+  while (sy.indexOf([semicolon] + statbegsys) != -1) {
+    if (sy == semicolon){
+      insymbol();
+    }
+    else{
+      Error(14);
+      statement([semicolon, endsy] + fsys)
+    }
+    if(sy == endsy){
+      insymbol();
+    }
+    else{
+      Error(57);
+    }
+  }//fim while
+}//fim compoundstatement
+
+function ifstatement(){
+  var x;//tipo item
+  var lc1, lc2;
+
+  insymbol();
+  expression(fsys + [thensy, dosy], x);
+  if (!(x.typ.indexOf(["bools", "notyp"] != -1))){
+    Error(17);
+  }
+  lc1 = lc;
+   emit(11); //{jmpc}
+  if (sy == thensy){
+    insymbol();
+  }
+  else{
+    Error(52);
+    if (sy == dosy){
+      insymbol();
+    }
+  }
+  statement(fsys + [elsesy]);
+  if (sy == elsesy){
+    insymbol();
+    lc2 = lc;
+    emit(10);
+    kode[lc1].y = lc;
+    statement(fsys);
+    kode[lc2].y = lc;
+  }
+  else{
+    kode[lc1].y = lc;
+  }
+}

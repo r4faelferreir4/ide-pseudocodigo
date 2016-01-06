@@ -571,7 +571,7 @@ function block(fsys, isfun, level){
   }
   function test(s1, s2, n){
     if (s1.indexOf(sy) == -1){
-      skip([s1, s2], n);
+      skip(s1.concat(s2), n);
     }
   }
   function TestSemicolon(){
@@ -984,7 +984,227 @@ function procdeclaration(){
     insymbol();
   else
     Error(14);
-  
-}
+    var bool = (isfun)?1:0;
+    emit(32 + bool);
+  }//procdeclaration
+
+  function statement(fsys){
+    var i;
+
+    function selector(fsys, v){
+      var x, a, j;
+      do{
+        if (sy == "period"){
+          insymbol();
+          if (sy != "ident")
+            Error(2);
+          else {
+              if (v.typ != "records")
+                Error(31);
+                else {
+                  j = btab[v.ref].last;
+                  tab[0].name = id;
+                  while(tab[j].name != id)
+                    j = tab[j].link;
+                  if (j == 0)
+                    Error(0);
+                  v.typ = tab[j].typ;
+                  v.ref = tab[j].ref;
+                  a = tab[j].adr;
+                  if (a != 0)
+                  emit1(9, a);
+                }
+                insymbol();
+          }
+        }
+        else {    //Seletor do Array
+          if (sy != "lbrack")
+            Error(11);
+          do{
+            insymbol();
+            expression(fsys.concat(["comma", "rbrack"]), x);
+            if (v.typ != "arrays")
+              Error(28);
+            else {
+              a = v.ref;
+              if (atab[a].inxtyp != x.typ)
+                Error(26);
+              else
+                if (atab[a].elsize == 1)
+                  emit1(20, a);
+                else
+                  emit1(21, a);
+              v.typ = atab[a].eltyp;
+              v.ref = atab[a].elref;
+            }
+          }while(sy == "comma");
+          if (sy == "rbrack")
+            insymbol();
+          else {
+            Error(12);
+            if (sy == "rparent")
+              insymbol();
+          }
+        }
+    }while(["lbrack", "lparent", "period"].indexOf(sy) != -1);
+    test(fsys, "", 6);
+  }//Selector
+
+  function call(fsys, i){
+    var x, lastp, cp, k;
+    emit1(18, i);
+    lastp = btab[tab[i].ref].lastpar;
+    cp = i;
+    if (sy == "lparent"){
+      do{
+        insymbol();
+        if (cp >= lastcp)
+          Error(39);
+        else {
+          cp++;
+          if (tab[cp].normal){
+            expression(fsys.concat(["comma", "colon", "rparent"]), x);
+            if (x.typ == tab[cp].typ){
+              if (x.ref != tab[cp].ref)
+                Error(36);
+              else
+                if (x.typ == "arrays")
+                  emit1(22, atab[x.ref].size);
+                else
+                  if (x.typ == "records")
+                    emit1(22, btab[x.ref].vsize);
+            }
+            else
+              if (x.typ == "ints" && tab[cp].typ == "reals")
+                emit1(26,0);
+              else
+                if (x.typ != "notyp")
+                  Error(36);
+          }
+          else {
+            if (sy != "ident")
+              Error(2);
+            else {
+              k = loc(id);
+              insymbol();
+              if (k != 0){
+                if (tab[k].obj != "variable")
+                  Error(37);
+                x.typ = tab[k].typ;
+                x.ref = tab[k].ref;
+                if (tab[k].normal)
+                  emit2(1, tab[k].lev, tab[k].adr);
+                else
+                  emit2(1, tab[k].lev, tab[k].adr);
+                if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
+                  selector(fsys.concat(["comma", "colon", "rparent"]), x);
+                if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
+                  Error(36);
+              }
+            }
+          }
+        }
+        test(["comma", "rparent"], fsys, 6);
+      }while(sy == "comma");
+      if (sy == "rparent")
+        insymbol();
+      else
+        Error(4);
+    }
+    if (cp < lastcp)
+      Error(39);
+    emit1(19, btab[tab[i].ref].psize-1);
+    if (tab[i].lev < level)
+      emit2(3, tab[i].lev, level);
+  }//call
+
+  function resulttype(a, b){
+    if (type1.indexOf(a) > type1.indexOf("reals") || type1.indexOf(b) > type1.indexOf("reals")){
+      Error(33);
+      return "notyp";
+    }
+    else
+      if (a == "notyp" || b == "notyp")
+        return "notyp";
+      else
+        if (a == "ints")
+          if(b == "ints")
+            return "ints";
+          else {
+            return "reals";
+            emit1(26, 1);
+          }
+        else {
+          return "reals";
+          if (b == "ints")
+            emit1(26, 0);
+        }
+  }//resulttype
+
+  function expression(){
+    var y, op;
+
+    function simpleexpression(fsys, x){
+      var y, op;
+
+      function term(fsys, x){
+        var y, op;
+
+        function factor(fsys, x){
+          var i, f;
+
+          function standfct(n){
+            var ts;
+
+            if (sy == "lparent")
+              insymbol();
+            else
+              Error(9);
+            if (n < 17){
+              expression(fsys.concat["lparent"], x);
+              switch (n) {
+                case 0, 2:
+                    ts = ["ints", "reals"];
+                    tab[i].typ = x.typ;
+                    if (x.typ == "reals")
+                      n++;
+                  break;
+                case 4, 5:
+                  ts = ["ints"];
+                  break;
+                case 6:
+                  ts = ["ints", "bools", "chars"];
+                  break;
+                case 7, 8:
+                  ts = ["chars"];
+                  break;
+                case 9, 10, 11, 12, 13, 14, 15, 16:
+                  ts = ["ints", "reals"];
+                  if (x.typ == "ints")
+                    emit1(26,0);
+                  break;
+              }
+              if (ts.indexOf(x.typ) != -1)
+                emit1(8, n);
+              else
+                if (x.typ != "notyp")
+                  Error(48);
+            }
+            else {
+              if (sy != "ident")
+                Error(2);
+              else
+                if (id != "input     ")
+                  Error(0);
+                else
+                  insymbol();
+                emit1(8, n);
+            }
+          }
+        }
+      }
+    }
+  }
+
 
 }//block

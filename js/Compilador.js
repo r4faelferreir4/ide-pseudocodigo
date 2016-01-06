@@ -1554,7 +1554,7 @@ function interpret(){
       }
     }//primeiro switch
   }
- while (ps != run);
+  while (ps != run);
 
   if (ps <> fin){
     //writeln;
@@ -1583,8 +1583,8 @@ function interpret(){
       h2 = btab[tab[h2].ref].last;
       while (h2 <> 0) {
         //  with tab[h2] do
-        if (obj == variable){
-          if (typ in stantyps){
+        if (tab[h2].obj == variable){
+          if (tab[h2].typ in stantyps){
             write('    ', name, ' = ');
             if (normal){
               h3 = h1 + adr;
@@ -1593,7 +1593,7 @@ function interpret(){
               h3 = s[h1 + adr].i;
             }
 
-            switch (typ) {
+            switch (tab[h2].typ) {
               case ints: writeln(s[h3].i: 10); break;
               reals: writeln(s[h3].r);break
               bools: writeln(s[h3].b: 10);break
@@ -1609,4 +1609,56 @@ function interpret(){
 
   //writeln;
   writeln(ocnt: 10, ' steps');
- }
+}
+
+function assignment(lv, ad);{
+  var x, y;
+  var f;
+
+  x.typ = tab[i].typ;
+  x.ref = tab[i].ref;
+
+  if (tab[i].normal){
+    f = 0;
+  }
+  else{
+    f = 1;
+  }
+  emit2(f, lv, ad);
+  if (["lbrack","lparent","period"].indexOf(sy) != -1){
+    selector([becomes, eql] + fsys, x);
+  }
+
+  if (sy == becmes) {
+    insymbol();
+  }else{
+    Error(51);
+    if (sy = eql){
+      insymbol();
+    }
+  }
+  expression(fsys, y);
+
+  if (x.typ == y.typ) {
+    if (x.typ.indexOf(stantyps) != 1) {
+      emit(38)
+    }else{
+      if (x.ref != y.ref) {
+        Error(46);
+      } else {
+        if (x.typ -= arrays)
+        emit1(23, atab[x.ref].size);
+        else
+        emit1(23, btab[x.ref].vsize);
+      }
+    }
+  }else{
+    if ((x.typ = reals) && (y.typ = ints)){
+      emit1(26, 0);
+      emit(38);
+    }else{
+      if ((x.typ <> notyp) && (y.typ <> notyp))
+      Error(46);
+    }
+  }
+}

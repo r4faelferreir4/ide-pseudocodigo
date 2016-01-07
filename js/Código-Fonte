@@ -1639,13 +1639,13 @@ var
               emit1(23, atab[x.ref].size)
             else
               emit1(23, btab[x.ref].vsize)
-          else
-            if (x.typ = reals) and (y.typ = ints) then
-            begin emit1(26, 0); emit(38)
-            end
-            else
-              if (x.typ <> notyp) and (y.typ <> notyp) then
-                Error(46)
+      else
+        if (x.typ = reals) and (y.typ = ints) then
+          begin emit1(26, 0); emit(38)
+        end
+        else
+          if (x.typ <> notyp) and (y.typ <> notyp) then
+            Error(46)
     end {assignment};
 
     procedure compoundstatement;

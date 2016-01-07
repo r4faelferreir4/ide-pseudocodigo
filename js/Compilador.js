@@ -105,7 +105,7 @@ function compiladorPascalS(){
 
 
 
-}
+
 
 //DEFINIÇÕES DE FUNÇÕES FALTANDO
 
@@ -1201,20 +1201,340 @@ function block(fsys, isfun, level){
                   insymbol();
                 emit1(8, n);
             }
+            x.typ = tab[i].typ;
+            if (sy == "lparent")
+              insymbol();
+            else
+              Error(4);
+          }
+
+          x.typ = "notyp";
+          x.ref = 0;
+          test(facbegsys, fsys, 58);
+          while (facbegsys.indexOf(sy) != -1){
+            if (sy == "ident"){
+              i = loc(id);
+              insymbol();
+              switch (tab[i].obj) {
+                case "konstant":
+                  x.typ = tab[i].typ;
+                  x.ref = 0;
+                  if (x.typ == "reals")
+                    emit1(25, tab[i].adr);
+                  else
+                    emit1(24, tab[i].adr);
+                  break;
+                case "variable":
+                  x.typ = tab[i].typ;
+                  x.ref = tab[i].ref;
+                  if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+                    if (tab[i].normal)
+                      f = 0;
+                    else
+                      f = 1;
+                    emit2(f, tab[i].lev, tab[i].adr);
+                    selector(fsys, x);
+                    if (stantyps.indexOf(x.typ) != -1)
+                      emit(34);
+                  }
+                  else {
+                    if (stantyps.indexOf(x.typ) != -1)
+                      if(tab[i].normal)
+                        f = 1;
+                      else
+                        f = 2;
+                    else
+                      if (tab[i].normal)
+                        f = 0;
+                      else
+                        f = 1;
+                    emit2(f, tab[i].lev, tab[i].adr);
+                  }
+                  break;
+                "type1", "prozedure":
+                  Error(44);
+                  break;
+                "funktion":
+                  x.typ = tab[i].typ;
+                  if (tab[i].lev != 0)
+                    call(fsys,i);
+                  else
+                    standfct(tab[i].adr);
+                  break;
+              }
+            }
+            else
+              if (["charcon", "intcon", "realcon"].indexOf(sy) != -1){
+                if (sy == "realcon"){
+                  x.typ = "reals";
+                  EnterReal(rnum);
+                  emit1(25, c1);
+                }
+                else {
+                  if (sy == "charcon")
+                    x.typ = "chars";
+                  else
+                    x.typ = "ints";
+                  emit1(24, inum);
+                }
+                x.ref = 0;
+                insymbol();
+              }
+              else
+                if (sy == "lparent"){
+                  insymbol();
+                  expression(fsys.concat(["lparent"]), x);
+                  if (sy == "lparent")
+                    insymbol();
+                  else
+                    Error(4);
+                }
+                else
+                  if (sy == "notsy"){
+                    insymbol();
+                    factor(fsys, x);
+                    if (x.typ == "bools")
+                      emit(35);
+                    else
+                      if (x.typ !- "notyp")
+                        Error(32);
+                  }
+                test(fsys, facbegsys, 6);
+          }
+        } //factor
+
+        factor(fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), x);
+        while (["times", "rdiv", "idiv", "imod", "andsy"].indexOf(sy) != -1){
+          op = sy;
+          insymbol();
+          factor (fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), y);
+          if (op == "times"){
+            x.typ = resulttype(x.typ, y.typ);
+            switch (x.typ) {
+              case "ints":  emit(57);
+              case "reals": emit(60);
+            }
+          }
+          else
+            if(op == "rdiv"){
+              if (x.typ == "ints"){
+                emit1(26,1);
+                x.typ = "reals";
+              }
+              if(y.typ == "ints"){
+                emit1(26,0);
+                y.typ = "reals";
+              }
+              if (x.typ == "reals" && y.typ == "reals")
+                emit(61);
+              else {
+                if (x.typ != "notyp" && y.typ != "notyp")
+                  Error(33);
+                x.typ = "notyp";
+              }
+            }
+            else
+              if (op == "andsy"){
+                if (x.typ == "bools" && y.typ == "bools")
+                  emit(56);
+                else {
+                  if (x.typ != "notyp" && y.typ != "notyp")
+                    Error(32);
+                  x.typ = "notyp";
+                }
+              }
+              else {
+                if (x.typ == "ints" && y.typ == "ints")
+                  if (op == "idiv")
+                    emit(58);
+                  else
+                    emit(59);
+                else {
+                  if (x.typ != "notyp" && y.typ != "notyp")
+                    Error(34);
+                  x.typ = "notyp";
+                }
+              }
+        }
+      }//term
+
+      if (["plus", "minus"].indexOf(sy) != -1){
+        op = sy;
+        insymbol();
+        term(fsys.concat(["plus", "minus"]), x);
+        if (types1.indexOf(x.typ) > types1.indexOf("reals"))
+          Error(33);
+        else
+          if (op == "minus")
+            emit(36);
+      }
+      else
+        term(fsys.concat(["plus", "minus", "orsy"]), x);
+      while (["plus", "minus", "orsy"].indexOf(sy) != -1){
+        op = sy;
+        insymbol();
+        term(fsys.concat(["plus", "minus", "orsy"]), y);
+        if (op == "orsy"){
+          if (x.typ == "bools" && y.typ == "bools")
+            emit(51);
+          else {
+            if (x.typ != "notyp" && y.typ != "notyp")
+              Error(32);
+            x.typ = "notyp";
+          }
+        }
+        else {
+          x.typ = resulttype(x.typ, y.typ);
+          switch (x.typ) {
+            case "ints":
+              if (op == "plus")
+                emit(52);
+              else
+                emit(53);
+              break;
+            case "reals":
+              if (op == "plus")
+                emit(54);
+              else
+                emit(55);
+              break;
           }
         }
       }
+    }//simpleexpression
+
+    simpleexpression(fsys.concat(["eql", "neq", "lss", "leq", "gtr", "geq"]), x);
+    if (["eql", "neq", "lss", "leq", "gtr", "geq"].indexOf(sy) != -1){
+      op = sy;
+      insymbol();
+      simpleexpression(fsys, y);
+      if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) && x.typ == y.typ)
+      switch (op) {
+        "eql": emit(45);break;
+        "neq": emit(46);break.
+        "lss": emit(47);break;
+        "leq": emit(48);break;
+        "gtr": emit(49);break;
+        "geq": emit(50);break;
+      }
+      else {
+        if (x.typ == "ints"){
+          x.typ = "reals";
+          emit1(26,1);
+        }
+        else
+          if(y.typ == "ints"){
+            y.typ = "reals";
+            emit1(26,0);
+          }
+        if (x.typ == "reals" && y.typ == "reals")
+          switch (op) {
+            "eql": emit(39);break;
+            "neq": emit(40);break;
+            "lss": emit(41);break;
+            "leq": emit(42);break;
+            "gtr": emit(43);break;
+            "geq": emit(44);break;
+          }
+        else
+          Error(35);
+      }
+      x.typ = "bools";
     }
+  }//expression
+
+  function assignment(lv, ad){
+    var x, y, f;
+    x.typ = tab[i].typ;
+    x.ref = tab[i].ref;
+    if (tab[i].normal)
+      f = 0;
+    else
+      f = 1;
+    emit2(f, lv, ad);
+    if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
+      selector(["becomes", "eql"].concat(fsys), x);
+    if (sy == "becomes")
+      insymbol();
+    else {
+      Error(51);
+      if (sy == "eql")
+        insymbol();
+    }
+    expression(fsys, y);
+    if (x.typ == y.typ)
+      if (stantyps.indexOf(x.typ) != -1)
+        emit(38);
+      else
+        if(x.ref != y.ref)
+          Error(46);
+        else
+          if (x.typ == "arrays")
+            emit1(23, atab[x.ref].size);
+          else
+            emit1(23, btab[x.ref].vsize);
+    else
+      if (x.typ == "reals" && y.typ == "ints"){
+        emit1(26,0);
+        emit(38);
+      }
+      else
+        if (x.typ != "notyp" && y.typ != "notyp")
+          Error(46);
+  }//assignment
+
+  function compoundstatement(){
+    insymbol();
+    statement(["semicolon", "endsy"].concat(fsys));
+    while (["semicolon"].concat(statbegsys).indexOf(sy) != -1){
+      if (sy == "semicolon")
+        insymbol();
+      else
+        Error(14);
+      statement(["semicolon", "endsy"].concat(fsys));
+    }
+    if (sy == "endsy")
+      insymbol();
+    else
+      Error(57);
+  }//compoundstatement
+
+  function ifstatement(){
+    var x, lc1, lc2;
+    insymbol();
+    expression(fsys.concat(["thensy", "dosy"]), x);
+    if (["bools", "notyp"].indexOf(x.typ) == -1)
+      Error(17);
+    lc1 = lc;
+    emit(11);
+    if (sy == "thensy")
+      insymbol();
+    else {
+      Error(52);
+      if (sy == "dosy")
+        insymbol;
+    }
+    statement(fsys.concat(["elsesy"]));
+    if (sy == "elsesy");{
+      insymbol();
+      lc2 = lc;
+      emit(10);
+      kode[lc1].y = lc;
+      statement(fsys);
+      kode[lc2].y = lc;
+    }
+    else
+      kode[lc1].y = lc;
   }
 
-=======
+
 
   }
->>>>>>> origin/master
+
 
 }//block
 
-function interpret(){
+  function interpret(){
   var ir; //buffer de instrução
   var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
   var ps = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
@@ -1834,110 +2154,5 @@ function interpret(){
 
   //writeln;
   writeln(ocnt: 10, ' steps');
-}
-
-function assignment(lv, ad);{
-  var x, y;
-  var f;
-
-  x.typ = tab[i].typ;
-  x.ref = tab[i].ref;
-
-  if (tab[i].normal){
-    f = 0;
-  }
-  else{
-    f = 1;
-  }
-  emit2(f, lv, ad);
-  if (["lbrack","lparent","period"].indexOf(sy) != -1){
-    selector([becomes, eql] + fsys, x);
-  }
-
-  if (sy == becmes) {
-    insymbol();
-  }else{
-    Error(51);
-    if (sy = eql){
-      insymbol();
-    }
-  }
-  expression(fsys, y);
-
-  if (x.typ == y.typ) {
-    if (x.typ.indexOf(stantyps) != 1) {
-      emit(38)
-    }else{
-      if (x.ref != y.ref) {
-        Error(46);
-      } else {
-        if (x.typ -= arrays)
-        emit1(23, atab[x.ref].size);
-        else
-        emit1(23, btab[x.ref].vsize);
-      }
-    }
-  }else{
-    if ((x.typ = reals) && (y.typ = ints)){
-      emit1(26, 0);
-      emit(38);
-    }else{
-      if ((x.typ <> notyp) && (y.typ <> notyp))
-      Error(46);
-    }
-  }
-}
-
-function compoundstatement(){
-  insymbol();
-  statement([semicolon, endsy] + fsys);
-  while (sy.indexOf([semicolon] + statbegsys) != -1) {
-    if (sy == semicolon){
-      insymbol();
-    }
-    else{
-      Error(14);
-      statement([semicolon, endsy] + fsys)
-    }
-    if(sy == endsy){
-      insymbol();
-    }
-    else{
-      Error(57);
-    }
-  }//fim while
-}//fim compoundstatement
-
-function ifstatement(){
-  var x;//tipo item
-  var lc1, lc2;
-
-  insymbol();
-  expression(fsys + [thensy, dosy], x);
-  if (!(x.typ.indexOf(["bools", "notyp"] != -1))){
-    Error(17);
-  }
-  lc1 = lc;
-   emit(11); //{jmpc}
-  if (sy == thensy){
-    insymbol();
-  }
-  else{
-    Error(52);
-    if (sy == dosy){
-      insymbol();
-    }
-  }
-  statement(fsys + [elsesy]);
-  if (sy == elsesy){
-    insymbol();
-    lc2 = lc;
-    emit(10);
-    kode[lc1].y = lc;
-    statement(fsys);
-    kode[lc2].y = lc;
-  }
-  else{
-    kode[lc1].y = lc;
-  }
-}
+  }//interpret
+}//Compilador PascalS

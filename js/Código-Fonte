@@ -1645,7 +1645,7 @@ var
         end
         else
           if (x.typ <> notyp) and (y.typ <> notyp) then
-            Error(46)
+                Error(46)
     end {assignment};
 
     procedure compoundstatement;

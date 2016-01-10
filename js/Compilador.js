@@ -1535,7 +1535,7 @@ function compiladorPascalS(){
   }//block
 
   function casestatement(){
-    
+
     var x;
     var i, j, k, lc1;
 
@@ -2107,37 +2107,37 @@ function compiladorPascalS(){
         break;
 
         case 49:
-        t = t - 1;
+        t--;
         s[t].b = s[t].i > s[t + 1].i;
         break;
 
         case 50:
-        t = t - 1;
+        t--;
         s[t].b = s[t].i >= s[t + 1].i;
         break;
 
         case 51:
-        t = t - 1;
+        t--;
         s[t].b = s[t].b || s[t + 1].b;
         break;
 
         case 52:
-        t = t - 1;
+        t--;
         s[t].i = s[t].i + s[t + 1].i;
         break;
 
         case 53:
-        t = t - 1;
+        t--;
         s[t].i = s[t].i - s[t + 1].i;
         break;
 
         case 54:
-        t = t - 1;
+        t--;
         s[t].r = s[t].r + s[t + 1].r;
         break;
 
         case 55:
-        t = t - 1;
+        t--;
         s[t].r = s[t].r - s[t + 1].r;
         break;
 
@@ -2147,14 +2147,14 @@ function compiladorPascalS(){
         break;
 
         case 57:
-        t = t - 1;
+        t--;
         s[t].i = s[t].i * s[t + 1].i;
         break;
 
         case 58:
-        t = t - 1;
-        if (s[t + 1].i = 0){
-          ps = divchk;
+        t--;
+        if (s[t + 1].i == 0){
+          ps = 'divchk';
         }
         else{
           s[t].i = s[t].i / s[t + 1].i;
@@ -2162,9 +2162,9 @@ function compiladorPascalS(){
         break;
 
         case 59:
-        t = t - 1;
-        if(s[t + 1].i = 0){
-          ps = divchk;
+        t--;
+        if(s[t + 1].i == 0){
+          ps = 'divchk';
         }
         else{
           s[t].i = s[t].i % s[t + 1].i;
@@ -2172,18 +2172,18 @@ function compiladorPascalS(){
         break;
 
         case 60:
-        t = t - 1;
+        t--;
         s[t].r = s[t].r * s[t + 1].r;
         break;
 
         61:
-        t = t - 1;
+        t--;
         s[t].r = s[t].r / s[t + 1].r;
         break;
 
         case 62:
         if (eof(InputFile)){
-          ps = redchk;
+          ps = 'redchk';
         }
         else{
           readln(InputFile);
@@ -2191,46 +2191,47 @@ function compiladorPascalS(){
 
         case 63:
         //      writeln;
-        lncnt = lncnt + 1;
+        lncnt++;
         chrcnt = 0;
         if (lncnt > linelimit){
-          ps = linchk;
+          ps = 'linchk';
         }
       }//primeiro switch
     }
     while (ps != run);
 
-    if (ps <> fin){
+    if (ps.indexOf("fin") == -1){
       //writeln;
       //writeln;
-      write('halt at', pc: 5, ' because of ');
+      write('halt at'+'     '+ pc+ ' because of ');
       switch (ps) {
-        caschk: writeln('undefined case');   break;
-        divchk: writeln('division by 0');    break;
-        inxchk: writeln('invalid index');    break;
-        stkchk: writeln('storage overflow'); break;
-        linchk: writeln('too much output');  break;
-        lngchk: writeln('line too long');    break;
-        redchk: writeln('reading past end of file'); break;
+        'caschk': console.log('undefined case');   break;
+        'divchk': console.log('division by 0');    break;
+        'inxchk': console.log('invalid index');    break;
+        'stkchk': console.log('storage overflow'); break;
+        'linchk': console.log('too much output');  break;
+        'lngchk': console.log('line too long');    break;
+        'redchk': console.log('reading past end of file'); break;
       }
-      h1 = b; blkcnt = 10; //{post mortem dump}
+      h1 = b;
+      blkcnt = 10; //{post mortem dump}
       do {
         //writeln;
-        blkcnt = blkcnt - 1;
-        if(blkcnt = 0){
+        blkcnt--;
+        if(blkcnt == 0){
           h1 = 0;
           h2 = s[h1 + 4].i;
         }
-        if (h1 <> 0) {
-          writeln(' ', tab[h2].name, ' called at ', s[h1 + 1].i: 5);
+        if (h1 != 0) {
+          console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1].i);
         }
         h2 = btab[tab[h2].ref].last;
-        while (h2 <> 0) {
+        while (h2 != 0) {
           //  with tab[h2] do
-          if (tab[h2].obj == variable){
-            if (tab[h2].typ in stantyps){
+          if (tab[h2].obj == 'variable'){
+            if (stantyps.indexOf(tab[h2].typ) != -1){
               write('    ', name, ' = ');
-              if (normal){
+              if (tab[h2].normal){
                 h3 = h1 + adr;
               }
               else{
@@ -2238,10 +2239,10 @@ function compiladorPascalS(){
               }
 
               switch (tab[h2].typ) {
-                case ints: writeln(s[h3].i: 10); break;
-                reals: writeln(s[h3].r);break
-                bools: writeln(s[h3].b: 10);break
-                chars: writeln(s[h3].c: 10);break
+                case 'ints': console.log("          "+s[h3].i); break;
+                'reals': console.log(s[h3].r);break
+                'bools': console.log("         "+s[h3].b);break
+                'chars': console.log("        "+s[h3].c);break
               }
             }
           }
@@ -2408,8 +2409,22 @@ function compiladorPascalS(){
     if (errs.length == 0){
       console.log("Compilação concluída com sucesso!");
       if (iflag){
-        
+        /*WriteLn('input data on file ? ');
+         Reset(InputFile);
+         Read(xname);
+         Assign(InputFile,xname);
+         Reset(InputFile);
+         If eof(InputFile) Then
+           WriteLn(' input data missing')*/
+
+
       }
+      interpret();
     }
+    else
+      ErrorMsg();
+
+    99:
+      //readln();
 
 }//Compilador PascalS

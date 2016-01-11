@@ -76,19 +76,19 @@ var typebegsys;
 var blockbegsys;
 var facbegsys;
 var statbegsys;
-var key[alfa.length()][nkw.length()];   //Tipo alfa não especificado, lembrar de tratar isso depois
+var key=[alfa.length()][nkw.length()];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [nkw];   //Tipo symbol não especificado, lembrar de tratar isso depois
 var sps = symbol;      //Simbolos especiais, tipo symbol não especificado
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
 var display = [lmax];
-var tab[tmax] = {name: alfa, link: index, obj: object2, typ: types, ref: index, normal: boolean, lev: new Array(lmax), adr}  //Identificador de tabela
-var atab[amax] = {inxtyp: types, eltyp: types, elref: index, low: index, high: index, elsize: index, size: index }
-var btab[bmax] = {last: index, lastpar: index, psize: index, vsize: index}
+var tab=[tmax] = {name: alfa, link: index, obj: object2, typ: types, ref: index, normal: boolean, lev: new Array(lmax), adr}  //Identificador de tabela
+var atab=[amax] = {inxtyp: types, eltyp: types, elref: index, low: index, high: index, elsize: index, size: index }
+var btab=[bmax] = {last: index, lastpar: index, psize: index, vsize: index}
 var stab = [smax];
 var rconst = [c2max];
-var kode[xmax];
+var kode=[xmax];
 var indexfile = 0;  //Índice para navegar na string do código
 var indexline = 0; //Índice para navegar entre as linhas
 var indexmax;  //Tamanho total do código
@@ -96,7 +96,7 @@ var indexmax;  //Tamanho total do código
 function compiladorPascalS(){
 
   indexmax = InputFile.length()
-  //InputFile.split("\n");    //Dividindo o código pelas linhas
+  InputFile.split("\n");    //Dividindo o código pelas linhas
 
   AppEnd:
   console.log("Aplicação finalizada!");
@@ -145,7 +145,7 @@ function compiladorPascalS(){
     console.log("\n");
     console.log(" palavras chave");
     while (errs[0] != NULL){        //Verificação se o vetor está vázio.
-      while !(k < ermax && k > 0)  //Verificação de k está entre os valores de erro cadastrados
+      while (!(k < ermax && k > 0))  //Verificação de k está entre os valores de erro cadastrados
       k++;
       console.log(k + "   " + Msg[k]);  //Exibindo erro no console
       errs.splice(errs.indexOf(k), 1);  //Localiza o erro que foi exibido e elimina-o da lista de erros
@@ -160,7 +160,7 @@ function compiladorPascalS(){
         console.log('');
         console.log(' programa incompleto');
         ErrorMsg(); //  { goto 99;} vai para linha 99? - Não, está em um comentário
-        continue AppEnd;//Retorna para a função principal e encerra a aplicação
+        //continue;// AppEnd();//Retorna para a função principal e encerra a aplicação
       }
       if (errpos != 0) {
         console.log('');
@@ -206,7 +206,7 @@ function compiladorPascalS(){
     Msg[4] = "arranjos";   Msg[5] = "niveis";
     Msg[6] = "código";   Msg[7] = "strings";
     console.log("Tabela do compilador para"+ Msg[n] +"é muito pequena");
-    continue AppEnd;    //Termina compilação.
+   // continue AppEnd;    //Termina compilação.
   }
 
   function insymbol(){      //Lê o próximo simbolo
@@ -250,7 +250,7 @@ function compiladorPascalS(){
           do{
             while((s%2) == 0){      //Verifica se é par
               s = s / 2;
-              d = d ** 2;
+              d = Math.pow(d,2);
             }
             s--;
             t = d * t;
@@ -264,7 +264,7 @@ function compiladorPascalS(){
       }
     }
 
-    1: while(ch == " ")
+    _1: while(ch == " ")
     NextCh();
     if(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z"){
       k = 0;
@@ -381,12 +381,12 @@ function compiladorPascalS(){
           break;
           case "\"\"":
           k = 0;
-          2:
+          _2:
           NextCh();
           if (ch == "\"\""){
             NextCh();
-            if (ch != "\"\"")
-            goto 3;
+            //if (ch != "\"\"")
+            // /////////////////////////continue _3;
           }
           if ((sx + k) == smax)
           fatal(7);
@@ -395,8 +395,8 @@ function compiladorPascalS(){
           if (cc == 1)    //fim da linha
           k = 0;
           else
-          goto 2;
-          3:
+          //////continue _2;
+          _3:
           if (k == 1){
             sy = "charcon";
             inum = stab[sx].charCodeAt(0);
@@ -426,7 +426,7 @@ function compiladorPascalS(){
               NextCh();
             }while(ch != ")");
             NextCh();
-            goto 1;
+            ////////continue _1;
           }
           break;
           case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
@@ -434,9 +434,9 @@ function compiladorPascalS(){
           NextCh();
           break;
           default:
-          Error(24);]
+          Error(24);
           NextCh();
-          goto 1;
+          ///////////goto _1;
         }
       }
     }
@@ -890,7 +890,7 @@ function compiladorPascalS(){
       var c = conrec;
       insymbol();
       test(["ident"], blockbegsys, 2);
-      whie(sy == "ident"){
+      while(sy == "ident"){
         enter(id, "konstant");
         insymbol();
         if (sy == "eql" )
@@ -984,7 +984,6 @@ function compiladorPascalS(){
       insymbol();
       else
       Error(14);
-      <<<<<<< HEAD
       var bool = (isfun)?1:0;
       emit(32 + bool);
     }//procdeclaration
@@ -1251,10 +1250,10 @@ function compiladorPascalS(){
                       emit2(f, tab[i].lev, tab[i].adr);
                     }
                     break;
-                    "type1", "prozedure":
+                    case "type1", "prozedure":
                     Error(44);
                     break;
-                    "funktion":
+                    case "funktion":
                     x.typ = tab[i].typ;
                     if (tab[i].lev != 0)
                     call(fsys,i);
@@ -1296,7 +1295,7 @@ function compiladorPascalS(){
                   if (x.typ == "bools")
                   emit(35);
                   else
-                  if (x.typ !- "notyp")
+                  if (x.typ != "notyp")
                   Error(32);
                 }
                 test(fsys, facbegsys, 6);
@@ -1410,12 +1409,12 @@ function compiladorPascalS(){
           simpleexpression(fsys, y);
           if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) && x.typ == y.typ)
           switch (op) {
-            "eql": emit(45);break;
-            "neq": emit(46);break.
-            "lss": emit(47);break;
-            "leq": emit(48);break;
-            "gtr": emit(49);break;
-            "geq": emit(50);break;
+            case "eql": emit(45);break;
+            case "neq": emit(46);break;
+            case "lss": emit(47);break;
+            case "leq": emit(48);break;
+            case "gtr": emit(49);break;
+            case "geq": emit(50);break;
           }
           else {
             if (x.typ == "ints"){
@@ -1429,12 +1428,12 @@ function compiladorPascalS(){
             }
             if (x.typ == "reals" && y.typ == "reals")
             switch (op) {
-              "eql": emit(39);break;
-              "neq": emit(40);break;
-              "lss": emit(41);break;
-              "leq": emit(42);break;
-              "gtr": emit(43);break;
-              "geq": emit(44);break;
+              case "eql": emit(39);break;
+              case "neq": emit(40);break;
+              case "lss": emit(41);break;
+              case "leq": emit(42);break;
+              case "gtr": emit(43);break;
+              case "geq": emit(44);break;
             }
             else
             Error(35);
@@ -1515,7 +1514,7 @@ function compiladorPascalS(){
           insymbol;
         }
         statement(fsys.concat(["elsesy"]));
-        if (sy == "elsesy");{
+        if (sy == "elsesy"){
           insymbol();
           lc2 = lc;
           emit(10);
@@ -1641,8 +1640,8 @@ function compiladorPascalS(){
     var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
     "lngchk", "redchk"];
     var t; //index do top da pilha
-    var b: //index base
-    h1, h2, h3, h4: integer;
+    var b; //index base
+    var h1, h2, h3, h4;
     var fld = new Array(4);//tamano padrão dos campos
     var display = new Array(lmax);
     var s = new Array(stacksize);
@@ -1729,30 +1728,30 @@ function compiladorPascalS(){
           case 3: s[t].r = Math.pow(s[t].r, 2); break;
           case 4: s[t].b = (s[t].i%2) != 0; break;
           case 5:
-          if (s[t].i < 0) or (s[t].i > 63){
+          if (s[t].i < 0 || s[t].i > 63){
             ps = 'inxchk';
           }
           else
             s[t].c = String.fromCharCode(s[t].i);
           break;
           case 6: s[t].i = s[t].c.charCodeAt();  break;
-          case 7: s[t].c =
+          case 7:
           var c = s[t].c.charCodeAt();
           c++;
           s[t].c = String.fromCharCode(c);
             break;
-          case 8: s[t].c =
+          case 8:
           var c = s[t].c.charCodeAt();
           c--;
           s[t].c = String.fromCharCode(c);
             break;
           case 9: s[t].i = Math.round(s[t].r); break;
           case 10: s[t].i = Math.floor(s[t].r); break;
-          case 11: s[t].r = Math.sin(s[t].r) break;
+          case 11: s[t].r = Math.sin(s[t].r); break;
           case 12: s[t].r = Math.cos(s[t].r); break;
           case 13: s[t].r = Math.exp(s[t].r); break;
           case 14: s[t].r = Math.log(s[t].r); break;
-          case 15: s[t].r = Math.sqrt(s[t].r) break;
+          case 15: s[t].r = Math.sqrt(s[t].r); break;
           case 16: s[t].r = Math.atan(s[t].r); break;
           /*case 17:
           if (t > stacksize){
@@ -2056,7 +2055,7 @@ function compiladorPascalS(){
           ps = 'lngchk';
         }
         else{
-          console.log(s[t - 2].r: s[t - 1].i: s[t].i);
+          console.log("     "+s[t - 2].r+ s[t - 1].i: s[t].i);
         }
         t = t - 3;
         break;
@@ -2418,7 +2417,7 @@ function compiladorPascalS(){
 
     if (errs.length == 0){
       console.log("Compilação concluída com sucesso!");
-      if (iflag){
+      /*if (iflag){
         /*WriteLn('input data on file ? ');
          Reset(InputFile);
          Read(xname);
@@ -2426,15 +2425,12 @@ function compiladorPascalS(){
          Reset(InputFile);
          If eof(InputFile) Then
            WriteLn(' input data missing')*/
-
-
-      }
+      }*/
       interpret();
     }
     else
       ErrorMsg();
 
-    99:
+    //99:
       //readln();
-
-}//Compilador PascalS
+}//CompiladorPascalS

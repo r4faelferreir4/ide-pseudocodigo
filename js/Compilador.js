@@ -96,7 +96,7 @@ var indexmax;  //Tamanho total do código
 function compiladorPascalS(){
 
   indexmax = InputFile.length()
-  InputFile.split("\n");    //Dividindo o código pelas linhas
+  //InputFile.split("\n");    //Dividindo o código pelas linhas
 
   AppEnd:
   console.log("Aplicação finalizada!");
@@ -167,7 +167,7 @@ function compiladorPascalS(){
         errpos = 0; //errpos := 0
       }
 
-      console.log(lc:5)//write(lc: 5, '  ');
+      console.log("     "+lc)//write(lc: 5, '  ');
       ll = 0;//ll := 0;
       cc = 0;//cc := 0;
       while (InputFile.charAt(indexfile) != "\n") {   //Verifica se chegou ao final da linha
@@ -1675,13 +1675,13 @@ function compiladorPascalS(){
     fld[4] = 1;
     do {
       ir = kode[pc];
-      pc = pc + 1;
-      ocnt = ocnt + 1;
+      pc++;
+      ocnt++;
       switch(ir.f){
         case 0:
-        t = t + 1;
+        t++;
         if (t > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else{
           s[t].i = display[ir.x] + ir.y;
@@ -1691,7 +1691,7 @@ function compiladorPascalS(){
         case 1:
         t = t + 1;
         if (t > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else{
           s[t] = s[display[ir.x] + ir.y];
@@ -1700,9 +1700,9 @@ function compiladorPascalS(){
         break;
 
         case 2:
-        t = t + 1;
+        t++;
         if (t > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else{
           s[t] = s[s[display[ir.x] + ir.y].i];
@@ -1715,7 +1715,7 @@ function compiladorPascalS(){
         h3 = b;
         do{
           display[h1] = h3;
-          h1 = h1 - 1;
+          h1--;
           h3 = s[h3 + 2].i
         }
         while( h1 == h2);
@@ -1723,28 +1723,38 @@ function compiladorPascalS(){
 
         case 8:
         switch (ir.y) {
-          case 0: s[t].i = abs(s[t].i); break;
-          case 1: s[t].r = abs(s[t].r); break;
-          case 2: s[t].i = sqr(s[t].i); break;
-          case 3: s[t].r = sqr(s[t].r); break;
-          case 4: s[t].b = odd(s[t].i); break;
+          case 0: s[t].i = Math.abs(s[t].i); break;
+          case 1: s[t].r = Math.abs(s[t].r); break;
+          case 2: s[t].i = Math.pow(s[t].i, 2); break;
+          case 3: s[t].r = Math.pow(s[t].r, 2); break;
+          case 4: s[t].b = (s[t].i%2) != 0; break;
           case 5:
           if (s[t].i < 0) or (s[t].i > 63){
-            ps = inxchk;
+            ps = 'inxchk';
           }
+          else
+            s[t].c = String.fromCharCode(s[t].i);
           break;
-          case 6: s[t].i = ord(s[t].c);  break;
-          case 7: s[t].c = succ(s[t].c); break;
-          case 8: s[t].c = pred(s[t].c); break;
-          case 9: s[t].i = round(s[t].r); break;
-          case 10: s[t].i = trunc(s[t].r); break;
-          case 11: s[t].r = sin(s[t].r) break;
-          case 12: s[t].r = cos(s[t].r); break;
-          case 13: s[t].r = exp(s[t].r); break;
-          case 14: s[t].r = ln(s[t].r); break;
-          case 15: s[t].r = sqrt(s[t].r) break;
-          case 16: s[t].r = arctan(s[t].r); break;
-          case 17:
+          case 6: s[t].i = s[t].c.charCodeAt();  break;
+          case 7: s[t].c =
+          var c = s[t].c.charCodeAt();
+          c++;
+          s[t].c = String.fromCharCode(c);
+            break;
+          case 8: s[t].c =
+          var c = s[t].c.charCodeAt();
+          c--;
+          s[t].c = String.fromCharCode(c);
+            break;
+          case 9: s[t].i = Math.round(s[t].r); break;
+          case 10: s[t].i = Math.floor(s[t].r); break;
+          case 11: s[t].r = Math.sin(s[t].r) break;
+          case 12: s[t].r = Math.cos(s[t].r); break;
+          case 13: s[t].r = Math.exp(s[t].r); break;
+          case 14: s[t].r = Math.log(s[t].r); break;
+          case 15: s[t].r = Math.sqrt(s[t].r) break;
+          case 16: s[t].r = Math.atan(s[t].r); break;
+          /*case 17:
           if (t > stacksize){
             ps = stkchk;
           }
@@ -1762,7 +1772,7 @@ function compiladorPascalS(){
           {
             s[t].b = eoln(InputFile);
           }
-          break;
+          break;*/
 
         }//switch case 8
 
@@ -1771,7 +1781,7 @@ function compiladorPascalS(){
         case 11:
         if (!s[t].b){
           pc = ir.y;
-          t = t - 1;
+          t--;
         }
         break;
 
@@ -1781,12 +1791,12 @@ function compiladorPascalS(){
         h2 = ir.y;
         h3 = 0;
         do {
-          if (kode[h2].f <> 13){
+          if (kode[h2].f != 13){
             h3 = 1;
-            ps = caschk;
+            ps = 'caschk';
           }
           else{
-            if (kode[h2].y = h1){
+            if (kode[h2].y == h1){
               h3 = 1;
               pc = kode[h2 + 1].y
             }
@@ -1794,7 +1804,7 @@ function compiladorPascalS(){
               h2 = h2 + 2;
             }
           }
-        } while (until h3 <> 0);
+        } while (h3 == 0);
         break;
 
         case 14:
@@ -1846,7 +1856,7 @@ function compiladorPascalS(){
         case 18:
         h1 = btab[tab[ir.y].ref].vsize;
         if (t + h1 > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else{
           t = t + 5;
@@ -1865,13 +1875,13 @@ function compiladorPascalS(){
         s[h1 + 2].i = display[h3];
         s[h1 + 3].i = b;
 
-        for (h3;  i < h4;  h3 = t + 1) {
+        for (h3 = t+1;  h3 < h4;  h3++) {
           s[h3].i = 0;
         }
 
         b = h1;
         t = h4;
-        pc = tab[h2].adr
+        pc = tab[h2].adr;
         break;
 
         case 20:
@@ -1879,14 +1889,14 @@ function compiladorPascalS(){
         h2 = atab[h1].low;
         h3 = s[t].i;
         if (h3 < h2){
-          ps = inxchk;
+          ps = 'inxchk';
         }
         else{
           if (h3 > atab[h1].high){
-            ps = inxchk;
+            ps = 'inxchk';
           }
           else{
-            t = t - 1;
+            t--;
             s[t].i = s[t].i + (h3 - h2);
           }
         }
@@ -1897,11 +1907,11 @@ function compiladorPascalS(){
         h2 = atab[h1].low;
         h3 = s[t].i;
         if (h3 < h2) {
-          ps = inxchk;
+          ps = 'inxchk';
         }
         else{
           if (h3 > atab[h1].high){
-            ps = inxchk;
+            ps = 'inxchk';
           }
           else{
             t = t - 1;
@@ -1911,16 +1921,16 @@ function compiladorPascalS(){
         break;
         case 22:
         h1 = s[t].i;
-        t = t - 1;
+        t--;
         h2 = ir.y + t;
         if(h2 > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else
         while (t < h2) {
-          t = t + 1;
+          t++;
           s[t] = s[h1];
-          h1 = h1 + 1;
+          h1++;
         }
         break;
 
@@ -1930,16 +1940,16 @@ function compiladorPascalS(){
         h3 = h1 + ir.y;
         while (h1 < h3){
           s[h1] = s[h2];
-          h1 = h1 + 1;
-          h2 = h2 + 1;
+          h1++;
+          h2++;
         }
         t = t - 2;
         break;
 
         case 24:
-        t = t + 1;
+        t++;
         if (t > stacksize){
-          ps = stkchk;
+          ps = 'stkchk';
         }
         else{
           s[t].i = ir.y;
@@ -1947,7 +1957,7 @@ function compiladorPascalS(){
         break;
 
         case 25:
-        t = t + 1;
+        t++;
         if (t > stacksize){
           ps = stkchk;
         }
@@ -1961,7 +1971,7 @@ function compiladorPascalS(){
         s[h1].r = s[h1].i;
         break;
 
-        case 27:
+        case 27:    //INSTRUÇÃO DE LEITURA
         if (eof(InputFile)){
           ps = redchk;
         }
@@ -1978,29 +1988,29 @@ function compiladorPascalS(){
         case 28:
         h1 = s[t].i;
         h2 = ir.y;
-        t = t - 1;
+        t--;
         chrcnt = chrcnt + h1;
         if (chrcnt > lineleng){
-          ps = lngchk;
+          ps = 'lngchk';
         }
         do {
-          write(stab[h2]);
-          h1 = h1 - 1;
-          h2 = h2 + 1;
+          console.log(stab[h2]);
+          h1--;
+          h2++;
         } while (h1 = 0);
         break;
 
         case 29:
         chrcnt = chrcnt + fld[ir.y];
         if (chrcnt > lineleng){
-          ps = lngchk;
+          ps = 'lngchk';
         }
         else
         switch (ir.y) {
-          case 1: write(s[t].i: fld[1]); break;
-          case 2: write(s[t].r: fld[2]); break;
-          case 3: write(s[t].b: fld[3]); break;
-          case 4: write(s[t].c);         break;
+          case 1: console.log(s[t].i+':'+ fld[1]); break;
+          case 2: console.log(s[t].r+':' +fld[2]); break;
+          case 3: console.log(s[t].b+':'+ fld[3]); break;
+          case 4: console.log(s[t].c);         break;
         }
         t = t - 1;
         break;
@@ -2008,20 +2018,20 @@ function compiladorPascalS(){
         case 30:
         chrcnt = chrcnt + s[t].i;
         if (chrcnt > lineleng){
-          ps = lngchk;
+          ps = 'lngchk';
         }
         else{
           switch (ir.y) {
-            case 1: write(s[t - 1].i: s[t].i); break;
-            case 2: write(s[t - 1].r: s[t].i); break;
-            case 3: write(s[t - 1].b: s[t].i); break;
-            case 4: write(s[t - 1].c: s[t].i); break;
+            case 1: console.log(s[t - 1].i+': '+s[t].i); break;
+            case 2: console.log(s[t - 1].r+':' +s[t].i); break;
+            case 3: console.log(s[t - 1].b+':' +s[t].i); break;
+            case 4: console.log(s[t - 1].c+':'+ s[t].i); break;
           }
         }
         t = t - 2;
         break;
         case 31:
-        ps = fin;
+        ps = 'fin';
         break;
 
         case 32:
@@ -2043,10 +2053,10 @@ function compiladorPascalS(){
         case 37:
         chrcnt = chrcnt + s[t - 1].i;
         if (chrcnt > lineleng) {
-          ps = lngchk;
+          ps = 'lngchk';
         }
         else{
-          write(s[t - 2].r: s[t - 1].i: s[t].i);
+          console.log(s[t - 2].r: s[t - 1].i: s[t].i);
         }
         t = t - 3;
         break;
@@ -2057,52 +2067,52 @@ function compiladorPascalS(){
         break;
 
         case 39
-        t = t - 1;
+        t--;
         s[t].b = s[t].r = s[t + 1].r;
         break;
 
         case 40:
-        t = t - 1;
+        t--;
         s[t].b = s[t].r == s[t + 1].r;
         break;
 
         case 41:
-        t = t - 1;
+        t--;
         s[t].b = s[t].r < s[t + 1].r;
         break;
 
         case 42:
-        t = t - 1;
+        t--;
         s[t].b = s[t].r <= s[t + 1].r;
         break;
 
         case 43:
-        t = t - 1;
+        t--;
         s[t].b = s[t].r > s[t + 1].r;
         break;
 
         case 44:
-        t = t - 1;
+        t--;
         s[t].b = s[t].r >= s[t + 1].r;
         break;
 
         case 45:
-        t = t - 1;
-        s[t].b = s[t].i = s[t + 1].i;
+        t--;
+        s[t].b = s[t].i == s[t + 1].i;
         break;
 
         case 46:
-        t = t - 1;
+        t--;
         s[t].b = s[t].i != s[t + 1].i;
         break;
 
         case 47:
-        t = t - 1;
+        t--;
         s[t].b = s[t].i < s[t + 1].i;
         break;
 
         case 48:
-        t = t - 1;
+        t--;
         s[t].b = s[t].i <= s[t + 1].i;
         break;
 

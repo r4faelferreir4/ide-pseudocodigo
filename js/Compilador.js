@@ -77,8 +77,8 @@ var blockbegsys;
 var facbegsys;
 var statbegsys;
 var key=[alfa.length()][nkw.length()];   //Tipo alfa não especificado, lembrar de tratar isso depois
-var ksy = [nkw];   //Tipo symbol não especificado, lembrar de tratar isso depois
-var sps = symbol;      //Simbolos especiais, tipo symbol não especificado
+var ksy = [];   //Tipo symbol não especificado, lembrar de tratar isso depois
+var sps = [];      //Simbolos especiais, tipo symbol não especificado
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
@@ -226,8 +226,7 @@ function compiladorPascalS(){
         }
       }
       while (ch >= 0 && ch <= 9){
-        var temp = "0";
-        s = 10 * s + ch.charCodeAt() - temp.charCodeAt();
+        s = 10 * s + Number(ch);
         NextCh();
       }
       e = s * sign + e;
@@ -266,41 +265,43 @@ function compiladorPascalS(){
 
     _1: while(ch == " ")
     NextCh();
-    if(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z"){
+    if(ch >= "a" && ch <= "z"){
       k = 0;
-      id = "          ";      //Seta a variavel id com espaços em branco
+      id = "";      //Seta a variavel id com espaços em branco
       do{
         if (k < alng){
           k++;
-          id[k] = ch;
+          id = id+ch;
         }
         NextCh();
-      }while(!(ch.charCodeAt(0) >= "a" && ch.charCodeAt(0) <= "z" || ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"));
-      i = 1;      //Busca binaria
+      }while(!(ch >= "a" && ch <= "z" || ch >= "0" && ch <= "9"));
+      /*i = 1;      //Busca binaria
       j = nkw;
       do{
         k = (i+j)/2
-        if ((i+j)%2 != 0) k = Math.floor(k);
-        if (id.charAt(0) <= key[k])     //VERIFICAR SE ESTÁ CORRETO
-        j = k - 1;
-        if(id.charAt(0) >= key[k])
-        i = k + 1;
-      }while(i < j);
-      if ((i - 1) > j)
-      sy = ksy[k];
+        if ((i+j)%2 != 0)
+          k = Math.floor(k);
+        if (id.length <= key[k].length)     //VERIFICAR SE ESTÁ CORRETO
+          j = k - 1;
+        else
+          i = k + 1;
+      }while(i < j);*/
+      i = key.indexOf(id);
+      if (i != -1)
+        sy = ksy[i];
       else
-      sy = "ident";
+        sy = "ident";
     }
     else {
-      if (ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9){
+      if (ch >= 0 && ch <= 9){
         k = 0;
         inum = 0;
         sy = "intcon";
         do{
-          inum = inum * 10 + ch.charCodeAt(0) - "0".charCodeAt();
+          inum = inum * 10 + Number(ch);
           k++;
           NextCh();
-        }while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= 9);
+        }while(ch >= 0 && ch <= 9);
         if(k > kmax || inum > nmax){
           Error(21);
           inum = 0;
@@ -314,9 +315,9 @@ function compiladorPascalS(){
             sy = "realcon";
             rnum = inum;
             e = 0;
-            while(ch.charCodeAt(0) >= "0" && ch.charCodeAt(0) <= "9"){
+            while(ch >= 0 && ch <= 9){
               e--;
-              rnum = 10 * rnum + (ch.charCodeAt(0) - "0".charCodeAt(0));
+              rnum = 10 * rnum + Number(ch);
               NextCh();
             }
             if (ch == "e")
@@ -379,40 +380,42 @@ function compiladorPascalS(){
           else
           sy = "period";
           break;
-          case "\"\"":
+          case "\"":
           k = 0;
-          _2:
-          NextCh();
-          if (ch == "\"\""){
+          do{
             NextCh();
-            //if (ch != "\"\"")
-            // /////////////////////////continue _3;
-          }
-          if ((sx + k) == smax)
-          fatal(7);
-          stab[sx+k] = ch;
-          k++;
-          if (cc == 1)    //fim da linha
-          k = 0;
-          else
-          //////continue _2;
-          _3:
+            if (ch == "\""){
+              NextCh();
+              if (ch != "\""){
+                Error(38);
+                sy = "charcon";
+                inum = 0;
+              }
+            }
+            if ((sx + k) == smax)
+            fatal(7);
+            stab[sx+k] = ch;
+            k++;
+            if (cc == 1)    //mudança de linha
+              k = 0;
+          }while(cc != 1);
           if (k == 1){
             sy = "charcon";
-            inum = stab[sx].charCodeAt(0);
+            inum = stab[sx].charCodeAt();
           }
-          else
-          if (k == 0){
+          else{
+          /*if (k == 0){
             Error(38);
             sy = "charcon";
             inum = 0;
           }
-          else {
+          else {*/
             sy = "stringsy";
             inum = sx;
             sleng = k;
             sx += k;
           }
+          //}
           break;
           case "(":
           NextCh();
@@ -422,11 +425,12 @@ function compiladorPascalS(){
             NextCh();
             do{
               while (ch != "*")
-              NextCh();
+                NextCh();
               NextCh();
             }while(ch != ")");
             NextCh();
-            ////////continue _1;
+            insymbol();
+            return;
           }
           break;
           case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
@@ -436,7 +440,7 @@ function compiladorPascalS(){
           default:
           Error(24);
           NextCh();
-          ///////////goto _1;
+          insymbol();
         }
       }
     }
@@ -681,7 +685,7 @@ function compiladorPascalS(){
           else
           skip(fsys, 50);
         }
-        test(fsys, "", 6)
+        test(fsys, "", 6);
       }
     }//constant
 
@@ -2295,21 +2299,21 @@ function compiladorPascalS(){
     key[23] = 'to'; key[24] = 'type';
     key[25] = 'until'; key[26] = 'var';
     key[27] = 'while';
-    ksy[1] = "andsy"; ksy[2] := "arraysy";
-    ksy[3] = 'beginsy'; ksy[4] := "casesy";
-    ksy[5] = 'constsy'; ksy[6] := "idiv";
-    ksy[7] = 'dosy'; ksy[8] := 'downtosy';
-    ksy[9] = 'elsesy'; ksy[10] := 'endsy';
-    ksy[11] = 'forsy'; ksy[12] := 'functionsy';
-    ksy[13] = 'ifsy'; ksy[14] := 'imod';
-    ksy[15] = 'notsy'; ksy[16] := 'ofsy';
-    ksy[17] = 'orsy'; ksy[18] := 'proceduresy';
-    ksy[19] = 'programsy'; ksy[20] := 'recordsy';
-    ksy[21] = 'repeatsy'; ksy[22] := 'thensy';
-    ksy[23] = 'tosy'; ksy[24] := 'typesy';
-    ksy[25] = 'untilsy'; ksy[26] := 'varsy';
+    ksy[1] = "andsy"; ksy[2] = "arraysy";
+    ksy[3] = 'beginsy'; ksy[4] = "casesy";
+    ksy[5] = 'constsy'; ksy[6] = "idiv";
+    ksy[7] = 'dosy'; ksy[8] = 'downtosy';
+    ksy[9] = 'elsesy'; ksy[10] = 'endsy';
+    ksy[11] = 'forsy'; ksy[12] = 'functionsy';
+    ksy[13] = 'ifsy'; ksy[14] = 'imod';
+    ksy[15] = 'notsy'; ksy[16] = 'ofsy';
+    ksy[17] = 'orsy'; ksy[18] = 'proceduresy';
+    ksy[19] = 'programsy'; ksy[20] = 'recordsy';
+    ksy[21] = 'repeatsy'; ksy[22] = 'thensy';
+    ksy[23] = 'tosy'; ksy[24] = 'typesy';
+    ksy[25] = 'untilsy'; ksy[26] = 'varsy';
     ksy[27] = 'whilesy';
-    sps['+'] = 'plus'; sps['-'] := 'minus';
+    sps['+'] = 'plus'; sps['-'] = 'minus';
     sps['*'] = 'times'; sps['/'] := 'rdiv';
     sps['('] = 'lparent'; sps[')'] := 'rparent';
     sps['='] = 'eql'; sps[','] := 'comma';

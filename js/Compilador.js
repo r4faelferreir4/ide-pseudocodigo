@@ -46,9 +46,9 @@ var symset;
 var typeset;
 var item = {typ: types, ref: index};
 var order = {
-  f : [omax*2];    //Intervalo -omax .. +omax
-  x : [lmax*2];    //Intervalo -lmax .. +lmax
-  y : [nmax*2];    //Intervalo -nmax .. +lmax
+  f : [omax*2],    //Intervalo -omax .. +omax
+  x : [lmax*2],    //Intervalo -lmax .. +lmax
+  y : [nmax*2],    //Intervalo -nmax .. +lmax
 }
 
 //DECLARAÇÃO DE VARIÁVEIS
@@ -69,33 +69,33 @@ var lc;           //Contador do programa
 var ll;           //Tamanho da linha atual
 var errs = [ermax];    //Lista de erros
 var errpos;       //Posição do erro
-var progname = alfa;
+var progname = [];
 var iflag, oflag;
 var constbegsys;
 var typebegsys;
 var blockbegsys;
 var facbegsys;
 var statbegsys;
-var key=[alfa.length()][nkw.length()];   //Tipo alfa não especificado, lembrar de tratar isso depois
+var key = [];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [];   //Tipo symbol não especificado, lembrar de tratar isso depois
 var sps = [];      //Simbolos especiais, tipo symbol não especificado
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
-var display = [lmax];
-var tab=[tmax] = {name: alfa, link: index, obj: object2, typ: types, ref: index, normal: boolean, lev: new Array(lmax), adr}  //Identificador de tabela
-var atab=[amax] = {inxtyp: types, eltyp: types, elref: index, low: index, high: index, elsize: index, size: index }
-var btab=[bmax] = {last: index, lastpar: index, psize: index, vsize: index}
-var stab = [smax];
-var rconst = [c2max];
-var kode=[xmax];
+var display = [];
+var tab = {name: "", link: 1, obj: [""], typ: [""], ref: 1, normal: true, lev: 1, adr: 44}  //Identificador de tabela
+var atab = {inxtyp: [""], eltyp: [""], elref: 1, low: 1, high: 1, elsize: 1, size: 1 }
+var btab = {last: index, lastpar: index, psize: index, vsize: index}
+var stab = [];
+var rconst = [];
+var kode = [];
 var indexfile = 0;  //Índice para navegar na string do código
 var indexline = 0; //Índice para navegar entre as linhas
 var indexmax;  //Tamanho total do código
 
 function compiladorPascalS(){
 
-  indexmax = InputFile.length()
+  indexmax = InputFile.length
   InputFile.split("\n");    //Dividindo o código pelas linhas
 
   AppEnd:
@@ -156,7 +156,7 @@ function compiladorPascalS(){
   //FUNÇÃO DE BUSCA DE CARACTERES
   function NextCh(){
     if (cc == ll){
-      if (indexline == InputFile.length() && indexfile == InputFile[InputFile.length()].length()) {    //Verifica se chegou ao final do texto
+      if (indexline == InputFile.length && indexfile == InputFile[InputFile.length].length {    //Verifica se chegou ao final do texto
         console.log('');
         console.log(' programa incompleto');
         ErrorMsg(); //  { goto 99;} vai para linha 99? - Não, está em um comentário
@@ -386,36 +386,33 @@ function compiladorPascalS(){
             NextCh();
             if (ch == "\""){
               NextCh();
-              if (ch != "\""){
-                Error(38);
-                sy = "charcon";
-                inum = 0;
-              }
+              if (ch != "\"")
+                break;
             }
             if ((sx + k) == smax)
             fatal(7);
             stab[sx+k] = ch;
             k++;
-            if (cc == 1)    //mudança de linha
+            if (cc == 1)    //mudou de linha
               k = 0;
           }while(cc != 1);
           if (k == 1){
             sy = "charcon";
             inum = stab[sx].charCodeAt();
           }
-          else{
-          /*if (k == 0){
+          else
+          if (k == 0){
             Error(38);
             sy = "charcon";
             inum = 0;
           }
-          else {*/
+          else {
             sy = "stringsy";
             inum = sx;
             sleng = k;
             sx += k;
           }
-          //}
+
           break;
           case "(":
           NextCh();
@@ -444,7 +441,7 @@ function compiladorPascalS(){
         }
       }
     }
-  }
+  }//insymbol
 
   function enter (x0, x1, x2, x3){
     t++;
@@ -467,14 +464,14 @@ function compiladorPascalS(){
       h = 0;
     }
     if (a == amax)
-    fatal(4);
+      fatal(4);
     else{
       a++;
       atab[a].inxtyp = tp;
       atab[a].low = l;
       atab[a].high = h;
     }
-  }
+  }//enterarray
 
   function EnterBlock(){
     if (b == bmax)
@@ -484,44 +481,44 @@ function compiladorPascalS(){
       btab[b].last = 0;
       btab[b].lastpar = 0;
     }
-  }
+  }//EnterBlock
 
-  function EnterReal(){
-    if(c2 == c2max-1)
-    fatal(3);
+  function EnterReal(x){
+    if(c2 == (c2max-1))
+      fatal(3);
     else {
       rconst[c2+1] = x;
       c1 = 1;
       while(rconst[c1] != x)
-      c1++;
+        c1++;
       if(c1 > c2)
-      c2 = c1;
+        c2 = c1;
     }
   }
 
   function emit(fct){
     if (lc == cmax)
-    fatal(6);
+      fatal(6);
     kode[lc].f = fct;
     lc++;
-  }
+  }//emit
 
   function emit1(fct, b){
     if (lc == cmax)
-    fatal(6);
+      fatal(6);
     kode[lc].f = fct;
     kode[lc].y = b;
     lc++;
-  }
+  }//emit1
 
   function emit2(fct, a, b){
     if (lc == cmax)
-    fatal(6);
+      fatal(6);
     kode[lc].f = fct;
     kode[lc].x = a;
     kode[lc].y = b;
     lc++;
-  }
+  }//emit2
 
   function printtables(){
     var i;
@@ -571,7 +568,7 @@ function compiladorPascalS(){
     function skip(fsys, n){
       Error(n);
       while(fsys.indexOf(sy) == -1)
-      insymbol();
+        insymbol();
     }
     function test(s1, s2, n){
       if (s1.indexOf(sy) == -1){
@@ -580,26 +577,26 @@ function compiladorPascalS(){
     }
     function TestSemicolon(){
       if(sy == "semicolon")
-      insymbol();
+        insymbol();
       else {
         Error(14);
         if (sy == "comma" || sy == "colon")
-        insymbol();
+          insymbol();
       }
-      test(["ident", blockbegsys], fsys, 6);
-    }
+      test(["ident"].concat(blockbegsys), fsys, 6);
+    }//TestSemicolon
     function enter(id, k){
       var j, l;
       if (t == tmax)
-      fatal(1);
+        fatal(1);
       else {
         tab[0].name - id;
         j = btab[display[level]].last;
         l = j;
         while(tab[j].name != id)
-        j = tab[j].link;
+          j = tab[j].link;
         if (j != 0)
-        Error(1);
+          Error(1);
         else {
           t++;
           tab[t].name = id;
@@ -2314,11 +2311,11 @@ function compiladorPascalS(){
     ksy[25] = 'untilsy'; ksy[26] = 'varsy';
     ksy[27] = 'whilesy';
     sps['+'] = 'plus'; sps['-'] = 'minus';
-    sps['*'] = 'times'; sps['/'] := 'rdiv';
-    sps['('] = 'lparent'; sps[')'] := 'rparent';
-    sps['='] = 'eql'; sps[','] := 'comma';
-    sps['['] = 'lbrack'; sps[']'] := 'rbrack';
-    sps['#'] = 'neq'; sps['&'] := 'andsy';
+    sps['*'] = 'times'; sps['/'] = 'rdiv';
+    sps['('] = 'lparent'; sps[')'] = 'rparent';
+    sps['='] = 'eql'; sps[','] = 'comma';
+    sps['['] = 'lbrack'; sps[']'] = 'rbrack';
+    sps['#'] = 'neq'; sps['&'] = 'andsy';
     sps[';'] = 'semicolon';
     constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
     typebegsys = ['ident', 'arraysy', 'recordsy'];

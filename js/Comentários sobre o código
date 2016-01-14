@@ -36,5 +36,4 @@ e quando foi encontrado um caracter novamente(476), os dois apontam para o inici
 
 goto 2 = linha 428 ele utiliza um goto 2 em forma de loop para ler os caracteres de uma string até mudar de linha. Utilizamos um laço do..while para fazer esse loop
 
-goto 3 = linha 419 é chamado quando encontra uma string com "" vazia, pula para a label 3 que trata sobre caracteres e emite um erro, pegamos este erro e passamos para o local do goto 3
-junto com um return para finalizar a função insymbol.
+goto 3 = linha 419 é chamado quando encontra uma string com "" vazia, pula para a label 3 que trata sobre caracteres e emite um erro, como esse goto está na label 2, que estamos tratando como um do..while, e a label 3 é imediatamente seguinte, então utilizamos um break.

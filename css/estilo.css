@@ -29,14 +29,15 @@
 
 #output{
   height: 310px;
+  width: 100%;
   font-family:Courier;
   color: #CCCCCC;
   background: #000000;
-}
-#output span {
-  margin: 0px;
-  display: block;
   white-space: nowrap;
+}
+
+#scriptBox{
+  width: 100%;
 }
 
 /* css para modal da saida */

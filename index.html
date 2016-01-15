@@ -21,6 +21,7 @@
 
   <!-- JS e CSS para pagina -->
   <script src="js/funcoes.js"></script>
+  <script src="js/Compilador.js"></script>
   <link rel=stylesheet href="css/estilo.css"/>
 
   <script>
@@ -88,17 +89,10 @@
               <h4 class="modal-title">Saída</h4>
             </div>
             <div id="modalBody" class="modal-body">
-              <div id="output">
-                <div id="lines">
-                </div>
-                <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
-              </div>
+              <textarea id="output" disabled="true"></textarea>
+              <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
             </div>
             <div id="modalFooter" class="modal-footer">
-              <button onclick="imprimir('nova linha')">nova linha</button>
-              <button onclick="renderInput(true)">Mostar btn</button>
-              <button onclick="renderInput(false)">Esconder btn</button>
-              <button onclick="getUltimaLinha()">valor ultima linha</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
             </div>
           </div>

@@ -22,11 +22,10 @@ var ermax = 59;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
 var nmax = 32767	//281474976710655 2**48-1
-var lineleng = 136;	//Tamanho da linha de saída
-var linelimit = 200;
+var lineleng = 300;	//Tamanho da linha de saída
+var linelimit = 500;
 var stacksize = 1500;
-var output_console = [""];    //Variável que irá imprimir na tela do console
-
+var output_console = new Array(linelimit);    //Variável que irá imprimir na tela do console
 
 //TIPOS DEFINIDOS
 
@@ -2328,7 +2327,8 @@ function compiladorPascalS(){
           ps = 'lngchk';
         }
         do {
-          console.log(stab[h2]);
+          output_console.push(stab[h2]);
+          output_console.shift();
           h1--;
           h2++;
         } while (h1 = 0);
@@ -2341,10 +2341,28 @@ function compiladorPascalS(){
         }
         else
         switch (ir.y) {
-          case 1: console.log(s[t].i+':'+ fld[1]); break;
-          case 2: console.log(s[t].r+':' +fld[2]); break;
-          case 3: console.log(s[t].b+':'+ fld[3]); break;
-          case 4: console.log(s[t].c);         break;
+          case 1:
+          var str = "          ";
+          var str += s[t].i;
+          output_console.push(str);
+          output_console.shift();
+          break;
+          case 2:
+          var str = "                    ";
+          str += s[t].r;
+          output_console.push(str);
+          output_console.shift();
+          break;
+          case 3:
+          var str = "           ";
+          str += s[t].b;
+          output_console.push(str);
+          output_console.shift();
+          break;
+          case 4:
+          output_console.push(s[t].c);
+          output_console.shift();
+          break;
         }
         t = t - 1;
         break;
@@ -2356,10 +2374,38 @@ function compiladorPascalS(){
         }
         else{
           switch (ir.y) {
-            case 1: console.log(s[t - 1].i+': '+s[t].i); break;
-            case 2: console.log(s[t - 1].r+':' +s[t].i); break;
-            case 3: console.log(s[t - 1].b+':' +s[t].i); break;
-            case 4: console.log(s[t - 1].c+':'+ s[t].i); break;
+            case 1:
+            var str = "";
+            for (var p = 0; p < s[t].i; p++)
+              str += " ";
+            str += s[t-1].i;
+            output_console.push(str);
+            output_console.shift();
+            break;
+            case 2:
+            var str = "";
+            for (var p = 0; p < s[t].i; p++)
+              str += " ";
+            str += s[t-1].r;
+            output_console.push(str);
+            output_console.shift();
+            break;
+            case 3:
+            var str = "";
+            for (var p = 0; p < s[t].i; p++)
+              str += " ";
+            str += s[t-1].b;
+            output_console.push(str);
+            output_console.shift();
+            break;
+            case 4:
+            var str = "";
+            for (var p = 0; p < s[t].i; p++)
+              str += " ";
+            str += s[t-1].c;
+            output_console.push(str);
+            output_console.shift();
+            break;
           }
         }
         t = t - 2;

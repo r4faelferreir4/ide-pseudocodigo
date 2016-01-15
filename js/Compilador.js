@@ -25,7 +25,6 @@ var nmax = 32767	//281474976710655 2**48-1
 var lineleng = 300;	//Tamanho da linha de saída
 var linelimit = 500;
 var stacksize = 1500;
-var output_console = new Array(linelimit);    //Variável que irá imprimir na tela do console
 
 //TIPOS DEFINIDOS
 
@@ -89,6 +88,9 @@ var kode = [];
 var indexfile = 0;  //Índice para navegar na string do código
 var indexline = 0; //Índice para navegar entre as linhas
 var indexmax;  //Tamanho total do código
+var output_console = new Array(linelimit);    //Variável que irá imprimir na tela do console
+var read_ok = true;
+
 function initArray(){
   var j = 0;
   do{
@@ -106,20 +108,16 @@ function initArray(){
   do{
     kode[j] = order;
   }while( j < cmax);
+  j = 0;
+  do{
+    output_console[j] = "";
+  }while(j < linelimit);
 }
 
 function compiladorPascalS(){
 
   indexmax = InputFile.length
   InputFile.split("\n");    //Dividindo o código pelas linhas
-
-  AppEnd:
-  console.log("Aplicação finalizada!");
-  return;
-
-
-
-
 
 
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
@@ -2310,12 +2308,24 @@ function compiladorPascalS(){
         }
         else{
           switch (ir.y) {
-            case 1: read(InputFile, s[s[t].i].i); break;
-            case 2: read(InputFile, s[s[t].i].r); break;
-            case 4: read(InputFile, s[s[t].i].c); break;
+            case 1:
+            while(read_ok);
+            s[s[t].i].i = InputFile;
+            read_ok = true;
+            break;
+            case 2:
+            while(read_ok);
+            s[s[t].i].r = InputFile;
+            read_ok = true;
+            break;
+            case 4:
+            while(read_ok);
+            s[s[t].i].c = InputFile;
+            read_ok = true;
+            break;
           }
         }
-        t = t - 1;
+        t--;
         break;
 
         case 28:
@@ -2642,13 +2652,13 @@ function compiladorPascalS(){
       } while (h1 < 0);
     }
 
-<<<<<<< HEAD
+
   //writeln;
   console.log("          "ocnt, " steps");
-=======
+
     //writeln;
     writeln(ocnt: 10, ' steps');
->>>>>>> origin/master
+
   }//interpret
 
   var Ok = false;

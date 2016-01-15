@@ -25,6 +25,7 @@ var nmax = 32767	//281474976710655 2**48-1
 var lineleng = 136;	//Tamanho da linha de saída
 var linelimit = 200;
 var stacksize = 1500;
+var output_console = [""];    //Variável que irá imprimir na tela do console
 
 
 //TIPOS DEFINIDOS

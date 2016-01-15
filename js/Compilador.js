@@ -36,46 +36,43 @@ var symbol;// = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "m
 var symbol1 =  ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
 "lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
 "casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-var index = [xmax*2];    //Intervalo entre -xmax e +xmax
-var alfa = [alng+1];
+//var index = [xmax*2];    //Intervalo entre -xmax e +xmax
+//var alfa = [alng+1];
 var object2;// = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
 var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
-var symset;
-var typeset;
-var item = {typ: types, ref: index};
+var symset = symbol1;
+var typeset = types;
+var item = {typ: "", ref: 1};
 var order = {
-  f : [omax*2],    //Intervalo -omax .. +omax
-  x : [lmax*2],    //Intervalo -lmax .. +lmax
-  y : [nmax*2],    //Intervalo -nmax .. +lmax
+  f : 1,    //Intervalo -omax .. +omax
+  x : 1,    //Intervalo -lmax .. +lmax
+  y : 1,    //Intervalo -nmax .. +lmax
 }
 
 //DECLARAÇÃO DE VARIÁVEIS
 
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
-var sy = symbol;  //Ultimo simbolo lido por insymbol
-var sy1 = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
-"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
-"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-var id = alfa;    //Identificador de insymbol
+var sy;  //Ultimo simbolo lido por insymbol
+var id;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
 var rnum;         //Real de insymbol
 var sleng;        //Tamanho da string de insymbol
 var ch;           //Ultimo caracter lido do código fonte
-var line = [llng+1];
+var line;         //Ultima linha lida
 var cc;           //Contagem de caracteres
 var lc;           //Contador do programa
 var ll;           //Tamanho da linha atual
-var errs = [ermax];    //Lista de erros
+var errs = [];    //Lista de erros
 var errpos;       //Posição do erro
 var progname = [];
 var iflag, oflag;
-var constbegsys;
-var typebegsys;
-var blockbegsys;
-var facbegsys;
-var statbegsys;
+var constbegsys = [];
+var typebegsys = [];
+var blockbegsys = [];
+var facbegsys = [];
+var statbegsys = [];
 var key = [];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [];   //Tipo symbol não especificado, lembrar de tratar isso depois
 var sps = [];      //Simbolos especiais, tipo symbol não especificado
@@ -83,15 +80,33 @@ var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
 var display = [];
-var tab = {name: "", link: 1, obj: [""], typ: [""], ref: 1, normal: true, lev: 1, adr: 44}  //Identificador de tabela
-var atab = {inxtyp: [""], eltyp: [""], elref: 1, low: 1, high: 1, elsize: 1, size: 1 }
-var btab = {last: index, lastpar: index, psize: index, vsize: index}
+var tab = [];
+var atab = [];
+var btab = []
 var stab = [];
 var rconst = [];
 var kode = [];
 var indexfile = 0;  //Índice para navegar na string do código
 var indexline = 0; //Índice para navegar entre as linhas
 var indexmax;  //Tamanho total do código
+function initArray(){
+  var j = 0;
+  do{
+    tab[j] =  {name: "", link: 1, obj: [""], typ: [""], ref: 1, normal: true, lev: 1, adr: 44};
+  }while(j < tmax);
+  j = 0;
+  do{
+    atab[j] = {inxtyp: [""], eltyp: [""], elref: 1, low: 1, high: 1, elsize: 1, size: 1 };
+  }while(j < amax);
+  j = 0;
+  do{
+    btab[j] = {last: 1, lastpar: 1, psize: 1, vsize: 1};
+  }while(j < bmax);
+  j = 0;
+  do{
+    kode[j] = order;
+  }while( j < cmax);
+}
 
 function compiladorPascalS(){
 
@@ -110,7 +125,7 @@ function compiladorPascalS(){
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
 
   function ErrorMsg(){
-    var k, Msg = [ermax];
+    var k, Msg = [];
     Msg[0] = "undef id  "; Msg[1] = "multi def ";
     Msg[2] = "identificador"; Msg[3] = "programa  " ;
     Msg[4] = ")         "; Msg[5] = ":         ";
@@ -195,12 +210,12 @@ function compiladorPascalS(){
     if(cc > errpos){
       console.log( '' + cc - errpos +"^"+ n );//write(' ': cc - errpos, '^', n: 2);
       errpos = cc + 3; //errpos := cc + 3;
-      errs = errs + n;//errs := errs + [n]
+      errs = errs.concat(n);//errs := errs + [n]
     }
   }
 
   function fatal(n){
-    Msg = alfa;
+    var Msg = [];
     Msg[0] = "identificador";   Msg[1] = "identificador";
     Msg[2] = "procedimentos";   Msg[3] = "reais";
     Msg[4] = "arranjos";   Msg[5] = "niveis";
@@ -558,7 +573,7 @@ function compiladorPascalS(){
   }
 
   function block(fsys, isfun, level){
-    var conrec = {tp: 1, i: 2, r: 2.4};
+    var conrec = {tp: "", i: 2, r: 2.4};
 
     var dx;   //Índice de alocação de dados
     var prt;  //Índice T deste procedimento
@@ -622,7 +637,7 @@ function compiladorPascalS(){
         i--;
       }while(i > 0 || j == 0);
       if (j == 0)
-      Error(0);
+        Error(0);
       return j;
     }//loc
 
@@ -637,6 +652,7 @@ function compiladorPascalS(){
 
     function constant(fsys, c){
       var x, sign;
+      c = conrec;
       c.tp = "notyp"
       c.i = 0;
       test(constbegsys, fsys, 50);
@@ -656,8 +672,8 @@ function compiladorPascalS(){
           if (sy == "ident"){
             x = loc(id);
             if (x != 0)
-            if (tab[x].obj != "konstant")
-            Error(25);
+              if (tab[x].obj != "konstant")
+                Error(25);
             else{
               c.tp = tab[x].typ;
               if (c.tp == "reals")
@@ -682,7 +698,7 @@ function compiladorPascalS(){
           else
           skip(fsys, 50);
         }
-        test(fsys, "", 6);
+        test(fsys, [""], 6);
       }
     }//constant
 
@@ -697,9 +713,9 @@ function compiladorPascalS(){
           low.i = 0;
         }
         if (sy == "colon")
-        insymbol();
+          insymbol();
         else
-        Error(13);
+          Error(13);
         constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
         if (high.tp != low.tp){
           Error(27);
@@ -721,9 +737,9 @@ function compiladorPascalS(){
             insymbol();
           }
           if (sy == "ofsy")
-          insymbol();
+            insymbol();
           else
-          Error(8);
+            Error(8);
           typ(fsys, eltp, elrf, elsz);
         }
         arsz = (atab[aref].high - atab[aref].low + 1)*elsz;
@@ -741,14 +757,14 @@ function compiladorPascalS(){
         if (sy == "ident"){
           x = loc(id);
           if (x != 0)
-          if (tab[x].obj != "type1")
-          Error(29);
+            if (tab[x].obj != "type1")
+              Error(29);
           else {
             tp = tab[x].typ;
             rf = tab[x].ref;
             sz = tab[x].adr;
             if(tp == "notyp")
-            Error(30);
+              Error(30);
           }
           insymbol();
         }
@@ -756,11 +772,11 @@ function compiladorPascalS(){
         if (sy = "arraysy"){
           insymbol();
           if (sy = "lbrack")
-          insymbol();
+            insymbol();
           else {
             Error(11);
             if (sy == "lparent")
-            insymbol();
+              insymbol();
           }
           tp = "arrays";
           arraytyp(rf, sz);
@@ -771,7 +787,7 @@ function compiladorPascalS(){
           tp = "records";
           rf = b;
           if (level == lmax)
-          fatal(5);
+            fatal(5);
           level++;
           display[level] = b;
           offset = 0;
@@ -779,10 +795,14 @@ function compiladorPascalS(){
             if (sy == "ident"){
               t0 = t;
               entervariable();
+              while(sy == "comma"){
+                insymbol();
+                entervariable();
+              }
               if (sy == "colon")
-              insymbol();
+                insymbol();
               else
-              Error(5);
+                Error(5);
               t1 = t;
               typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), eltp, elrf, elsz);
               while (t0 < t1){
@@ -796,7 +816,7 @@ function compiladorPascalS(){
             }
             if (sy == "endsy"){
               if (sy == "semicolon")
-              insymbol();
+                insymbol();
               else {
                 Error(14);
                 if (sy == "comma")
@@ -811,7 +831,7 @@ function compiladorPascalS(){
           insymbol();
           level--;
         }
-        test(fsys, "", 6);
+        test(fsys, [""], 6);
       }
     }//typ
 
@@ -838,27 +858,27 @@ function compiladorPascalS(){
         if (sy == "colon"){
           insymbol();
           if (sy != "ident")
-          Error(2);
+            Error(2);
           else {
             x = loc(id);
             insymbol();
             if (x != 0)
-            if (tab[x].obj != "type1")
-            Error(29);
-            else {
-              tp = tab[x].typ;
-              rf = tab[x].ref;
-              if (valpar)
-              sz = tab[x].adr;
-              else
-              sz = 1;
-            }
+              if (tab[x].obj != "type1")
+                Error(29);
+              else {
+                tp = tab[x].typ;
+                rf = tab[x].ref;
+                if (valpar)
+                sz = tab[x].adr;
+                else
+                sz = 1;
+              }
 
           }
           test(["semicolon", "rparent"], ["comma", "ident"].concat(fsys), 14);
         }
         else
-        Error(5);
+          Error(5);
         while(t0 < t){
           t0++;
           tab[t0].typ = tp;
@@ -868,9 +888,9 @@ function compiladorPascalS(){
           tab[t0].lev = level;
           dx += sz;
         }
-        if (sy == "rparent"){
+        if (sy != "rparent"){
           if (sy == "semicolon")
-          insymbol();
+            insymbol();
           else {
             Error(14);
             if (sy == "comma")
@@ -884,7 +904,7 @@ function compiladorPascalS(){
         test(["semicolon", "colon"], fsys, 6);
       }
       else
-      Error(4);
+        Error(4);
     }
 
     function constantdeclaration(){
@@ -895,11 +915,11 @@ function compiladorPascalS(){
         enter(id, "konstant");
         insymbol();
         if (sy == "eql" )
-        insymbol();
+          insymbol();
         else {
           Error(16);
           if (sy == "becomes")
-          insymbol();
+            insymbol();
         }
         constant(["semicolon", "comma", "ident"].concat(fsys), c);
         tab[t].typ = c.tp;
@@ -909,10 +929,10 @@ function compiladorPascalS(){
           tab[t].adr = c1;
         }
         else
-        tab[t].adr = c.i;
+          tab[t].adr = c.i;
         TestSemicolon();
       }
-    }
+    }//constantdeclaration
 
     function typedeclaration(){
       var tp, rf, sz, t1;
@@ -923,11 +943,11 @@ function compiladorPascalS(){
         t1 = t;
         insymbol();
         if (sy == "eql")
-        insymbol();
+          insymbol();
         else {
           Error(16);
           if (sy == "becomes")
-          insymbol();
+            insymbol();
         }
         typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
         tab[t1].typ = tp;
@@ -935,7 +955,7 @@ function compiladorPascalS(){
         tab[t1].adr = sz;
         TestSemicolon();
       }
-    }
+    }//typedeclaration
 
     function variabledeclaration(){
       var t0, t1, rf, sz, tp;
@@ -948,9 +968,9 @@ function compiladorPascalS(){
           entervariable();
         }
         if (sy == "colon")
-        insymbol();
+          insymbol();
         else
-        Error(5);
+          Error(5);
         t1 = t;
         typ(["semicolon", "comma", "ident"].concat(fsys), tp, rf, sz);
         while(t0 < t1){
@@ -964,7 +984,7 @@ function compiladorPascalS(){
         }
         TestSemicolon();
       }
-    }
+    }//variabledeclaration
 
     function procdeclaration(){
       var isfun;
@@ -972,19 +992,19 @@ function compiladorPascalS(){
       insymbol();
       if (sy != "ident"){
         Error(2);
-        id = "          ";
+        id = "";
       }
       if (isfun)
-      enter(id, "funktion");
+        enter(id, "funktion");
       else
-      enter(id, "prozedure");
+        enter(id, "prozedure");
       tab[t].normal = true;
       insymbol();
       block(["semicolon"].concat(fsys), isfun, level+1);
       if (sy == "semicolon")
-      insymbol();
+        insymbol();
       else
-      Error(14);
+        Error(14);
       var bool = (isfun)?1:0;
       emit(32 + bool);
     }//procdeclaration
@@ -994,57 +1014,59 @@ function compiladorPascalS(){
 
       function selector(fsys, v){
         var x, a, j;
+        x = item;
+        v = item;
         do{
           if (sy == "period"){
             insymbol();
             if (sy != "ident")
-            Error(2);
+              Error(2);
             else {
               if (v.typ != "records")
-              Error(31);
+                Error(31);
               else {
                 j = btab[v.ref].last;
                 tab[0].name = id;
                 while(tab[j].name != id)
-                j = tab[j].link;
+                  j = tab[j].link;
                 if (j == 0)
-                Error(0);
+                  Error(0);
                 v.typ = tab[j].typ;
                 v.ref = tab[j].ref;
                 a = tab[j].adr;
                 if (a != 0)
-                emit1(9, a);
+                  emit1(9, a);
               }
               insymbol();
             }
           }
           else {    //Seletor do Array
             if (sy != "lbrack")
-            Error(11);
+              Error(11);
             do{
               insymbol();
               expression(fsys.concat(["comma", "rbrack"]), x);
               if (v.typ != "arrays")
-              Error(28);
+                Error(28);
               else {
                 a = v.ref;
                 if (atab[a].inxtyp != x.typ)
-                Error(26);
+                  Error(26);
                 else
-                if (atab[a].elsize == 1)
-                emit1(20, a);
+                  if (atab[a].elsize == 1)
+                    emit1(20, a);
                 else
-                emit1(21, a);
+                  emit1(21, a);
                 v.typ = atab[a].eltyp;
                 v.ref = atab[a].elref;
               }
             }while(sy == "comma");
             if (sy == "rbrack")
-            insymbol();
+              insymbol();
             else {
               Error(12);
               if (sy == "rparent")
-              insymbol();
+                insymbol();
             }
           }
         }while(["lbrack", "lparent", "period"].indexOf(sy) != -1);
@@ -1053,6 +1075,7 @@ function compiladorPascalS(){
 
       function call(fsys, i){
         var x, lastp, cp, k;
+        x = item;
         emit1(18, i);
         lastp = btab[tab[i].ref].lastpar;
         cp = i;
@@ -1067,13 +1090,13 @@ function compiladorPascalS(){
                 expression(fsys.concat(["comma", "colon", "rparent"]), x);
                 if (x.typ == tab[cp].typ){
                   if (x.ref != tab[cp].ref)
-                  Error(36);
+                    Error(36);
                   else
-                  if (x.typ == "arrays")
-                  emit1(22, atab[x.ref].size);
-                  else
-                  if (x.typ == "records")
-                  emit1(22, btab[x.ref].vsize);
+                    if (x.typ == "arrays")
+                      emit1(22, atab[x.ref].size);
+                    else
+                      if (x.typ == "records")
+                        emit1(22, btab[x.ref].vsize);
                 }
                 else
                 if (x.typ == "ints" && tab[cp].typ == "reals")
@@ -2208,7 +2231,7 @@ function compiladorPascalS(){
         }
       }//primeiro switch
     }
-    while (ps != run);
+    while (ps != "run");
 
     if (ps.indexOf("fin") == -1){
       //writeln;

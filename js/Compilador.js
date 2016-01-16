@@ -58,8 +58,8 @@ var id;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
 var rnum;         //Real de insymbol
 var sleng;        //Tamanho da string de insymbol
-var ch;           //Ultimo caracter lido do código fonte
-var line;         //Ultima linha lida
+var ch="";           //Ultimo caracter lido do código fonte
+var line = "";         //Ultima linha lida
 var cc;           //Contagem de caracteres
 var lc;           //Contador do programa
 var ll;           //Tamanho da linha atual
@@ -85,41 +85,51 @@ var btab = []
 var stab = [];
 var rconst = [];
 var kode = [];
-var indexfile = 0;  //Índice para navegar na string do código
-var indexline = 0; //Índice para navegar entre as linhas
+var iln = 0;  //contador de caracteres total
+var token = [""];
+var pc_token = 0;
+
 var indexmax;  //Tamanho total do código
 var output_console = new Array(linelimit);    //Variável que irá imprimir na tela do console
 var read_ok = true;
 
 function initArray(){
   var j = 0;
+  console.log("iniciando tab");
   do{
     tab[j] =  {name: "", link: 1, obj: [""], typ: [""], ref: 1, normal: true, lev: 1, adr: 44};
+    j++;
   }while(j < tmax);
   j = 0;
+  console.log("tab iniciada");
   do{
     atab[j] = {inxtyp: [""], eltyp: [""], elref: 1, low: 1, high: 1, elsize: 1, size: 1 };
+    j++;
   }while(j < amax);
   j = 0;
+  console.log("atab iniciada");
   do{
     btab[j] = {last: 1, lastpar: 1, psize: 1, vsize: 1};
+    j++;
   }while(j < bmax);
   j = 0;
+  console.log("btab iniciada");
   do{
     kode[j] = order;
+    j++;
   }while( j < cmax);
   j = 0;
+  console.log("kode iniciada");
   do{
     output_console[j] = "";
+    j++;
   }while(j < linelimit);
 }
 
 function compiladorPascalS(){
 
-  indexmax = InputFile.length
-  InputFile.split("\n");    //Dividindo o código pelas linhas
-
-
+  indexmax = InputFile.length;
+  InputFile = InputFile.split("\n");
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
 
   function ErrorMsg(){
@@ -169,44 +179,26 @@ function compiladorPascalS(){
   //FUNÇÃO DE BUSCA DE CARACTERES
   function NextCh(){
     if (cc == ll){
-      if (indexline == InputFile.length && indexfile == InputFile[InputFile.length].length) {    //Verifica se chegou ao final do texto
-        console.log('');
-        console.log(' programa incompleto');
-        ErrorMsg(); //  { goto 99;} vai para linha 99? - Não, está em um comentário
-        //continue;// AppEnd();//Retorna para a função principal e encerra a aplicação
+      if (indexmax == iln){
+        console.log("Programa incompleto");
       }
-      if (errpos != 0) {
-        console.log('');
-        errpos = 0; //errpos := 0
-      }
-
-      console.log("     "+lc)//write(lc: 5, '  ');
-      ll = 0;//ll := 0;
-      cc = 0;//cc := 0;
-      while (InputFile.charAt(indexfile) != "\n") {   //Verifica se chegou ao final da linha
-        ll += 1;//ll := ll + 1;
-        ch = InputFile.charAt(indexfile);     //Lê um caracter
-        indexfile++;                //Incrementa o contador de caracteres
-        console.log(ch);//      write(ch);
-        line[ll] = ch;//line[ll] := ch
-      }
-      console.log('');//  writeln;
-      indexline++;      //Vai para a próxima linha do código.
-      indexfile = 0;    //Zera o contador de caracteres da linha
-      ll += 1;//ll := ll + 1;
-      line[ll] = ' ';//line[ll] := ' ';
+      if (errpos != 0)
+        errpos = 0;
+      ll = 0;
+      cc = 0;
+      line = InputFile[iln];
+      ll = line.length;
     }
-    cc += 1;//cc := cc + 1;
-    ch = line[cc];//ch := line[cc];
+    cc++;
+    ch = line[cc];
   }
-
   //Função Error
   function Error(n){
     if (errpos == 0) {
       console.log(" ****");
     }
     if(cc > errpos){
-      console.log( '' + cc - errpos +"^"+ n );//write(' ': cc - errpos, '^', n: 2);
+      console.log( "cc: "+  cc+" ch " + ch +"errpos: "+ errpos +"^"+ n );//write(' ': cc - errpos, '^', n: 2);
       errpos = cc + 3; //errpos := cc + 3;
       errs = errs.concat(n);//errs := errs + [n]
     }
@@ -276,18 +268,19 @@ function compiladorPascalS(){
       }
     }
 
-    _1: while(ch == " ")
-    NextCh();
+    while(ch == " ")
+      NextCh();
+    /*
     if(ch >= "a" && ch <= "z"){
       k = 0;
       id = "";      //Seta a variavel id com espaços em branco
       do{
         if (k < alng){
           k++;
-          id = id+ch;
+          id += ch;
         }
         NextCh();
-      }while(!(ch >= "a" && ch <= "z" || ch >= "0" && ch <= "9"));
+      }while((ch >= "a" && ch <= "z") || (ch >= 0 && ch <= 9));
       /*i = 1;      //Busca binaria
       j = nkw;
       do{
@@ -301,9 +294,10 @@ function compiladorPascalS(){
     }while(i < j);*/
     i = key.indexOf(id);
     if (i != -1)
-    sy = ksy[i];
+      sy = ksy[i];
     else
-    sy = "ident";
+      sy = "ident";
+    debugger;
   }
   else {
     if (ch >= 0 && ch <= 9){
@@ -407,7 +401,7 @@ function compiladorPascalS(){
           stab[sx+k] = ch;
           k++;
           if (cc == 1)    //mudou de linha
-          k = 0;
+            k = 0;
         }while(cc != 1);
         if (k == 1){
           sy = "charcon";
@@ -604,13 +598,14 @@ function block(fsys, isfun, level){
     if (t == tmax)
     fatal(1);
     else {
-      tab[0].name - id;
+      tab[0].name = id;
       j = btab[display[level]].last;
       l = j;
+      console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
       while(tab[j].name != id)
-      j = tab[j].link;
+        j = tab[j].link;
       if (j != 0)
-      Error(1);
+        Error(1);
       else {
         t++;
         tab[t].name = id;
@@ -1476,7 +1471,6 @@ function block(fsys, isfun, level){
         x.typ = "bools";
       }
     }//expression
-
     function assignment(lv, ad){
       var x, y, f;
       x = item;
@@ -1995,11 +1989,11 @@ function interpret(){
   fld[2] = 22;
   fld[3] = 10;
   fld[4] = 1;
-  do {
+    do {
     ir = kode[pc];
     pc++;
     ocnt++;
-    switch(ir.f){
+      switch(ir.f){
       case 0:
       t++;
       if (t > stacksize){
@@ -2096,38 +2090,36 @@ function interpret(){
 }
 break;*/
 
-}//switch case 8
-
-case 9: s[t].i = s[t].i + ir.y; break;
-case 10: pc = ir.y; //jump
-case 11:
-if (!s[t].b){
-  pc = ir.y;
-  t--;
-}
-break;
-
-case 12:
-h1 = s[t].i;
-t = t - 1;
-h2 = ir.y;
-h3 = 0;
-do {
-  if (kode[h2].f != 13){
-    h3 = 1;
-    ps = 'caschk';
+  }//switch case 8
+  break;
+  case 9: s[t].i = s[t].i + ir.y; break;
+  case 10: pc = ir.y; //jump
+  case 11:
+  if (!s[t].b){
+    pc = ir.y;
+    t--;
   }
-  else{
-    if (kode[h2].y == h1){
-      h3 = 1;
-      pc = kode[h2 + 1].y
-    }
-    else{
-      h2 = h2 + 2;
-    }
-  }
-} while (h3 == 0);
-break;
+  break;
+  case 12:
+    h1 = s[t].i;
+    t = t - 1;
+    h2 = ir.y;
+    h3 = 0;
+    do {
+      if (kode[h2].f != 13){
+        h3 = 1;
+        ps = 'caschk';
+      }
+      else{
+        if (kode[h2].y == h1){
+          h3 = 1;
+          pc = kode[h2 + 1].y
+        }
+        else
+          h2 += 2;
+        }
+    } while (h3 == 0);
+    break;
 
 case 14:
 h1 = s[t - 1].i;
@@ -2584,9 +2576,8 @@ case 63:
 //      writeln;
 lncnt++;
 chrcnt = 0;
-if (lncnt > linelimit){
+if (lncnt > linelimit)
   ps = 'linchk';
-}
 }//primeiro switch
 }
 while (ps != "run");
@@ -2651,18 +2642,18 @@ console.log("          " + ocnt + " steps");
 //writeln(ocnt: 10, ' steps');
 
 }//interpret
+initArray();
 
-var Ok = false;
-if (paramcount >= 1){
+//var Ok = false;
+/*if (paramcount >= 1){
   assign(InputFile, ParamStr(1));
   reset(InputFile);
   Ok = IoResult == 0;
 }
 
-while (!Ok){
+/*while (!Ok){
   console.log("");
-  //INTRODUZIR O CÓDIGO NA VARIÁVEL InputFile
-}
+}*/
 key[1] = 'and'; key[2] = 'array';
 key[3] = 'begin'; key[4] = 'case';
 key[5] = 'const'; key[6] = 'div';
@@ -2700,8 +2691,7 @@ sps['#'] = 'neq'; sps['&'] = 'andsy';
 sps[';'] = 'semicolon';
 constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
 typebegsys = ['ident', 'arraysy', 'recordsy'];
-blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy',
-'functionsy', 'beginsy'];
+blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
 facbegsys = ['intcon', 'realcon', 'charcon', 'ident', 'lparent', 'notsy'];
 statbegsys = ['beginsy', 'ifsy', 'whilesy', 'repeatsy', 'forsy', 'casesy'];
 stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars'];
@@ -2718,10 +2708,12 @@ b = 1;
 sx = 0;
 c2 = 0;
 display[0] = 1;
+display[1] = 1;
+display[2] = 1;
 iflag = false;
 oflag = false;
 if (sy != "programsy")
-Error(3);
+;
 else {
   insymbol();
   if (sy != "ident")
@@ -2755,7 +2747,7 @@ else {
     Error(20);
   }
 }
-enter('', "variable", "notyp", 0); {sentinel}
+enter('', "variable", "notyp", 0);
 enter('false', "konstant", "bools", 0);
 enter('true', "konstant", "bools", 1);
 enter('real', "type1", "reals", 1);
@@ -2788,7 +2780,7 @@ btab[1].last = t;
 btab[1].lastpar = 1;
 btab[1].psize = 0;
 btab[1].vsize = 0;
-Block(blockbegsys.concat(statbegsys), false, 1);
+block(blockbegsys.concat(statbegsys), false, 1);
 if (sy != "period")
 Error(22);
 Emit(31);

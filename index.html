@@ -63,10 +63,10 @@
         </form>
         <!--<input id="compilar" name="compilar" type="button" value="Compilar" onclick="return popitup('console.html')"/>-->
         <!--<input id="compilar" class="btn btn-default btn-lg" name="compilar" type="button" value="Compilar" onclick="getCode();"/>-->
-        <button name="compilar" id="compilar"type="button" class="btn btn-default" onclick="">
+        <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
           <span class="glyphicon glyphicon-sort"></span> Depurar
         </button>
-        <button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#modalOutput">
+        <button name="depurar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#modalOutput" onclick="return getCode();">
           <span class="glyphicon glyphicon-play"></span> Compilar
         </button>
 
@@ -74,7 +74,7 @@
         <span class="glyphicon glyphicon-play"></span> Compilar
       </button>-->
 
-      <button name="compilar" id="compilar"type="button" class="btn btn-default" onclick="">
+      <button name="compilar" id="novo"type="button" class="btn btn-default" onclick="">
         <span class="glyphicon glyphicon-file"></span> Novo
       </button>
 
@@ -124,8 +124,9 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 </script>
 <script>
 function getCode(){
-  var text = iniciaCompilador(editor.getValue());
-  alert(text);
+  InputFile = editor.getValue();
+  compiladorPascalS();
+  //alert(text);
 }
 </script>
 </body>

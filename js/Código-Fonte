@@ -80,7 +80,7 @@ var
   sps: array[char] of symbol; {special symbols}
   xname: xstring;
 
-  t, a, b, sx, c1, c2: integer; {indices to tables}
+  t, a, b , sx, c1, c2: integer; {indices to tables}
   stantyps: typset;
   display: array[0..lmax] of integer;
 

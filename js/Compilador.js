@@ -128,8 +128,9 @@ function initArray(){
 
 function compiladorPascalS(){
 
-  indexmax = InputFile.length;
+
   InputFile = InputFile.split("\n");
+  indexmax = InputFile.length;
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
 
   function ErrorMsg(){
@@ -181,16 +182,18 @@ function compiladorPascalS(){
     if (cc == ll){
       if (indexmax == iln){
         console.log("Programa incompleto");
+        return;
       }
       if (errpos != 0)
         errpos = 0;
       ll = 0;
       cc = 0;
       line = InputFile[iln];
+      iln++;
       ll = line.length;
     }
-    cc++;
     ch = line[cc];
+    cc++;
   }
   //Função Error
   function Error(n){
@@ -270,7 +273,7 @@ function compiladorPascalS(){
 
     while(ch == " ")
       NextCh();
-    /*
+
     if(ch >= "a" && ch <= "z"){
       k = 0;
       id = "";      //Seta a variavel id com espaços em branco
@@ -280,7 +283,7 @@ function compiladorPascalS(){
           id += ch;
         }
         NextCh();
-      }while((ch >= "a" && ch <= "z") || (ch >= 0 && ch <= 9));
+      }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= 0 && ch <= 9)));
       /*i = 1;      //Busca binaria
       j = nkw;
       do{
@@ -297,7 +300,6 @@ function compiladorPascalS(){
       sy = ksy[i];
     else
       sy = "ident";
-    debugger;
   }
   else {
     if (ch >= 0 && ch <= 9){
@@ -444,7 +446,9 @@ function compiladorPascalS(){
         default:
         Error(24);
         NextCh();
+        debugger;
         insymbol();
+        return;
       }
     }
   }
@@ -565,8 +569,8 @@ function printtables(){
 }
 
 function block(fsys, isfun, level){
-  var conrec = {tp: "", i: 2, r: 2.4};
-  var conrec = {tp: 0, i: 0, r: 0.0};
+//  var conrec = {tp: "", i: 2, r: 2.4};
+  var conrec = {tp: "", i: 0, r: 0.0};
 
   var dx;   //Índice de alocação de dados
   var prt;  //Índice T deste procedimento
@@ -629,7 +633,7 @@ function block(fsys, isfun, level){
       while(tab[j].name != id)
       j = tab[j].link;
       i--;
-    }while(i > 0 || j == 0);
+    }while(!((i < 0) || (j != 0)));
     if (j == 0)
     Error(0);
     return j;
@@ -694,13 +698,16 @@ function block(fsys, isfun, level){
       }
       test(fsys, [""], 6);
     }
+    return c;
   }//constant
 
   function typ(fsys, tp, rf, sz){
     var x, eltp, elrf, eldz, offset, t0, t1;
     function arraytyp(aref, arsz){
       var eltp, low, high, elrf, elsz;
-      constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
+      low = conrec;
+      high = conrec;
+      low = constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
       if (low.tp == "reals"){
         Error(27);
         low.tp = "ints";
@@ -710,7 +717,7 @@ function block(fsys, isfun, level){
       insymbol();
       else
       Error(13);
-      constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
+      high = constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
       if (high.tp != low.tp){
         Error(27);
         high.i = low.i;

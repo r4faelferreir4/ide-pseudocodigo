@@ -184,7 +184,8 @@ function compiladorPascalS(){
     if (cc == ll){
       if (iln+1 >= indexmax){
         console.log("Programa incompleto");
-        sy = undefined;
+        //sy = undefined;
+        throw new Error("Something went badly wrong!");
         return;
       }
       if (errpos != 0)

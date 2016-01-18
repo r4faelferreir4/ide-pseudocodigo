@@ -53,7 +53,7 @@ var order = {
 //DECLARAÇÃO DE VARIÁVEIS
 
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
-var sy;  //Ultimo simbolo lido por insymbol
+var sy="";  //Ultimo simbolo lido por insymbol
 var id;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
 var rnum;         //Real de insymbol
@@ -75,6 +75,7 @@ var statbegsys = [];
 var key = [];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [];   //Tipo symbol não especificado, lembrar de tratar isso depois
 var sps = [];      //Simbolos especiais, tipo symbol não especificado
+var csps = [];    //Caracteres de simbolos especiais
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
@@ -128,8 +129,10 @@ function initArray(){
 
 function compiladorPascalS(){
 
-  indexmax = InputFile.length;
+
   InputFile = InputFile.split("\n");
+  indexmax = InputFile.length;
+  console.log(InputFile[iln]);
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
 
   function ErrorMsg(){
@@ -179,18 +182,23 @@ function compiladorPascalS(){
   //FUNÇÃO DE BUSCA DE CARACTERES
   function NextCh(){
     if (cc == ll){
-      if (indexmax == iln){
+      if (iln+1 >= indexmax){
         console.log("Programa incompleto");
+        sy = undefined;
+        return;
       }
       if (errpos != 0)
         errpos = 0;
       ll = 0;
       cc = 0;
+      if (InputFile[iln] == "")  iln++;
       line = InputFile[iln];
+      iln++;
       ll = line.length;
     }
-    cc++;
     ch = line[cc];
+    debugger;
+    cc++;
   }
   //Função Error
   function Error(n){
@@ -211,6 +219,7 @@ function compiladorPascalS(){
     Msg[4] = "arranjos";   Msg[5] = "niveis";
     Msg[6] = "código";   Msg[7] = "strings";
     console.log("Tabela do compilador para"+ Msg[n] +"é muito pequena");
+    sy = undefined;
     // continue AppEnd;    //Termina compilação.
   }
 
@@ -267,10 +276,10 @@ function compiladorPascalS(){
 
       }
     }
-
+    if (sy == undefined)  return;
     while(ch == " ")
       NextCh();
-    /*
+
     if(ch >= "a" && ch <= "z"){
       k = 0;
       id = "";      //Seta a variavel id com espaços em branco
@@ -280,7 +289,7 @@ function compiladorPascalS(){
           id += ch;
         }
         NextCh();
-      }while((ch >= "a" && ch <= "z") || (ch >= 0 && ch <= 9));
+      }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")));
       /*i = 1;      //Busca binaria
       j = nkw;
       do{
@@ -297,10 +306,9 @@ function compiladorPascalS(){
       sy = ksy[i];
     else
       sy = "ident";
-    debugger;
   }
   else {
-    if (ch >= 0 && ch <= 9){
+    if (ch >= "0" && ch <= "9"){
       k = 0;
       inum = 0;
       sy = "intcon";
@@ -345,6 +353,7 @@ function compiladorPascalS(){
       }
     }
     else {
+      debugger;
       switch (ch) {
         case ":":
         NextCh();
@@ -387,13 +396,13 @@ function compiladorPascalS(){
         else
         sy = "period";
         break;
-        case "\"":
+        case "\'":
         k = 0;
         do{
           NextCh();
-          if (ch == "\""){
+          if (ch == "\'"){
             NextCh();
-            if (ch != "\"")
+            if (ch != "\'")
             break;
           }
           if ((sx + k) == smax)
@@ -419,7 +428,6 @@ function compiladorPascalS(){
           sleng = k;
           sx += k;
         }
-
         break;
         case "(":
         NextCh();
@@ -437,17 +445,30 @@ function compiladorPascalS(){
           return;
         }
         break;
-        case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
+        /*case "+", "-", "*", "/", ")", "=", ",", "[", "]", "#", "&", ";":
         sy = sps[ch];
         NextCh();
+        break;*/
+        case " ":
+        return;
         break;
         default:
-        Error(24);
-        NextCh();
-        insymbol();
+        if (csps.indexOf(ch) != -1){
+          sy = sps[ch];
+          NextCh();
+        }
+        else{
+          Error(24);
+          NextCh();
+          debugger;
+          insymbol();
+          return;
+        }
       }
+      debugger;
     }
   }
+  if (iln == indexmax)  sy = NULL;
 }//insymbol
 
 function enter (x0, x1, x2, x3){
@@ -565,8 +586,8 @@ function printtables(){
 }
 
 function block(fsys, isfun, level){
-  var conrec = {tp: "", i: 2, r: 2.4};
-  var conrec = {tp: 0, i: 0, r: 0.0};
+//  var conrec = {tp: "", i: 2, r: 2.4};
+  var conrec = {tp: "", i: 0, r: 0.0};
 
   var dx;   //Índice de alocação de dados
   var prt;  //Índice T deste procedimento
@@ -629,7 +650,7 @@ function block(fsys, isfun, level){
       while(tab[j].name != id)
       j = tab[j].link;
       i--;
-    }while(i > 0 || j == 0);
+    }while(!((i < 0) || (j != 0)));
     if (j == 0)
     Error(0);
     return j;
@@ -646,9 +667,9 @@ function block(fsys, isfun, level){
 
   function constant(fsys, c){
     var x, sign;
-    c = conrec;
-    c.tp = "notyp"
-    c.i = 0;
+    //c = conrec;
+    //c.tp = "notyp"
+    //c.i = 0;
     test(constbegsys, fsys, 50);
     if(constbegsys.indexOf(sy) != -1){
       if (sy == "charcon"){
@@ -694,13 +715,16 @@ function block(fsys, isfun, level){
       }
       test(fsys, [""], 6);
     }
+    return c;
   }//constant
 
   function typ(fsys, tp, rf, sz){
     var x, eltp, elrf, eldz, offset, t0, t1;
     function arraytyp(aref, arsz){
       var eltp, low, high, elrf, elsz;
-      constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
+      low = conrec;
+      high = conrec;
+      low = constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
       if (low.tp == "reals"){
         Error(27);
         low.tp = "ints";
@@ -710,7 +734,7 @@ function block(fsys, isfun, level){
       insymbol();
       else
       Error(13);
-      constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
+      high = constant(["rbrack", "comma", "rparent", "ofsy"].concat(fsys), high);
       if (high.tp != low.tp){
         Error(27);
         high.i = low.i;
@@ -915,7 +939,7 @@ function block(fsys, isfun, level){
         if (sy == "becomes")
         insymbol();
       }
-      constant(["semicolon", "comma", "ident"].concat(fsys), c);
+      c = constant(["semicolon", "comma", "ident"].concat(fsys), c);
       tab[t].typ = c.tp;
       tab[t].ref = 0;
       if (c.tp == "reals"){
@@ -1009,9 +1033,6 @@ function block(fsys, isfun, level){
     function selector(fsys, v){
       var x, a, j;
       x = item;
-      v = item;
-      v = item;
-      x = item;
       do{
         if (sy == "period"){
           insymbol();
@@ -1041,7 +1062,7 @@ function block(fsys, isfun, level){
           Error(11);
           do{
             insymbol();
-            expression(fsys.concat(["comma", "rbrack"]), x);
+            x = expression(fsys.concat(["comma", "rbrack"]), x);
             if (v.typ != "arrays")
             Error(28);
             else {
@@ -1067,6 +1088,7 @@ function block(fsys, isfun, level){
         }
       }while(["lbrack", "lparent", "period"].indexOf(sy) != -1);
       test(fsys, "", 6);
+      return v;
     }//Selector
 
     function call(fsys, i){
@@ -1083,7 +1105,7 @@ function block(fsys, isfun, level){
           else {
             cp++;
             if (tab[cp].normal){
-              expression(fsys.concat(["comma", "colon", "rparent"]), x);
+              x = expression(fsys.concat(["comma", "colon", "rparent"]), x);
               if (x.typ == tab[cp].typ){
                 if (x.ref != tab[cp].ref)
                 Error(36);
@@ -1120,7 +1142,7 @@ function block(fsys, isfun, level){
                   else
                   emit2(1, tab[k].lev, tab[k].adr);
                   if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-                  selector(fsys.concat(["comma", "colon", "rparent"]), x);
+                  x = selector(fsys.concat(["comma", "colon", "rparent"]), x);
                   if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
                   Error(36);
                 }
@@ -1142,7 +1164,7 @@ function block(fsys, isfun, level){
     }//call
 
     function resulttype(a, b){
-      if (type1.indexOf(a) > type1.indexOf("reals") || type1.indexOf(b) > type1.indexOf("reals")){
+      if (types1.indexOf(a) > types1.indexOf("reals") || types1.indexOf(b) > types1.indexOf("reals")){
         Error(33);
         return "notyp";
       }
@@ -1164,7 +1186,7 @@ function block(fsys, isfun, level){
       }
     }//resulttype
 
-    function expression(){
+    function expression(fsys, x){
       var y, op;
       y = item;
 
@@ -1191,7 +1213,7 @@ function block(fsys, isfun, level){
               else
               Error(9);
               if (n < 17){
-                expression(fsys.concat["lparent"], x);
+                x = expression(fsys.concat["lparent"], x);
                 switch (n) {
                   case 0, 2:
                   ts = ["ints", "reals"];
@@ -1262,7 +1284,7 @@ function block(fsys, isfun, level){
                     else
                     f = 1;
                     emit2(f, tab[i].lev, tab[i].adr);
-                    selector(fsys, x);
+                    x = selector(fsys, x);
                     if (stantyps.indexOf(x.typ) != -1)
                     emit(34);
                   }
@@ -1312,7 +1334,7 @@ function block(fsys, isfun, level){
               else
               if (sy == "lparent"){
                 insymbol();
-                expression(fsys.concat(["lparent"]), x);
+                x = expression(fsys.concat(["lparent"]), x);
                 if (sy == "lparent")
                 insymbol();
                 else
@@ -1321,7 +1343,7 @@ function block(fsys, isfun, level){
               else
               if (sy == "notsy"){
                 insymbol();
-                factor(fsys, x);
+                x = factor(fsys, x);
                 if (x.typ == "bools")
                 emit(35);
                 else
@@ -1330,9 +1352,10 @@ function block(fsys, isfun, level){
               }
               test(fsys, facbegsys, 6);
             }
+            return x;
           } //factor
 
-          factor(fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), x);
+          x = factor(fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), x);
           while (["times", "rdiv", "idiv", "imod", "andsy"].indexOf(sy) != -1){
             op = sy;
             insymbol();
@@ -1385,12 +1408,13 @@ function block(fsys, isfun, level){
               }
             }
           }
+          return x;
         }//term
 
         if (["plus", "minus"].indexOf(sy) != -1){
           op = sy;
           insymbol();
-          term(fsys.concat(["plus", "minus"]), x);
+          x = term(fsys.concat(["plus", "minus"]), x);
           if (types1.indexOf(x.typ) > types1.indexOf("reals"))
           Error(33);
           else
@@ -1398,11 +1422,11 @@ function block(fsys, isfun, level){
           emit(36);
         }
         else
-        term(fsys.concat(["plus", "minus", "orsy"]), x);
+        x = term(fsys.concat(["plus", "minus", "orsy"]), x);
         while (["plus", "minus", "orsy"].indexOf(sy) != -1){
           op = sy;
           insymbol();
-          term(fsys.concat(["plus", "minus", "orsy"]), y);
+          y = term(fsys.concat(["plus", "minus", "orsy"]), y);
           if (op == "orsy"){
             if (x.typ == "bools" && y.typ == "bools")
             emit(51);
@@ -1430,13 +1454,14 @@ function block(fsys, isfun, level){
             }
           }
         }
+        return x;
       }//simpleexpression
 
-      simpleexpression(fsys.concat(["eql", "neq", "lss", "leq", "gtr", "geq"]), x);
+      x = simpleexpression(fsys.concat(["eql", "neq", "lss", "leq", "gtr", "geq"]), x);
       if (["eql", "neq", "lss", "leq", "gtr", "geq"].indexOf(sy) != -1){
         op = sy;
         insymbol();
-        simpleexpression(fsys, y);
+        y = simpleexpression(fsys, y);
         if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) && x.typ == y.typ)
         switch (op) {
           case "eql": emit(45);break;
@@ -1470,6 +1495,7 @@ function block(fsys, isfun, level){
         }
         x.typ = "bools";
       }
+      return x;
     }//expression
     function assignment(lv, ad){
       var x, y, f;
@@ -1483,7 +1509,7 @@ function block(fsys, isfun, level){
       f = 1;
       emit2(f, lv, ad);
       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-      selector(["becomes", "eql"].concat(fsys), x);
+      x = selector(["becomes", "eql"].concat(fsys), x);
       if (sy == "becomes")
       insymbol();
       else {
@@ -1491,7 +1517,7 @@ function block(fsys, isfun, level){
         if (sy == "eql")
         insymbol();
       }
-      expression(fsys, y);
+      y = expression(fsys, y);
       if (x.typ == y.typ)
       if (stantyps.indexOf(x.typ) != -1)
       emit(38);
@@ -1533,7 +1559,7 @@ function block(fsys, isfun, level){
       var x, lc1, lc2;
       x = item;
       insymbol();
-      expression(fsys.concat(["thensy", "dosy"]), x);
+      x = expression(fsys.concat(["thensy", "dosy"]), x);
       if (["bools", "notyp"].indexOf(x.typ) == -1)
       Error(17);
       lc1 = lc;
@@ -1575,7 +1601,7 @@ function block(fsys, isfun, level){
       function caselabel(){
         var lab, k;
         lab = conrec;
-        constant(fsys.concat(["comma", "colon"]), lab);
+        lab = constant(fsys.concat(["comma", "colon"]), lab);
 
         if (lab.tp != x.typ) {
           Error(47);
@@ -1615,7 +1641,7 @@ function block(fsys, isfun, level){
       insymbol();
       i = 0;
       j = 0;
-      expression(fsys.concat(["ofsy", "comma", "colon"]), x);
+      x = expression(fsys.concat(["ofsy", "comma", "colon"]), x);
       if (["ints", "bools", "chars", "notyp"].indexOf(x.typ) == -1)
       Error(23);
       lc1 = lc;
@@ -1659,7 +1685,7 @@ function block(fsys, isfun, level){
       }
       if (sy == "untilsy"){
         insymbol();
-        expression(fsys, x);
+        x = expression(fsys, x);
         if (["bools", "notyp"].indexOf(x.typ) == -1)
         Error(17);
         emit1(11, lc1);
@@ -1673,7 +1699,7 @@ function block(fsys, isfun, level){
       var lc1, lc2;
       insymbol();
       lc1 = lc;
-      expression(fsys.concat(["dosy"]), x);
+      x = expression(fsys.concat(["dosy"]), x);
       if (["bools", "notyp"].indexOf(x.typ) == -1)
       Error(17);
       lc2 = lc;
@@ -1711,7 +1737,7 @@ function block(fsys, isfun, level){
       skip(["becomes", "tosy", "downtosy", "dosy"].concat(fsys), 2);
       if (sy == "becomes"){
         insymbol();
-        expression(["tosy", "downtosy", "dosy"].concat(fsys), x);
+        x = expression(["tosy", "downtosy", "dosy"].concat(fsys), x);
         if (x.typ != cvt)
         Error(19);
       }
@@ -1722,7 +1748,7 @@ function block(fsys, isfun, level){
         if (sy == "downtosy")
         f = 16;
         insymbol();
-        expression(["dosy"].concat(fsys), x);
+        x = expression(["dosy"].concat(fsys), x);
         if (x.typ != cvt)
         Error(19);
       }
@@ -1770,7 +1796,7 @@ function block(fsys, isfun, level){
                 f = 1;
                 emit1(f, tab[i].lev, tab[i].adr);
                 if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-                selector(fsys.concat(["comma", "rparent"]), x);
+                x = selector(fsys.concat(["comma", "rparent"]), x);
                 if (["ints", "reals", "chars", "notyp"].indexOf(x.typ) != -1)
                 emit1(27, types1.indexOf(x.typ));
                 else
@@ -1797,19 +1823,19 @@ function block(fsys, isfun, level){
               insymbol();
             }
             else {
-              expression(fsys.concat(["comma", "colon","rparent"]), x);
+              x = expression(fsys.concat(["comma", "colon","rparent"]), x);
               if (stantyps.indexOf(x.typ) == -1)
               Error(41);
               if (sy == "colon"){
                 insymbol();
-                expression(fsys.concat(["comma", "colon", "rparent"]), y);
+                y = expression(fsys.concat(["comma", "colon", "rparent"]), y);
                 if (y.typ != "ints")
                 Error(43);
                 if (sy == "colon"){
                   if (x.typ != "reals")
                   Error(42);
                   insymbol();
-                  expression(fsys.concat(["comma", "rparent"]), y);
+                  y = expression(fsys.concat(["comma", "rparent"]), y);
                   if (y.typ != "ints")
                   Error(43);
                   emit(37);
@@ -1831,8 +1857,7 @@ function block(fsys, isfun, level){
         break;
       }
     }
-
-    if (statbegsys.concat["ident"].indexOf(sy) != -1)
+    if (statbegsys.concat(["ident"]).indexOf(sy) != -1)
     switch (sy) {
       case "ident":
       i = loc(id);
@@ -1931,6 +1956,7 @@ function block(fsys, isfun, level){
     while(["proceduresy", "functionsy"].indexOf(sy) != -1)
     procdeclaration();
     test(["beginsy"], blockbegsys.concat(statbegsys), 56);
+    if (sy == undefined) return undefined;
   }while(statbegsys.indexOf(sy) == -1);
   tab[prt].adr = lc;
   insymbol();
@@ -1941,6 +1967,7 @@ function block(fsys, isfun, level){
     else
     Error(14);
     statement(["semicolon", "endsy"].concat(fsys));
+    if (sy == undefined) return undefined;
   }
   if (sy == "endsy")
   insymbol();
@@ -2689,6 +2716,11 @@ sps['='] = 'eql'; sps[','] = 'comma';
 sps['['] = 'lbrack'; sps[']'] = 'rbrack';
 sps['#'] = 'neq'; sps['&'] = 'andsy';
 sps[';'] = 'semicolon';
+csps[0] = "+";  csps[1] = "-" ; csps[2] = "*";
+csps[3] = "/";  csps[4] = "(";  csps[5] = ")";
+csps[6] = "=";  csps[7] = ","; csps[8] = "[";
+csps[9] = "]";  csps[10] = "#"; csps[11] = "&";
+csps[12] = ";";
 constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
 typebegsys = ['ident', 'arraysy', 'recordsy'];
 blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
@@ -2712,8 +2744,10 @@ display[1] = 1;
 display[2] = 1;
 iflag = false;
 oflag = false;
-if (sy != "programsy")
-;
+if (sy != "programsy"){
+  console.log("Aplicação finalizada");
+  return;
+}
 else {
   insymbol();
   if (sy != "ident")

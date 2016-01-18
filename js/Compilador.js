@@ -185,10 +185,11 @@ function compiladorPascalS(){
       if (iln+1 >= indexmax){
         console.log("Programa incompleto");
         sy = undefined;
+        throw new Error("Something went badly wrong!");
         return;
       }
       if (errpos != 0)
-        errpos = 0;
+      errpos = 0;
       ll = 0;
       cc = 0;
       if (InputFile[iln] == "")  iln++;
@@ -278,7 +279,7 @@ function compiladorPascalS(){
     }
     if (sy == undefined)  return;
     while(ch == " ")
-      NextCh();
+    NextCh();
 
     if(ch >= "a" && ch <= "z"){
       k = 0;
@@ -303,9 +304,9 @@ function compiladorPascalS(){
     }while(i < j);*/
     i = key.indexOf(id);
     if (i != -1)
-      sy = ksy[i];
+    sy = ksy[i];
     else
-      sy = "ident";
+    sy = "ident";
   }
   else {
     if (ch >= "0" && ch <= "9"){
@@ -410,7 +411,7 @@ function compiladorPascalS(){
           stab[sx+k] = ch;
           k++;
           if (cc == 1)    //mudou de linha
-            k = 0;
+          k = 0;
         }while(cc != 1);
         if (k == 1){
           sy = "charcon";
@@ -586,7 +587,7 @@ function printtables(){
 }
 
 function block(fsys, isfun, level){
-//  var conrec = {tp: "", i: 2, r: 2.4};
+  //  var conrec = {tp: "", i: 2, r: 2.4};
   var conrec = {tp: "", i: 0, r: 0.0};
 
   var dx;   //Índice de alocação de dados
@@ -624,9 +625,9 @@ function block(fsys, isfun, level){
       l = j;
       console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
       while(tab[j].name != id)
-        j = tab[j].link;
+      j = tab[j].link;
       if (j != 0)
-        Error(1);
+      Error(1);
       else {
         t++;
         tab[t].name = id;
@@ -2016,11 +2017,11 @@ function interpret(){
   fld[2] = 22;
   fld[3] = 10;
   fld[4] = 1;
-    do {
+  do {
     ir = kode[pc];
     pc++;
     ocnt++;
-      switch(ir.f){
+    switch(ir.f){
       case 0:
       t++;
       if (t > stacksize){
@@ -2117,36 +2118,36 @@ function interpret(){
 }
 break;*/
 
-  }//switch case 8
-  break;
-  case 9: s[t].i = s[t].i + ir.y; break;
-  case 10: pc = ir.y; //jump
-  case 11:
-  if (!s[t].b){
-    pc = ir.y;
-    t--;
+}//switch case 8
+break;
+case 9: s[t].i = s[t].i + ir.y; break;
+case 10: pc = ir.y; //jump
+case 11:
+if (!s[t].b){
+  pc = ir.y;
+  t--;
+}
+break;
+case 12:
+h1 = s[t].i;
+t = t - 1;
+h2 = ir.y;
+h3 = 0;
+do {
+  if (kode[h2].f != 13){
+    h3 = 1;
+    ps = 'caschk';
   }
-  break;
-  case 12:
-    h1 = s[t].i;
-    t = t - 1;
-    h2 = ir.y;
-    h3 = 0;
-    do {
-      if (kode[h2].f != 13){
-        h3 = 1;
-        ps = 'caschk';
-      }
-      else{
-        if (kode[h2].y == h1){
-          h3 = 1;
-          pc = kode[h2 + 1].y
-        }
-        else
-          h2 += 2;
-        }
-    } while (h3 == 0);
-    break;
+  else{
+    if (kode[h2].y == h1){
+      h3 = 1;
+      pc = kode[h2 + 1].y
+    }
+    else
+    h2 += 2;
+  }
+} while (h3 == 0);
+break;
 
 case 14:
 h1 = s[t - 1].i;
@@ -2604,7 +2605,7 @@ case 63:
 lncnt++;
 chrcnt = 0;
 if (lncnt > linelimit)
-  ps = 'linchk';
+ps = 'linchk';
 }//primeiro switch
 }
 while (ps != "run");
@@ -2673,13 +2674,13 @@ initArray();
 
 //var Ok = false;
 /*if (paramcount >= 1){
-  assign(InputFile, ParamStr(1));
-  reset(InputFile);
-  Ok = IoResult == 0;
+assign(InputFile, ParamStr(1));
+reset(InputFile);
+Ok = IoResult == 0;
 }
 
 /*while (!Ok){
-  console.log("");
+console.log("");
 }*/
 key[1] = 'and'; key[2] = 'array';
 key[3] = 'begin'; key[4] = 'case';
@@ -2833,7 +2834,7 @@ if (errs.length == 0){
   Reset(InputFile);
   If eof(InputFile) Then
   WriteLn(' input data missing')}*/
-interpret();
+  interpret();
 }
 else
 ErrorMsg();

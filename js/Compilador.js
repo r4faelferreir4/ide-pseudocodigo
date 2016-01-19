@@ -1,7 +1,9 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//
+//emit2(0
+//debugger
+//Error(31)
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -65,7 +67,7 @@ function xtp(tp, rf, sz){
 }
 
 
-
+//record
 //DECLARAÇÃO DE VARIÁVEIS
 
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
@@ -132,7 +134,7 @@ function initArray(){
   j = 0;
   console.log("btab iniciada");
   do{
-    kode[j] = new order(1, 1, 1);
+    kode[j] = new order(0, 0, 0);
     j++;
   }while( j < cmax);
   j = 0;
@@ -202,7 +204,7 @@ function compiladorPascalS(){
       throw new Error("Programa incompleto");
       return;
     }
-    if (iln == indexmax) debugger;
+    //if (iln == indexmax) debugger;
     if (cc == ll){
       if (errpos != 0)
       errpos = 0;
@@ -487,7 +489,7 @@ function compiladorPascalS(){
   }
 }//insymbol
 
-function enter (x0, x1, x2, x3){
+function enter(x0, x1, x2, x3){
   t++;
   tab[t].name = x0;
   tab[t].link = t - 1;
@@ -558,6 +560,7 @@ function emit1(fct, b){
 function emit2(fct, a, b){
   if (lc == cmax)
   fatal(6);
+  if (fct == 0) debugger;
   kode[lc].f = fct;
   kode[lc].x = a;
   kode[lc].y = b;
@@ -638,7 +641,7 @@ function block(fsys, isfun, level){
       tab[0].name = id;
       j = btab[display[level]].last;
       l = j;
-      console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
+      //console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
       while(tab[j].name != id)
       j = tab[j].link;
       if (j != 0)
@@ -734,7 +737,7 @@ function block(fsys, isfun, level){
   }//constant
 
   function typ(fsys, xtype){
-    var x, eltp, elrf, eldz, offset, t0, t1;
+    var x, eltp, elrf, elsz, offset, t0, t1;
     function arraytyp(xtype){
       var eltp, low, high, elrf, elsz;
       low = new conrec("", 0, 0);
@@ -755,12 +758,14 @@ function block(fsys, isfun, level){
         high.i = low.i;
       }
       EnterArray(low.tp, low.i, high.i);
-      xtype.aref = a;
+      xtype.rf = a;
       if (sy == "comma"){
         insymbol();
         eltp = "arrays";
         var xtype2 = new xtp("", elrf, elsz);
         arraytyp(xtype2);
+        elrf = xtype2.rf;
+        elsz = xtype2.sz;
       }
       else {
         if (sy == "rbrack")
@@ -774,7 +779,11 @@ function block(fsys, isfun, level){
         insymbol();
         else
         Error(8);
-        typ(fsys, xtype);
+        var xtype3 = new xtp(eltp, elrf, elsz);
+        typ(fsys, xtype3);
+        eltp = xtype3.tp;
+        elrf = xtype3.rf;
+        elsz = xtype3.sz;
       }
       xtype.sz = (atab[xtype.rf].high - atab[xtype.rf].low + 1)*elsz;
       atab[xtype.rf].size = xtype.sz;
@@ -803,9 +812,9 @@ function block(fsys, isfun, level){
         insymbol();
       }
       else
-      if (sy = "arraysy"){
+      if (sy == "arraysy"){
         insymbol();
-        if (sy = "lbrack")
+        if (sy == "lbrack")
         insymbol();
         else {
           Error(11);
@@ -816,54 +825,61 @@ function block(fsys, isfun, level){
         arraytyp(xtype);
       }
       else{
-        insymbol();
-        EnterBlock();
-        xtype.tp = "records";
-        xtype.rf = b;
-        if (level == lmax)
-        fatal(5);
-        level++;
-        display[level] = b;
-        offset = 0;
-        while(sy != "endsy"){
-          if (sy == "ident"){
-            t0 = t;
-            entervariable();
-            while(sy == "comma"){
-              insymbol();
+        if (sy == "records"){
+          insymbol();
+          EnterBlock();
+          //debugger;
+          xtype.tp = "records";
+          xtype.rf = b;
+          if (level == lmax)
+          fatal(5);
+          level++;
+          display[level] = b;
+          offset = 0;
+          while(sy != "endsy"){
+            if (sy == "ident"){
+              t0 = t;
               entervariable();
+              while(sy == "comma"){
+                insymbol();
+                entervariable();
+              }
+              if (sy == "colon")
+                insymbol();
+              else
+                Error(5);
+              t1 = t;
+              var xtype2 = new xtp(eltp, elrf, elsz);
+              typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), xtype2);
+              eltp = xtype2.tp;
+              elrf = xtype2.rf;
+              elsz = xtype2.sz;
+              while (t0 < t1){
+                t0++;
+                tab[t0].typ = eltp;
+                tab[t0].ref = elrf;
+                tab[t0].normal = true;
+                tab[t0].adr = offset;
+                offset += elsz;
+              }
             }
-            if (sy == "colon")
-            insymbol();
-            else
-            Error(5);
-            t1 = t;
-            typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), xtype);
-            while (t0 < t1){
-              t0++;
-              tab[t0].typ = eltp;
-              tab[t0].ref = elrf;
-              tab[t0].normal = true;
-              tab[t0].adr = offset;
-              offset += elsz;
-            }
-          }
-          if (sy == "endsy"){
-            if (sy == "semicolon")
-            insymbol();
-            else {
-              Error(14);
-              if (sy == "comma")
+            if (sy == "endsy"){
+              if (sy == "semicolon")
               insymbol();
+              else {
+                Error(14);
+                if (sy == "comma")
+                insymbol();
+              }
+              test(["ident", "endsy","semicolon"], fsys, 6);
             }
-            test(["ident", "endsy","semicolon"], fsys, 6);
           }
+          btab[xtype.rf].vsize = offset;
+          xtype.sz = offset;
+          btab[xtype.rf].psize = 0;
+          insymbol();
+          level--;
         }
-        btab[rf].vsize = offset;
-        xtype.sz = offset;
-        btab[rf].psize = 0;
-        insymbol();
-        level--;
       }
       test(fsys, [""], 6);
     }
@@ -1041,7 +1057,8 @@ function block(fsys, isfun, level){
     insymbol();
     else
     Error(14);
-    var bool = (isfun)?1:0;
+    var bool = 0;
+    if(isfun) bool++;
     emit(32 + bool);
   }//procdeclaration
 
@@ -1106,7 +1123,6 @@ function block(fsys, isfun, level){
         }
       }while(["lbrack", "lparent", "period"].indexOf(sy) != -1);
       test(fsys, "", 6);
-      return v;
     }//Selector
 
     function call(fsys, i){
@@ -1155,8 +1171,10 @@ function block(fsys, isfun, level){
                   Error(37);
                   x.typ = tab[k].typ;
                   x.ref = tab[k].ref;
-                  if (tab[k].normal)
+                  if (tab[k].normal){
+                  debugger;
                   emit2(0, tab[k].lev, tab[k].adr);
+                  }
                   else
                   emit2(1, tab[k].lev, tab[k].adr);
                   if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
@@ -1474,7 +1492,7 @@ function block(fsys, isfun, level){
         op = sy;
         insymbol();
         simpleexpression(fsys, y);
-        if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) && x.typ == y.typ)
+        if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) != -1 && x.typ == y.typ)
         switch (op) {
           case "eql": emit(45);break;
           case "neq": emit(46);break;
@@ -1602,7 +1620,11 @@ function block(fsys, isfun, level){
       var i, j, k, lc1;
 
       var casetab = new Array(csmax);
-      var caserecord = {val: 0, lc: 0};
+      function CaseRecord(val, lc){
+        this.val = val;
+        this.lc = lc;
+      }
+      var caserecord = new CaseRecord(0,0);
       //inicializa array com objetos do tipo caserecord
       for (var i = 0; i < csmax; i++){
         casetab[i] = caserecord;
@@ -1736,6 +1758,7 @@ function block(fsys, isfun, level){
         else
         if (tab[i].obj == "variable"){
           cvt = tab[i].typ;
+          debugger;
           emit2(0, tab[i].lev, tab[i].adr);
           if (["notyp", "ints", "bools", "chars"].indexOf(cvt) == -1)
           Error(18);
@@ -2001,15 +2024,15 @@ function interpret(){
   var fld = new Array(4);//tamano padrão dos campos
   var display = new Array(lmax);
   var s = new Array(stacksize);
-  var record = function() {
-    this.i = 0;
-    this.r = 0.0;
-    this.b = false;
-    this.c = "";
-  };
+  function record(i, r, b, c) {
+    this.i = i;
+    this.r = r;
+    this.b = b;
+    this.c = c;
+  }
   //inicializa array com objetos do tipo record
   for (var i = 0; i < s.length; i++){
-    s[i] = new record();
+    s[i] = new record(1, 1, true, "c");
   }
 
   s[1].i = 0;
@@ -2032,6 +2055,7 @@ function interpret(){
     ir = kode[pc];
     pc++;
     ocnt++;
+    debugger;
     switch(ir.f){
       case 0:
       t++;
@@ -2468,7 +2492,13 @@ if (chrcnt > lineleng) {
   ps = 'lngchk';
 }
 else{
-  console.log("     "+ s[t - 2].r + s[t - 1].i + s[t].i);
+  var str = "";
+  str += "     ";
+  str += s[t-2].r;
+  str += s[t-2].i;
+  str += s[t].i;
+  output_console.push(str);
+  output_console.shift();
 }
 t = t - 3;
 break;
@@ -2619,12 +2649,12 @@ if (lncnt > linelimit)
 ps = 'linchk';
 }//primeiro switch
 }
-while (ps != "run");
+while (ps == "run");
 
 if (ps.indexOf("fin") == -1){
   //writeln;
   //writeln;
-  write('halt at'+'     '+ pc+ ' because of ');
+  //write('halt at'+'     '+ pc+ ' because of ');
   switch (ps) {
     case 'caschk': console.log('undefined case');   break;
     case 'divchk': console.log('division by 0');    break;

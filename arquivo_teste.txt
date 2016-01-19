@@ -1,0 +1,32 @@
+program test(output);	(*teste comentario*)
+    const ten = 10; plus = '+';
+    type row = array [1..ten] of real;
+         complex = record re,im: real end;
+    var i, j: integer;
+        p: boolean;
+        z: complex;
+        matrix: array [-3..+3] of row;
+        pattern: array [1..5,1..5] of char;
+
+ procedure dummy(var i: integer; var z: complex);
+    var u,v: row;
+        hl,h2: record c: complex;r: row
+               end;
+
+    function null(x,y:real; z: complex): boolean;
+       var a: array ['a'..'z'] of complex;
+           u: char
+       begin while x<y do x := x+1.O;
+          null:=x=y
+       end;
+
+    begin 
+	p := null(hl.c.re, h2.c.im, z)
+    end;
+
+ begin i := 85; j := 51;
+    repeat
+       if i > j then i := i-j else j := j-i
+    until i = j;
+    writeln(i)
+ end.

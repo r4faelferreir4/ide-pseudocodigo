@@ -2,8 +2,8 @@
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
 //emit2(0
-//debugger
-//Error(31)
+//debuggerfactor
+//Error(6)
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -102,7 +102,7 @@ var tab = [];
 var atab = [];
 var btab = []
 var stab = [];
-var rconst = [];
+var rconst = new Array(c2max);
 var kode = [];
 var iln = 0;  //contador de caracteres total
 var token = [""];
@@ -230,7 +230,8 @@ function compiladorPascalS(){
       console.log(" ****");
     }
     if(cc > errpos){
-      console.log( "cc: "+  cc+" ch " + ch +"errpos: "+ errpos +"^"+ n );//write(' ': cc - errpos, '^', n: 2);
+      console.log( "Caracter inesperado em "+ch+" na linha "+iln+"após "+id );//write(' ': cc - errpos, '^', n: 2);
+      console.log("errpos "+errpos+"código "+n);
       errpos = cc + 3; //errpos := cc + 3;
       errs = errs.concat(n);//errs := errs + [n]
     }
@@ -299,7 +300,7 @@ function compiladorPascalS(){
 
       }
     }
-    while(ch == " ")
+    while(ch == " " || ch == "\t")
     NextCh();
 
     if(ch >= "a" && ch <= "z"){
@@ -560,7 +561,6 @@ function emit1(fct, b){
 function emit2(fct, a, b){
   if (lc == cmax)
   fatal(6);
-  if (fct == 0) debugger;
   kode[lc].f = fct;
   kode[lc].x = a;
   kode[lc].y = b;
@@ -825,10 +825,9 @@ function block(fsys, isfun, level){
         arraytyp(xtype);
       }
       else{
-        if (sy == "records"){
+        if (sy == "recordsy"){
           insymbol();
           EnterBlock();
-          //debugger;
           xtype.tp = "records";
           xtype.rf = b;
           if (level == lmax)
@@ -862,6 +861,7 @@ function block(fsys, isfun, level){
                 tab[t0].adr = offset;
                 offset += elsz;
               }
+              if (sy == "semicolon") insymbol();
             }
             if (sy == "endsy"){
               if (sy == "semicolon")
@@ -1171,10 +1171,8 @@ function block(fsys, isfun, level){
                   Error(37);
                   x.typ = tab[k].typ;
                   x.ref = tab[k].ref;
-                  if (tab[k].normal){
-                  debugger;
+                  if (tab[k].normal)
                   emit2(0, tab[k].lev, tab[k].adr);
-                  }
                   else
                   emit2(1, tab[k].lev, tab[k].adr);
                   if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
@@ -1317,7 +1315,7 @@ function block(fsys, isfun, level){
                     else
                     f = 1;
                     emit2(f, tab[i].lev, tab[i].adr);
-                    x = selector(fsys, x);
+                    selector(fsys, x);
                     if (stantyps.indexOf(x.typ) != -1)
                     emit(34);
                   }
@@ -1758,7 +1756,6 @@ function block(fsys, isfun, level){
         else
         if (tab[i].obj == "variable"){
           cvt = tab[i].typ;
-          debugger;
           emit2(0, tab[i].lev, tab[i].adr);
           if (["notyp", "ints", "bools", "chars"].indexOf(cvt) == -1)
           Error(18);
@@ -1943,7 +1940,6 @@ function block(fsys, isfun, level){
     test(fsys, [""], 14);
   }
 
-
   dx = 5;
   prt = t;
   if (level > lmax)
@@ -1978,8 +1974,8 @@ function block(fsys, isfun, level){
   }
   else
   Error(5);
-  if (sy == "semicolon")
-  insymbol();
+  if (sy == "semicolon"){
+  insymbol();}
   else
   Error(14);
   do{

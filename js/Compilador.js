@@ -1,9 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit2(0
-//debuggerfactor
-//Error(6)
+//normal
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -105,8 +103,6 @@ var stab = [];
 var rconst = new Array(c2max);
 var kode = [];
 var iln = 0;  //contador de caracteres total
-var token = [""];
-var pc_token = 0;
 
 var indexmax;  //Tamanho total do código
 var output_console = new Array(linelimit);    //Variável que irá imprimir na tela do console
@@ -152,7 +148,6 @@ function compiladorPascalS(){
   indexmax = InputFile.length;
   console.log(InputFile[iln]);
   //DEFINIÇÕES DE FUNÇÕES FALTANDO
-
   function ErrorMsg(){
     var k, Msg = [];
     Msg[0] = "undef id  "; Msg[1] = "multi def ";
@@ -895,7 +890,7 @@ function block(fsys, isfun, level){
     while (sy == "ident" || sy == "varsy"){
       if (sy != "varsy")
       valpar = true;
-      else {
+      else{
         insymbol();
         valpar =  false;
       }
@@ -2394,8 +2389,11 @@ if (chrcnt > lineleng){
 else
 switch (ir.y) {
   case 1:
-  var str = "          ";
+  var str = "";
   str += s[t].i;
+  output_console.push(str);
+  output_console.shift();
+  str = "";
   output_console.push(str);
   output_console.shift();
   break;
@@ -2861,7 +2859,7 @@ Error(49);
 if (progname == "test0")
 printtables();
 
-/*if (errs.length == 0){
+/*if (errs.length == 0)
   console.log("Compilação concluída com sucesso!");
   /*if (iflag){
   /*WriteLn('input data on file ? ');
@@ -2872,6 +2870,7 @@ printtables();
   If eof(InputFile) Then
   WriteLn(' input data missing')}*/
   interpret();
+
 /*}
 else
 ErrorMsg();*/

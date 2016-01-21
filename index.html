@@ -14,7 +14,6 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
   <!-- importação codemirror -->
-  <link rel=stylesheet href="../../doc/docs.css">
   <link rel="stylesheet" href="codemirror/lib/codemirror.css">
   <script src="codemirror/lib/codemirror.js"></script>
   <script src="codemirror/mode/pascal/pascal.js"></script>
@@ -66,7 +65,7 @@
         <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
           <span class="glyphicon glyphicon-sort"></span> Depurar
         </button>
-        <button name="depurar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#modalOutput" onclick="return getCode();">
+        <button name="depurar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#modalOutput" >
           <span class="glyphicon glyphicon-play"></span> Compilar
         </button>
 
@@ -93,6 +92,8 @@
               <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
             </div>
             <div id="modalFooter" class="modal-footer">
+              <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
+              <!--<button type="button" class="btn btn-default" onclick="atualizarConsole()" >Atualizar</button>-->
               <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
             </div>
           </div>

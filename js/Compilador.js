@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//normal
+//debugger
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -199,7 +199,6 @@ function compiladorPascalS(){
       throw new Error("Programa incompleto");
       return;
     }
-    //if (iln == indexmax) debugger;
     if (cc == ll){
       if (errpos != 0)
       errpos = 0;
@@ -244,7 +243,6 @@ function compiladorPascalS(){
 
   function insymbol(){      //Lê o próximo simbolo
     var i, j, k, e;
-
     function readscale(){
       var s, sign;
       NextCh();
@@ -258,7 +256,7 @@ function compiladorPascalS(){
           sign = -1;
         }
       }
-      while (ch >= 0 && ch <= 9){
+      while (ch >= 0 && ch <= 9 && ch != " "){
         s = 10 * s + Number(ch);
         NextCh();
       }
@@ -326,7 +324,7 @@ function compiladorPascalS(){
     sy = "ident";
   }
   else {
-    if (ch >= "0" && ch <= "9"){
+    if (ch >= "0" && ch <= "9" && ch != " "){
       k = 0;
       inum = 0;
       sy = "intcon";
@@ -334,7 +332,7 @@ function compiladorPascalS(){
         inum = inum * 10 + Number(ch);
         k++;
         NextCh();
-      }while(ch >= 0 && ch <= 9);
+      }while(ch >= 0 && ch <= 9 && ch != " ");
       if(k > kmax || inum > nmax){
         Error(21);
         inum = 0;
@@ -1360,7 +1358,7 @@ function block(fsys, isfun, level){
               else
               if (sy == "lparent"){
                 insymbol();
-                expression(fsys.concat(["lparent"]), x);
+                expression(fsys.concat(["rparent"]), x);
                 if (sy == "lparent")
                 insymbol();
                 else
@@ -1388,8 +1386,8 @@ function block(fsys, isfun, level){
             if (op == "times"){
               x.typ = resulttype(x.typ, y.typ);
               switch (x.typ) {
-                case "ints":  emit(57);
-                case "reals": emit(60);
+                case "ints":  emit(57);break;
+                case "reals": emit(60);break;
               }
             }
             else
@@ -2032,6 +2030,7 @@ function interpret(){
   s[4].i = btab[1].last;
   b = 0;
   display[1] = 0;
+  debugger;
   t = btab[2].vsize - 1;
   pc = tab[s[4].i].adr;
   ps = 'run';
@@ -2044,9 +2043,9 @@ function interpret(){
   fld[4] = 1;
   do {
     ir = kode[pc];
+    //debugger;
     pc++;
     ocnt++;
-    debugger;
     switch(ir.f){
       case 0:
       t++;
@@ -2064,7 +2063,9 @@ function interpret(){
         ps = 'stkchk';
       }
       else{
-        s[t] = s[display[ir.x] + ir.y];
+        var i1 = display[ir.x]+ir.y;
+        var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
+        s[t] = s1;
 
       }
       break;
@@ -2075,7 +2076,9 @@ function interpret(){
         ps = 'stkchk';
       }
       else{
-        s[t] = s[s[display[ir.x] + ir.y].i];
+        var i1 = s[display[ir.x]+ir.y].i;
+        var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
+        s[t] = s1;
       }
       break;
 
@@ -2297,7 +2300,8 @@ if(h2 > stacksize){
 else
 while (t < h2) {
   t++;
-  s[t] = s[h1];
+  var s1 = new record(s[h1].i, s[h1].r, s[h1].b, s[h1].c);
+  s[t] = s1;
   h1++;
 }
 break;
@@ -2307,7 +2311,8 @@ h1 = s[t - 1].i;
 h2 = s[t].i;
 h3 = h1 + ir.y;
 while (h1 < h3){
-  s[h1] = s[h2];
+  var s1 = new record(s[h2].i, s[h2].r, s[h2].b, s[h2].c);
+  s[h1] = s1;
   h1++;
   h2++;
 }
@@ -2498,13 +2503,14 @@ t = t - 3;
 break;
 
 case 38:
-s[s[t - 1].i] = s[t];
+s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
+s[s[t - 1].i] = s1;
 t = t - 2;
 break;
 
 case 39:
 t--;
-s[t].b = s[t].r = s[t + 1].r;
+s[t].b = s[t].r == s[t + 1].r;
 break;
 
 case 40:
@@ -2644,6 +2650,7 @@ ps = 'linchk';
 }//primeiro switch
 }
 while (ps == "run");
+debugger;
 
 if (ps.indexOf("fin") == -1){
   //writeln;

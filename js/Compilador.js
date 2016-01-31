@@ -224,7 +224,7 @@ function compiladorPascalS(){
       console.log(" ****");
     }
     if(cc > errpos){
-      console.log( "Caracter inesperado em "+ch+" na linha "+iln+"após "+id );//write(' ': cc - errpos, '^', n: 2);
+      console.log( "Caracter \'" +ch+"\' na linha "+iln+"após "+id );//write(' ': cc - errpos, '^', n: 2);
       console.log("errpos "+errpos+"código "+n);
       errpos = cc + 3; //errpos := cc + 3;
       errs = errs.concat(n);//errs := errs + [n]
@@ -856,7 +856,7 @@ function block(fsys, isfun, level){
               }
               if (sy == "semicolon") insymbol();
             }
-            if (sy == "endsy"){
+            if (sy != "endsy"){
               if (sy == "semicolon")
               insymbol();
               else {
@@ -1359,7 +1359,7 @@ function block(fsys, isfun, level){
               if (sy == "lparent"){
                 insymbol();
                 expression(fsys.concat(["rparent"]), x);
-                if (sy == "lparent")
+                if (sy == "rparent")
                 insymbol();
                 else
                 Error(4);
@@ -1529,7 +1529,7 @@ function block(fsys, isfun, level){
       f = 1;
       emit2(f, lv, ad);
       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-      x = selector(["becomes", "eql"].concat(fsys), x);
+      selector(["becomes", "eql"].concat(fsys), x);
       if (sy == "becomes")
       insymbol();
       else {
@@ -1605,7 +1605,6 @@ function block(fsys, isfun, level){
     }//ifstatement
 
     function casestatement(){
-
       var x;
       x = new item("", 1);
       var i, j, k, lc1;
@@ -1615,13 +1614,11 @@ function block(fsys, isfun, level){
         this.val = val;
         this.lc = lc;
       }
-      var caserecord = new CaseRecord(0,0);
       //inicializa array com objetos do tipo caserecord
       for (var i = 0; i < csmax; i++){
-        casetab[i] = caserecord;
+        casetab[i] = new CaseRecord(0,0);
       }
       var exittab = new Array(csmax);
-
       function caselabel(){
         var lab, k;
         lab = new conrec("", 0, 0);
@@ -1646,7 +1643,8 @@ function block(fsys, isfun, level){
       }//fim caselabel
 
       function onecase(){
-        if (sy.indexOf(constbegsys) != -1){
+        if (constbegsys.indexOf(sy) != -1){
+          caselabel();
           while (sy == "comma") {
             insymbol();
             caselabel();
@@ -1675,7 +1673,7 @@ function block(fsys, isfun, level){
       else
       Error(8);
       onecase();
-      while (sy = semicolon) {
+      while (sy == "semicolon") {
         insymbol();
         onecase();
       }

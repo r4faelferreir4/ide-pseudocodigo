@@ -34,6 +34,14 @@ function atualizarConsole(){
 
 }
 
+  function mostrarModalOutput(){
+    $('#modalOutput').modal('show');
+  }
+
+  function esconderModalOutput(){
+    $('#modalOutput').modal('hide');
+  }
+
 function renderInput(bool) {
   if (bool) {
     document.getElementById("scriptBox").style.visibility = "visible";

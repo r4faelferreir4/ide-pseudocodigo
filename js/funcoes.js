@@ -13,7 +13,7 @@ function limpaInput() {
   document.getElementById("scriptBox").value = "";
 }
 
-function adacionarSaida(string) {
+function adcionarSaida(string) {
   output_console.push(string);
   output_console.shift();
   atualizarConsole();
@@ -26,13 +26,12 @@ function limpaConsole() {
 
 function atualizarConsole(){
   limpaConsole();
-  for (var i = 0; i < output_console.length; i++) {
-    if(output_console[i] !== undefined) {
-      //document.getElementById("output").value += (output_console[i]).concat("\n");
+  var i = output_console.join("");
+      document.getElementById("output").value = i;
       //Mostra posicao
-      document.getElementById("output").value += (output_console[i]).concat(" ===> pos: ").concat(i).concat("\n");
-    }
-  }
+      //document.getElementById("output").value += (output_console[i]).concat(" ===> pos: ").concat(i).concat("\n");
+
+
 }
 
 function renderInput(bool) {

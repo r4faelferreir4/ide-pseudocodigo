@@ -74,7 +74,7 @@ var id;    //Identificador de insymbol
 var inum;         //Inteiro de insymbol
 var rnum;         //Real de insymbol
 var sleng;        //Tamanho da string de insymbol
-var ch="";           //Ultimo caracter lido do código fonte
+var ch = "";           //Ultimo caracter lido do código fonte
 var line = "";         //Ultima linha lida
 var cc;           //Contagem de caracteres
 var lc;           //Contador do programa
@@ -138,7 +138,7 @@ function initArray(){
   do{
     output_console[j] = "";
     j++;
-  }while(j < linelimit);
+  }while(j < 15);
 }
 
 function compiladorPascalS(){
@@ -1678,7 +1678,7 @@ function block(fsys, isfun, level){
         onecase();
       }
       kode[lc1].y = lc;
-      for (k = 1; k < i; k++) {
+      for (k = 1; k <= i; k++) {
         emit1(13, casetab[k].val);
         emit1(13, casetab[k].lc);
       }
@@ -2001,8 +2001,7 @@ function block(fsys, isfun, level){
 function interpret(){
   var ir; //buffer de instrução
   var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
-  var ps = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
-  "lngchk", "redchk"];
+  var ps = "";
   var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
   "lngchk", "redchk"];
   var t; //index do top da pilha
@@ -2041,7 +2040,6 @@ function interpret(){
   fld[4] = 1;
   do {
     ir = kode[pc];
-    //debugger;
     pc++;
     ocnt++;
     switch(ir.f){
@@ -2148,7 +2146,7 @@ break;*/
 }//switch case 8
 break;
 case 9: s[t].i = s[t].i + ir.y; break;
-case 10: pc = ir.y; //jump
+case 10: pc = ir.y; break;//jump
 case 11:
 if (!s[t].b){
   pc = ir.y;
@@ -2168,7 +2166,7 @@ do {
   else{
     if (kode[h2].y == h1){
       h3 = 1;
-      pc = kode[h2 + 1].y
+      pc = kode[h2 + 1].y;
     }
     else
     h2 += 2;
@@ -2376,12 +2374,15 @@ chrcnt = chrcnt + h1;
 if (chrcnt > lineleng){
   ps = 'lngchk';
 }
+var string = "";
 do {
-  output_console.push(stab[h2]);
-  output_console.shift();
+  string += stab[h2];
   h1--;
   h2++;
-} while (h1 = 0);
+} while (h1 != 0);
+output_console.push(string);
+if (output_console.length >= linelimit) output_console.shift();
+atualizarConsole();
 break;
 
 case 29:
@@ -2395,26 +2396,27 @@ switch (ir.y) {
   var str = "";
   str += s[t].i;
   output_console.push(str);
-  output_console.shift();
-  str = "";
-  output_console.push(str);
-  output_console.shift();
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
   break;
   case 2:
   var str = "                    ";
   str += s[t].r;
   output_console.push(str);
-  output_console.shift();
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
   break;
   case 3:
   var str = "           ";
   str += s[t].b;
   output_console.push(str);
-  output_console.shift();
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
   break;
   case 4:
   output_console.push(s[t].c);
-  output_console.shift();
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
   break;
 }
 t = t - 1;
@@ -2433,7 +2435,8 @@ else{
     str += " ";
     str += s[t-1].i;
     output_console.push(str);
-    output_console.shift();
+    if (output_console.length >= linelimit) output_console.shift();
+    atualizarConsole();
     break;
     case 2:
     var str = "";
@@ -2441,7 +2444,8 @@ else{
     str += " ";
     str += s[t-1].r;
     output_console.push(str);
-    output_console.shift();
+    if (output_console.length >= linelimit) output_console.shift();
+    atualizarConsole();
     break;
     case 3:
     var str = "";
@@ -2449,7 +2453,8 @@ else{
     str += " ";
     str += s[t-1].b;
     output_console.push(str);
-    output_console.shift();
+    if (output_console.length >= linelimit) output_console.shift();
+    atualizarConsole();
     break;
     case 4:
     var str = "";
@@ -2457,7 +2462,8 @@ else{
     str += " ";
     str += s[t-1].c;
     output_console.push(str);
-    output_console.shift();
+    if (output_console.length >= linelimit) output_console.shift();
+    atualizarConsole();
     break;
   }
 }
@@ -2495,7 +2501,8 @@ else{
   str += s[t-2].i;
   str += s[t].i;
   output_console.push(str);
-  output_console.shift();
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
 }
 t = t - 3;
 break;
@@ -2643,8 +2650,10 @@ case 63:
 //      writeln;
 lncnt++;
 chrcnt = 0;
-if (lncnt > linelimit)
-ps = 'linchk';
+  var string = "\n";
+  output_console.push(string);
+  if (output_console.length >= linelimit) output_console.shift();
+  atualizarConsole();
 }//primeiro switch
 }
 while (ps == "run");
@@ -2722,20 +2731,20 @@ Ok = IoResult == 0;
 /*while (!Ok){
 console.log("");
 }*/
-key[1] = 'and'; key[2] = 'array';
-key[3] = 'begin'; key[4] = 'case';
+key[1] = 'e'; key[2] = 'arranjo';
+key[3] = 'inicio'; key[4] = 'caso';
 key[5] = 'const'; key[6] = 'div';
-key[7] = 'do'; key[8] = 'downto';
-key[9] = 'else'; key[10] = 'end';
-key[11] = 'for'; key[12] = 'function';
-key[13] = 'if'; key[14] = 'mod';
-key[15] = 'not'; key[16] = 'of';
-key[17] = 'or'; key[18] = 'procedure';
-key[19] = 'program'; key[20] = 'record';
-key[21] = 'repeat'; key[22] = 'then';
-key[23] = 'to'; key[24] = 'type';
-key[25] = 'until'; key[26] = 'var';
-key[27] = 'while';
+key[7] = 'faca'; key[8] = 'decrementa';
+key[9] = 'senao'; key[10] = 'fim';
+key[11] = 'para'; key[12] = 'funcao';
+key[13] = 'se'; key[14] = 'mod';
+key[15] = 'nao'; key[16] = 'de';
+key[17] = 'ou'; key[18] = 'procedimento';
+key[19] = 'programa'; key[20] = 'registro';
+key[21] = 'repete'; key[22] = 'entao';
+key[23] = 'incrementa'; key[24] = 'tipo';
+key[25] = 'ate'; key[26] = 'var';
+key[27] = 'enquanto';
 ksy[1] = "andsy"; ksy[2] = "arraysy";
 ksy[3] = 'beginsy'; ksy[4] = "casesy";
 ksy[5] = 'constsy'; ksy[6] = "idiv";
@@ -2823,12 +2832,12 @@ else {
   }
 }
 enter('', "variable", "notyp", 0);
-enter('false', "konstant", "bools", 0);
-enter('true', "konstant", "bools", 1);
+enter('falso', "konstant", "bools", 0);
+enter('verdadeiro', "konstant", "bools", 1);
 enter('real', "type1", "reals", 1);
-enter('char', "type1", "chars", 1);
-enter('boolean', "type1", "bools", 1);
-enter('integer', "type1", "ints", 1);
+enter('caracter', "type1", "chars", 1);
+enter('logico', "type1", "bools", 1);
+enter('inteiro', "type1", "ints", 1);
 enter('abs', "funktion", "reals", 0);
 enter('sqr', "funktion", "reals", 2);
 enter('odd', "funktion", "bools", 4);
@@ -2848,8 +2857,8 @@ enter('eof', "funktion", "bools", 17);
 enter('eoln', "funktion", "bools", 18);
 enter('read', "prozedure", "notyp", 1);
 enter('readln', "prozedure", "notyp", 2);
-enter('write', "prozedure", "notyp", 3);
-enter('writeln', "prozedure", "notyp", 4);
+enter('escreve', "prozedure", "notyp", 3);
+enter('escreveln', "prozedure", "notyp", 4);
 enter('', "prozedure", "notyp", 0);
 btab[1].last = t;
 btab[1].lastpar = 1;

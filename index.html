@@ -65,10 +65,9 @@
         <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
           <span class="glyphicon glyphicon-sort"></span> Depurar
         </button>
-        <button name="depurar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#modalOutput" onclick="getCode();">
+        <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="getCode();">
           <span class="glyphicon glyphicon-play"></span> Compilar
         </button>
-
         <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
         <span class="glyphicon glyphicon-play"></span> Compilar
       </button>-->
@@ -93,7 +92,7 @@
             </div>
             <div id="modalFooter" class="modal-footer">
               <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
-              <!--<button type="button" class="btn btn-default" onclick="atualizarConsole()" >Atualizar</button>-->
+              <button type="button" class="btn btn-default" onclick="atualizarConsole()" >Atualizar</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
             </div>
           </div>
@@ -125,8 +124,12 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 </script>
 <script>
 function getCode(){
-  InputFile = editor.getValue();
-  compiladorPascalS();
+  mostrarModalOutput();
+  setTimeout(function(){
+    InputFile = editor.getValue();
+    compiladorPascalS();
+}, 2000);
+
   //alert(text);
 }
 </script>

@@ -30,8 +30,6 @@ function atualizarConsole(){
       document.getElementById("output").value = i;
       //Mostra posicao
       //document.getElementById("output").value += (output_console[i]).concat(" ===> pos: ").concat(i).concat("\n");
-
-
 }
 
   function mostrarModalOutput(){

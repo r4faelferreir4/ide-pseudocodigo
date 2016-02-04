@@ -2233,7 +2233,6 @@ function interpret(){
   var fld = new Array(4);//tamano padrão dos campos
   var display = new Array(lmax);
   var s = new Array(stacksize);
-  mostrarModalOutput();
   function record(i, r, b, c) {
     this.i = i;
     this.r = r;

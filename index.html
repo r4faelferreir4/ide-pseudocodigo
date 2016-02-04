@@ -124,11 +124,12 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 </script>
 <script>
 function getCode(){
+  InputFile = editor.getValue();
+  compiladorPascalS();
   mostrarModalOutput();
   setTimeout(function(){
-    InputFile = editor.getValue();
-    compiladorPascalS();
-}, 2000);
+    interpret();
+}, 300);
 
   //alert(text);
 }

@@ -1,6 +1,6 @@
 function runScript(e) {
   if (e.keyCode == 13) {
-    adacionarSaida(pegaValorInput());
+    adcionarSaida(pegaValorInput());
     limpaInput();
   }
 }
@@ -25,8 +25,10 @@ function limpaConsole() {
 }
 
 function atualizarConsole(){
-  limpaConsole();
-  var i = output_console.join("");
+  //limpaConsole();
+  var i = document.getElementById("output").value;
+  var j = output_console.pop();
+  i = i + j;
       document.getElementById("output").value = i;
       //Mostra posicao
       //document.getElementById("output").value += (output_console[i]).concat(" ===> pos: ").concat(i).concat("\n");

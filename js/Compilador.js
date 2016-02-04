@@ -2221,6 +2221,182 @@ function block(fsys, isfun, level){
   }
 }//block
 
+
+try{
+  initArray();
+
+  //var Ok = false;
+  /*if (paramcount >= 1){
+  assign(InputFile, ParamStr(1));
+  reset(InputFile);
+  Ok = IoResult == 0;
+  }
+
+  /*while (!Ok){
+  console.log("");
+  }*/
+  key[1] = 'e'; key[2] = 'arranjo';
+  key[3] = 'inicio'; key[4] = 'caso';
+  key[5] = 'const'; key[6] = 'div';
+  key[7] = 'faca'; key[8] = 'decrementa';
+  key[9] = 'senao'; key[10] = 'fim';
+  key[11] = 'para'; key[12] = 'funcao';
+  key[13] = 'se'; key[14] = 'mod';
+  key[15] = 'nao'; key[16] = 'de';
+  key[17] = 'ou'; key[18] = 'procedimento';
+  key[19] = 'programa'; key[20] = 'registro';
+  key[21] = 'repete'; key[22] = 'entao';
+  key[23] = 'incrementa'; key[24] = 'tipo';
+  key[25] = 'ate'; key[26] = 'var';
+  key[27] = 'enquanto';
+  ksy[1] = "andsy"; ksy[2] = "arraysy";
+  ksy[3] = 'beginsy'; ksy[4] = "casesy";
+  ksy[5] = 'constsy'; ksy[6] = "idiv";
+  ksy[7] = 'dosy'; ksy[8] = 'downtosy';
+  ksy[9] = 'elsesy'; ksy[10] = 'endsy';
+  ksy[11] = 'forsy'; ksy[12] = 'functionsy';
+  ksy[13] = 'ifsy'; ksy[14] = 'imod';
+  ksy[15] = 'notsy'; ksy[16] = 'ofsy';
+  ksy[17] = 'orsy'; ksy[18] = 'proceduresy';
+  ksy[19] = 'programsy'; ksy[20] = 'recordsy';
+  ksy[21] = 'repeatsy'; ksy[22] = 'thensy';
+  ksy[23] = 'tosy'; ksy[24] = 'typesy';
+  ksy[25] = 'untilsy'; ksy[26] = 'varsy';
+  ksy[27] = 'whilesy';
+  sps['+'] = 'plus'; sps['-'] = 'minus';
+  sps['*'] = 'times'; sps['/'] = 'rdiv';
+  sps['('] = 'lparent'; sps[')'] = 'rparent';
+  sps['='] = 'eql'; sps[','] = 'comma';
+  sps['['] = 'lbrack'; sps[']'] = 'rbrack';
+  sps['#'] = 'neq'; sps['&'] = 'andsy';
+  sps[';'] = 'semicolon';
+  csps[0] = "+";  csps[1] = "-" ; csps[2] = "*";
+  csps[3] = "/";  csps[4] = "(";  csps[5] = ")";
+  csps[6] = "=";  csps[7] = ","; csps[8] = "[";
+  csps[9] = "]";  csps[10] = "#"; csps[11] = "&";
+  csps[12] = ";";
+  constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
+  typebegsys = ['ident', 'arraysy', 'recordsy'];
+  blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
+  facbegsys = ['intcon', 'realcon', 'charcon', 'ident', 'lparent', 'notsy'];
+  statbegsys = ['beginsy', 'ifsy', 'whilesy', 'repeatsy', 'forsy', 'casesy'];
+  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars'];
+  lc = 0;
+  ll = 0;
+  cc = 0;
+  ch = " ";
+  errpos = 0;
+  errs = [];
+  insymbol();
+  t = -1;
+  a = 0;
+  b = 1;
+  sx = 0;
+  c2 = 0;
+  display[0] = 1;
+  display[1] = 1;
+  display[2] = 1;
+  iflag = false;
+  oflag = false;
+  if (sy != "programsy"){
+    console.log("Aplicação finalizada");
+    return;
+  }
+  else {
+    insymbol();
+    if (sy != "ident")
+    Error(2);
+    else {
+      progname = id;
+      insymbol();
+      if (sy != "lparent")
+      Error(9);
+      else
+      do{
+        insymbol();
+        if (sy != "ident")
+        Error(2);
+        else {
+          if (id == "input")
+          iflag = true;
+          else
+          if (id == "output")
+          oflag = true;
+          else
+          Error(0);
+          insymbol();
+        }
+      }while(sy == "comma");
+      if (sy == "rparent")
+      insymbol();
+      else
+      Error(4);
+      if (!oflag)
+      Error(20);
+    }
+  }
+  enter('', "variable", "notyp", 0);
+  enter('falso', "konstant", "bools", 0);
+  enter('verdadeiro', "konstant", "bools", 1);
+  enter('real', "type1", "reals", 1);
+  enter('caracter', "type1", "chars", 1);
+  enter('logico', "type1", "bools", 1);
+  enter('inteiro', "type1", "ints", 1);
+  enter('abs', "funktion", "reals", 0);
+  enter('sqr', "funktion", "reals", 2);
+  enter('odd', "funktion", "bools", 4);
+  enter('chr', "funktion", "chars", 5);
+  enter('ord', "funktion", "ints", 6);
+  enter('succ', "funktion", "chars", 7);
+  enter('pred', "funktion", "chars", 8);
+  enter('round', "funktion", "ints", 9);
+  enter('trunc', "funktion", "ints", 10);
+  enter('sin', "funktion", "reals", 11);
+  enter('cos', "funktion", "reals", 12);
+  enter('exp', "funktion", "reals", 13);
+  enter('ln', "funktion", "reals", 14);
+  enter('sqrt', "funktion", "reals", 15);
+  enter('arctan', "funktion", "reals", 16);
+  enter('eof', "funktion", "bools", 17);
+  enter('eoln', "funktion", "bools", 18);
+  enter('read', "prozedure", "notyp", 1);
+  enter('readln', "prozedure", "notyp", 2);
+  enter('escreve', "prozedure", "notyp", 3);
+  enter('escreveln', "prozedure", "notyp", 4);
+  enter('', "prozedure", "notyp", 0);
+  btab[1].last = t;
+  btab[1].lastpar = 1;
+  btab[1].psize = 0;
+  btab[1].vsize = 0;
+  block(blockbegsys.concat(statbegsys), false, 1);
+  if (sy != "period")
+    Error(22);
+  emit(31);
+  if (btab[2].vsize > stacksize)
+    Error(49);
+  if (progname == "test0")
+    printtables();
+
+  /*if (errs.length == 0)
+    console.log("Compilação concluída com sucesso!");
+    /*if (iflag){
+    /*WriteLn('input data on file ? ');
+    Reset(InputFile);
+    Read(xname);
+    Assign(InputFile,xname);
+    Reset(InputFile);
+    If eof(InputFile) Then
+    WriteLn(' input data missing')}*/
+}
+catch(err){
+  return err;
+}
+finally{
+  alert("Compilação finalizada");
+  //interpret();
+}
+
+}//CompiladorPascalS
 function interpret(){
   var ir; //buffer de instrução
   var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
@@ -2250,7 +2426,7 @@ function interpret(){
   s[4].i = btab[1].last;
   b = 0;
   display[1] = 0;
-  debugger;
+  //debugger;
   t = btab[2].vsize - 1;
   pc = tab[s[4].i].adr;
   ps = 'run';
@@ -2265,6 +2441,7 @@ function interpret(){
     ir = kode[pc];
     pc++;
     ocnt++;
+    //debugger;
     switch(ir.f){
       case 0:
       t++;
@@ -2911,177 +3088,3 @@ function interpret(){
     }
     console.log("          " + ocnt + " steps");
 }//interpret
-try{
-  initArray();
-
-  //var Ok = false;
-  /*if (paramcount >= 1){
-  assign(InputFile, ParamStr(1));
-  reset(InputFile);
-  Ok = IoResult == 0;
-  }
-
-  /*while (!Ok){
-  console.log("");
-  }*/
-  key[1] = 'e'; key[2] = 'arranjo';
-  key[3] = 'inicio'; key[4] = 'caso';
-  key[5] = 'const'; key[6] = 'div';
-  key[7] = 'faca'; key[8] = 'decrementa';
-  key[9] = 'senao'; key[10] = 'fim';
-  key[11] = 'para'; key[12] = 'funcao';
-  key[13] = 'se'; key[14] = 'mod';
-  key[15] = 'nao'; key[16] = 'de';
-  key[17] = 'ou'; key[18] = 'procedimento';
-  key[19] = 'programa'; key[20] = 'registro';
-  key[21] = 'repete'; key[22] = 'entao';
-  key[23] = 'incrementa'; key[24] = 'tipo';
-  key[25] = 'ate'; key[26] = 'var';
-  key[27] = 'enquanto';
-  ksy[1] = "andsy"; ksy[2] = "arraysy";
-  ksy[3] = 'beginsy'; ksy[4] = "casesy";
-  ksy[5] = 'constsy'; ksy[6] = "idiv";
-  ksy[7] = 'dosy'; ksy[8] = 'downtosy';
-  ksy[9] = 'elsesy'; ksy[10] = 'endsy';
-  ksy[11] = 'forsy'; ksy[12] = 'functionsy';
-  ksy[13] = 'ifsy'; ksy[14] = 'imod';
-  ksy[15] = 'notsy'; ksy[16] = 'ofsy';
-  ksy[17] = 'orsy'; ksy[18] = 'proceduresy';
-  ksy[19] = 'programsy'; ksy[20] = 'recordsy';
-  ksy[21] = 'repeatsy'; ksy[22] = 'thensy';
-  ksy[23] = 'tosy'; ksy[24] = 'typesy';
-  ksy[25] = 'untilsy'; ksy[26] = 'varsy';
-  ksy[27] = 'whilesy';
-  sps['+'] = 'plus'; sps['-'] = 'minus';
-  sps['*'] = 'times'; sps['/'] = 'rdiv';
-  sps['('] = 'lparent'; sps[')'] = 'rparent';
-  sps['='] = 'eql'; sps[','] = 'comma';
-  sps['['] = 'lbrack'; sps[']'] = 'rbrack';
-  sps['#'] = 'neq'; sps['&'] = 'andsy';
-  sps[';'] = 'semicolon';
-  csps[0] = "+";  csps[1] = "-" ; csps[2] = "*";
-  csps[3] = "/";  csps[4] = "(";  csps[5] = ")";
-  csps[6] = "=";  csps[7] = ","; csps[8] = "[";
-  csps[9] = "]";  csps[10] = "#"; csps[11] = "&";
-  csps[12] = ";";
-  constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
-  typebegsys = ['ident', 'arraysy', 'recordsy'];
-  blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
-  facbegsys = ['intcon', 'realcon', 'charcon', 'ident', 'lparent', 'notsy'];
-  statbegsys = ['beginsy', 'ifsy', 'whilesy', 'repeatsy', 'forsy', 'casesy'];
-  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars'];
-  lc = 0;
-  ll = 0;
-  cc = 0;
-  ch = " ";
-  errpos = 0;
-  errs = [];
-  insymbol();
-  t = -1;
-  a = 0;
-  b = 1;
-  sx = 0;
-  c2 = 0;
-  display[0] = 1;
-  display[1] = 1;
-  display[2] = 1;
-  iflag = false;
-  oflag = false;
-  if (sy != "programsy"){
-    console.log("Aplicação finalizada");
-    return;
-  }
-  else {
-    insymbol();
-    if (sy != "ident")
-    Error(2);
-    else {
-      progname = id;
-      insymbol();
-      if (sy != "lparent")
-      Error(9);
-      else
-      do{
-        insymbol();
-        if (sy != "ident")
-        Error(2);
-        else {
-          if (id == "input")
-          iflag = true;
-          else
-          if (id == "output")
-          oflag = true;
-          else
-          Error(0);
-          insymbol();
-        }
-      }while(sy == "comma");
-      if (sy == "rparent")
-      insymbol();
-      else
-      Error(4);
-      if (!oflag)
-      Error(20);
-    }
-  }
-  enter('', "variable", "notyp", 0);
-  enter('falso', "konstant", "bools", 0);
-  enter('verdadeiro', "konstant", "bools", 1);
-  enter('real', "type1", "reals", 1);
-  enter('caracter', "type1", "chars", 1);
-  enter('logico', "type1", "bools", 1);
-  enter('inteiro', "type1", "ints", 1);
-  enter('abs', "funktion", "reals", 0);
-  enter('sqr', "funktion", "reals", 2);
-  enter('odd', "funktion", "bools", 4);
-  enter('chr', "funktion", "chars", 5);
-  enter('ord', "funktion", "ints", 6);
-  enter('succ', "funktion", "chars", 7);
-  enter('pred', "funktion", "chars", 8);
-  enter('round', "funktion", "ints", 9);
-  enter('trunc', "funktion", "ints", 10);
-  enter('sin', "funktion", "reals", 11);
-  enter('cos', "funktion", "reals", 12);
-  enter('exp', "funktion", "reals", 13);
-  enter('ln', "funktion", "reals", 14);
-  enter('sqrt', "funktion", "reals", 15);
-  enter('arctan', "funktion", "reals", 16);
-  enter('eof', "funktion", "bools", 17);
-  enter('eoln', "funktion", "bools", 18);
-  enter('read', "prozedure", "notyp", 1);
-  enter('readln', "prozedure", "notyp", 2);
-  enter('escreve', "prozedure", "notyp", 3);
-  enter('escreveln', "prozedure", "notyp", 4);
-  enter('', "prozedure", "notyp", 0);
-  btab[1].last = t;
-  btab[1].lastpar = 1;
-  btab[1].psize = 0;
-  btab[1].vsize = 0;
-  block(blockbegsys.concat(statbegsys), false, 1);
-  if (sy != "period")
-    Error(22);
-  emit(31);
-  if (btab[2].vsize > stacksize)
-    Error(49);
-  if (progname == "test0")
-    printtables();
-
-  /*if (errs.length == 0)
-    console.log("Compilação concluída com sucesso!");
-    /*if (iflag){
-    /*WriteLn('input data on file ? ');
-    Reset(InputFile);
-    Read(xname);
-    Assign(InputFile,xname);
-    Reset(InputFile);
-    If eof(InputFile) Then
-    WriteLn(' input data missing')}*/
-}
-catch(err){
-  return err;
-}
-finally{
-  interpret();
-}
-
-}//CompiladorPascalS

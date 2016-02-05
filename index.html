@@ -29,6 +29,7 @@
     if (window.focus) {newwindow.focus();}
     return false;
   }
+
   </script>
 </head>
 <body>
@@ -129,6 +130,7 @@ function getCode(){
   mostrarModalOutput();
   setTimeout(function(){
     interpret();
+    scrollOutput();
 }, 300);
 
   //alert(text);

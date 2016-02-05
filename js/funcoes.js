@@ -42,6 +42,10 @@ function atualizarConsole(){
     $('#modalOutput').modal('hide');
   }
 
+  function scrollOutput(){
+    document.getElementById('output').scrollTop=document.getElementById('output').scrollHeight;
+  }
+
 function renderInput(bool) {
   if (bool) {
     document.getElementById("scriptBox").style.visibility = "visible";

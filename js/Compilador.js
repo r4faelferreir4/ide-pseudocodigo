@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//catch
+//emit1(f)x =
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -105,8 +105,6 @@ var kode = [];
 var iln = 0;  //contador de caracteres total
 
 var indexmax;  //Tamanho total do código
-var output_console = [];    //Variável que irá imprimir na tela do console
-var read_ok = true;
 
 function initArray(){
   var j = 0;
@@ -1286,6 +1284,7 @@ function block(fsys, isfun, level){
                         Error(37);
                       x.typ = tab[k].typ;
                       x.ref = tab[k].ref;
+                      debugger;
                       if (tab[k].normal)
                         emit2(0, tab[k].lev, tab[k].adr);
                       else
@@ -2012,9 +2011,10 @@ function block(fsys, isfun, level){
             if (sy == "lparent"){
               do{
                 insymbol();
-                if (sy != ident)
+                if (sy != "ident")
                 Error(2);
                 else {
+                  debugger;
                   i = loc(id);
                   insymbol();
                   if (i != 0)
@@ -2027,9 +2027,9 @@ function block(fsys, isfun, level){
                     f = 0;
                     else
                     f = 1;
-                    emit1(f, tab[i].lev, tab[i].adr);
+                    emit2(f, tab[i].lev, tab[i].adr);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-                    x = selector(fsys.concat(["comma", "rparent"]), x);
+                    selector(fsys.concat(["comma", "rparent"]), x);
                     if (["ints", "reals", "chars", "notyp"].indexOf(x.typ) != -1)
                     emit1(27, types1.indexOf(x.typ));
                     else
@@ -2359,8 +2359,8 @@ try{
   enter('arctan', "funktion", "reals", 16);
   enter('eof', "funktion", "bools", 17);
   enter('eoln', "funktion", "bools", 18);
-  enter('read', "prozedure", "notyp", 1);
-  enter('readln', "prozedure", "notyp", 2);
+  enter('recebe', "prozedure", "notyp", 1);
+  enter('recebeln', "prozedure", "notyp", 2);
   enter('escreve', "prozedure", "notyp", 3);
   enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
@@ -2387,56 +2387,43 @@ try{
     Reset(InputFile);
     If eof(InputFile) Then
     WriteLn(' input data missing')}*/
-}
-catch(err){
-  return err;
-}
-finally{
-  alert("Compilação finalizada");
-  //interpret();
-}
+  }
+  catch(err){
+    return err;
+  }
+  finally{
+    alert("Compilação finalizada");
+    //interpret();
+  }
 
 }//CompiladorPascalS
-function interpret(){
-  var ir; //buffer de instrução
-  var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
-  var ps = "";
-  var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
-  "lngchk", "redchk"];
-  var t; //index do top da pilha
-  var b; //index base
-  var h1, h2, h3, h4;
-  var fld = new Array(4);//tamano padrão dos campos
-  var display = new Array(lmax);
-  var s = new Array(stacksize);
-  function record(i, r, b, c) {
-    this.i = i;
-    this.r = r;
-    this.b = b;
-    this.c = c;
-  }
-  //inicializa array com objetos do tipo record
-  for (var i = 0; i < s.length; i++){
-    s[i] = new record(1, 1, true, "c");
-  }
 
-  s[1].i = 0;
-  s[2].i = 0;
-  s[3].i = -1;
-  s[4].i = btab[1].last;
-  b = 0;
-  display[1] = 0;
-  //debugger;
-  t = btab[2].vsize - 1;
-  pc = tab[s[4].i].adr;
-  ps = 'run';
-  lncnt = 0;
-  ocnt = 0;
-  chrcnt = 0;
-  fld[1] = 10;
-  fld[2] = 22;
-  fld[3] = 10;
-  fld[4] = 1;
+//VARIÁVEIS INTERPRETADOR
+var ir; //buffer de instrução
+var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
+var ps = "";
+var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
+"lngchk", "redchk"];
+var t; //index do top da pilha
+var b; //index base
+var h1, h2, h3, h4;
+var fld = new Array(4);//tamano padrão dos campos
+var display = new Array(lmax);
+var s = new Array(stacksize);
+var call_read = false;
+var output_console = [];    //Variável que irá imprimir na tela do console
+var read_ok = false;
+function record(i, r, b, c) {
+  this.i = i;
+  this.r = r;
+  this.b = b;
+  this.c = c;
+}
+//inicializa array com objetos do tipo record
+for (var i = 0; i < s.length; i++){
+  s[i] = new record(1, 1, true, "c");
+}
+function interpreter(){
   do {
     ir = kode[pc];
     pc++;
@@ -2721,28 +2708,43 @@ function interpret(){
       break;
 
       case 27:    //INSTRUÇÃO DE LEITURA
-      if (eof(InputFile)){
+      /*if (InputFile){
         ps = 'redchk';
       }
-      else{
+      else{*/
         switch (ir.y) {
           case 1:
-          while(read_ok);
-          s[s[t].i].i = InputFile;
-          read_ok = true;
+          if (read_ok) {
+            s[s[t].i].i = Number(InputFile);
+            read_ok = false;
+          }
+          else{
+            call_read = true;
+            return;
+          }
           break;
           case 2:
-          while(read_ok);
-          s[s[t].i].r = InputFile;
-          read_ok = true;
+          if (read_ok) {
+            s[s[t].i].r = Number(InputFile);
+            read_ok = false;
+          }
+          else{
+            call_read = true;
+            return;
+          }
           break;
           case 4:
-          while(read_ok);
-          s[s[t].i].c = InputFile;
-          read_ok = true;
+          if (read_ok) {
+            s[s[t].i].c = InputFile;
+            read_ok = false;
+          }
+          else{
+            call_read = true;
+            return;
+          }
           break;
         }
-      }
+      //}
       t--;
       break;
 
@@ -3019,12 +3021,12 @@ function interpret(){
       break;
 
       case 62:
-      if (eof(InputFile)){
-        ps = 'redchk';
-      }
-      else{
-        readln(InputFile);
-      }
+      //if (eof(InputFile)){
+      //  ps = 'redchk';
+      //}
+      //else{
+      //  readln(InputFile);
+      //}
 
       case 63:
       //      writeln;
@@ -3037,8 +3039,31 @@ function interpret(){
       }//primeiro switch
     }
     while (ps == "run");
-    debugger;
-
+}
+function interpret(){
+  s[1].i = 0;
+  s[2].i = 0;
+  s[3].i = -1;
+  s[4].i = btab[1].last;
+  b = 0;
+  display[1] = 0;
+  //debugger;
+  t = btab[2].vsize - 1;
+  pc = tab[s[4].i].adr;
+  ps = 'run';
+  lncnt = 0;
+  ocnt = 0;
+  chrcnt = 0;
+  fld[1] = 10;
+  fld[2] = 22;
+  fld[3] = 10;
+  fld[4] = 1;
+    interpreter();
+    if (call_read){
+      pc--;
+      ocnt--;
+      return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
+    }
     if (ps.indexOf("fin") == -1){
       switch (ps) {
         case 'caschk': console.log('undefined case');   break;

@@ -1,12 +1,20 @@
 function runScript(e) {
   if (e.keyCode == 13) {
-    adcionarSaida(pegaValorInput());
+    debugger;
+    var input = pegaValorInput();
+    //input.pop();
+    adcionarSaida(input);
+    InputFile = input;
     limpaInput();
+    read_ok = true;
+    call_read = false;
+    interpreter();
   }
 }
 
 function pegaValorInput() {
   return document.getElementById("scriptBox").value;
+
 }
 
 function limpaInput() {

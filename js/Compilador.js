@@ -2762,9 +2762,9 @@ function interpreter(){
         h1--;
         h2++;
       } while (h1 != 0);
-      output_console.push(string);
-      if (output_console.length >= linelimit) output_console.shift();
-      atualizarConsole();
+      atualizarConsole(string);
+      //call_read = true;
+      //return;
       break;
 
       case 29:
@@ -2777,28 +2777,28 @@ function interpreter(){
         case 1:
         var str = "";
         str += s[t].i;
-        output_console.push(str);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(str);
+        //call_read = true;
+        //return;
         break;
         case 2:
         var str = "                    ";
         str += s[t].r;
-        output_console.push(str);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(str);
+        //call_read = true;
+        //return;
         break;
         case 3:
         var str = "           ";
         str += s[t].b;
-        output_console.push(str);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(str);
+        //call_read = true;
+        //return;
         break;
         case 4:
-        output_console.push(s[t].c);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(s[t].c);
+        //call_read = true;
+        //return;
         break;
       }
       t = t - 1;
@@ -2816,36 +2816,36 @@ function interpreter(){
           for (var p = 0; p < s[t].i; p++)
           str += " ";
           str += s[t-1].i;
-          output_console.push(str);
-          if (output_console.length >= linelimit) output_console.shift();
-          atualizarConsole();
+          atualizarConsole(str);
+          //call_read = true;
+          //return;
           break;
           case 2:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
           str += s[t-1].r;
-          output_console.push(str);
-          if (output_console.length >= linelimit) output_console.shift();
-          atualizarConsole();
+          atualizarConsole(str);
+          //call_read = true;
+          //return;
           break;
           case 3:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
           str += s[t-1].b;
-          output_console.push(str);
-          if (output_console.length >= linelimit) output_console.shift();
-          atualizarConsole();
+          atualizarConsole(str);
+          //call_read = true;
+          //return;
           break;
           case 4:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
           str += s[t-1].c;
-          output_console.push(str);
-          if (output_console.length >= linelimit) output_console.shift();
-          atualizarConsole();
+          atualizarConsole(str);
+          //call_read = true;
+          //return;
           break;
         }
       }
@@ -2882,9 +2882,9 @@ function interpreter(){
         str += s[t-2].r;
         str += s[t-2].i;
         str += s[t].i;
-        output_console.push(str);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(str);
+        //call_read = true;
+        //return;
       }
       t = t - 3;
       break;
@@ -3033,37 +3033,43 @@ function interpreter(){
       lncnt++;
       chrcnt = 0;
         var string = "\n";
-        output_console.push(string);
-        if (output_console.length >= linelimit) output_console.shift();
-        atualizarConsole();
+        atualizarConsole(string);
+        //call_read = true;
+        //return;
       }//primeiro switch
     }
     while (ps == "run");
 }
 function interpret(){
-  s[1].i = 0;
-  s[2].i = 0;
-  s[3].i = -1;
-  s[4].i = btab[1].last;
-  b = 0;
-  display[1] = 0;
-  //debugger;
-  t = btab[2].vsize - 1;
-  pc = tab[s[4].i].adr;
-  ps = 'run';
-  lncnt = 0;
-  ocnt = 0;
-  chrcnt = 0;
-  fld[1] = 10;
-  fld[2] = 22;
-  fld[3] = 10;
-  fld[4] = 1;
+  if (call_read){
+    call_read = false;
     interpreter();
-    if (call_read){
-      pc--;
-      ocnt--;
-      return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
-    }
+  }
+  else{
+    s[1].i = 0;
+    s[2].i = 0;
+    s[3].i = -1;
+    s[4].i = btab[1].last;
+    b = 0;
+    display[1] = 0;
+    //debugger;
+    t = btab[2].vsize - 1;
+    pc = tab[s[4].i].adr;
+    ps = 'run';
+    lncnt = 0;
+    ocnt = 0;
+    chrcnt = 0;
+    fld[1] = 10;
+    fld[2] = 22;
+    fld[3] = 10;
+    fld[4] = 1;
+      interpreter();
+  }
+  if (call_read){
+    pc--;
+    ocnt--;
+    return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
+  }
     if (ps.indexOf("fin") == -1){
       switch (ps) {
         case 'caschk': console.log('undefined case');   break;
@@ -3113,3 +3119,4 @@ function interpret(){
     }
     console.log("          " + ocnt + " steps");
 }//interpret
+//False

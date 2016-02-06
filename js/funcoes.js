@@ -3,12 +3,11 @@ function runScript(e) {
     debugger;
     var input = pegaValorInput();
     //input.pop();
-    adcionarSaida(input);
+    atualizarConsole(input);
     InputFile = input;
     limpaInput();
     read_ok = true;
-    call_read = false;
-    interpreter();
+    interpret();
   }
 }
 
@@ -32,14 +31,17 @@ function limpaConsole() {
   document.getElementById("output").value = "";
 }
 
-function atualizarConsole(){
-  //limpaConsole();
-  var i = document.getElementById("output").value;
-  var j = output_console.pop();
-  i = i + j;
-      document.getElementById("output").value = i;
-      //Mostra posicao
-      //document.getElementById("output").value += (output_console[i]).concat(" ===> pos: ").concat(i).concat("\n");
+function atualizarConsole(string){
+  string = document.getElementById("output").value + string;
+  document.getElementById("output").value = string;
+  scrollOutput();
+}
+
+function changeOutput(){
+  call_read = true;
+  pc++;         //As instruções de leitura precisam retornar na mesma instrução, as de escrita podem seguir para a próxima instrução.
+  ocnt++;
+  interpret();
 }
 
   function mostrarModalOutput(){

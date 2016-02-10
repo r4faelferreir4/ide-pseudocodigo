@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit1(f)x =
+//lngchk
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -422,6 +422,7 @@ function compiladorPascalS(){
           sy = "period";
           break;
           case "\'":
+          debugger;
           k = 0;
           do{
             NextCh();
@@ -1317,26 +1318,28 @@ function block(fsys, isfun, level){
 
       function resulttype(a, b){
         try{
+          var result;
           if (types1.indexOf(a) > types1.indexOf("reals") || types1.indexOf(b) > types1.indexOf("reals")){
             Error(33);
-            return "notyp";
+            result =  "notyp";
           }
           else
           if (a == "notyp" || b == "notyp")
-            return "notyp";
+            result =  "notyp";
           else
             if (a == "ints")
               if(b == "ints")
-                return "ints";
+                result =  "ints";
               else {
-                return "reals";
+                result = "reals";
                 emit1(26, 1);
               }
             else {
-              return "reals";
+              result =  "reals";
               if (b == "ints")
                 emit1(26, 0);
             }
+            return result;
         }
         catch(err){
           return err;
@@ -1785,7 +1788,6 @@ function block(fsys, isfun, level){
         var x;
         x = new item("", 1);
         var i, j, k, lc1;
-
         var casetab = new Array(csmax);
         function CaseRecord(val, lc){
           this.val = val;
@@ -1796,6 +1798,7 @@ function block(fsys, isfun, level){
           casetab[i] = new CaseRecord(0,0);
         }
         var exittab = new Array(csmax);
+        debugger;
         function caselabel(){
           try{
             var lab, k;
@@ -1870,7 +1873,7 @@ function block(fsys, isfun, level){
             emit1(13, casetab[k].lc);
           }
           emit1(10, 0);
-          for (k = 1; k < j; k++)
+          for (k = 1; k <= j; k++)
             kode[exittab[k]].y = lc;
           if (sy == "endsy")
             insymbol();
@@ -2285,6 +2288,7 @@ try{
   ll = 0;
   cc = 0;
   ch = " ";
+  iln = 0;
   errpos = 0;
   errs = [];
   insymbol();
@@ -2359,10 +2363,10 @@ try{
   enter('arctan', "funktion", "reals", 16);
   enter('eof', "funktion", "bools", 17);
   enter('eoln', "funktion", "bools", 18);
-  enter('recebe', "prozedure", "notyp", 1);
-  enter('recebeln', "prozedure", "notyp", 2);
+  enter('leia', "prozedure", "notyp", 1);
+  //enter('leialn', "prozedure", "notyp", 2);
   enter('escreve', "prozedure", "notyp", 3);
-  enter('escreveln', "prozedure", "notyp", 4);
+  //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
   btab[1].last = t;
   btab[1].lastpar = 1;
@@ -2753,31 +2757,37 @@ function interpreter(){
       h2 = ir.y;
       t--;
       chrcnt = chrcnt + h1;
-      if (chrcnt > lineleng){
-        ps = 'lngchk';
-      }
       var string = "";
       do {
+        debugger;
+        while (stab[h2] == "\\"){
+          if (stab[h2+1] == "n"){
+              window.setTimeout(atualizarConsole(string+"\n"), 1000);
+              string = "";
+              h2 += 2;
+              h1 -= 2;
+              if (h1 <= 0)  break;
+          }
+          else
+            string += stab[h2];
+        }
+        if (h1 <= 0) break;
         string += stab[h2];
         h1--;
         h2++;
-      } while (h1 != 0);
-      atualizarConsole(string);
+      } while (h1 > 0);
+      window.setTimeout(atualizarConsole(string), 1000);
       //call_read = true;
       //return;
       break;
 
       case 29:
       chrcnt = chrcnt + fld[ir.y];
-      if (chrcnt > lineleng){
-        ps = 'lngchk';
-      }
-      else
       switch (ir.y) {
         case 1:
         var str = "";
         str += s[t].i;
-        atualizarConsole(str);
+        window.setTimeout(atualizarConsole(str), 1000);
         //call_read = true;
         //return;
         break;
@@ -2796,7 +2806,7 @@ function interpreter(){
         //return;
         break;
         case 4:
-        atualizarConsole(s[t].c);
+        atualizarConsole(String.fromCharCode(s[t].i));
         //call_read = true;
         //return;
         break;
@@ -2806,21 +2816,17 @@ function interpreter(){
 
       case 30:
       chrcnt = chrcnt + s[t].i;
-      if (chrcnt > lineleng){
-        ps = 'lngchk';
-      }
-      else{
-        switch (ir.y) {
-          case 1:
+      switch (ir.y) {
+        case 1:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
           str += s[t-1].i;
-          atualizarConsole(str);
+          window.setTimeout(atualizarConsole(str), 1000);
           //call_read = true;
           //return;
-          break;
-          case 2:
+        break;
+        case 2:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
@@ -2828,8 +2834,8 @@ function interpreter(){
           atualizarConsole(str);
           //call_read = true;
           //return;
-          break;
-          case 3:
+        break;
+        case 3:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
@@ -2837,8 +2843,8 @@ function interpreter(){
           atualizarConsole(str);
           //call_read = true;
           //return;
-          break;
-          case 4:
+        break;
+        case 4:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
           str += " ";
@@ -2846,8 +2852,7 @@ function interpreter(){
           atualizarConsole(str);
           //call_read = true;
           //return;
-          break;
-        }
+        break;
       }
       t = t - 2;
       break;
@@ -2873,19 +2878,14 @@ function interpreter(){
 
       case 37:
       chrcnt = chrcnt + s[t - 1].i;
-      if (chrcnt > lineleng) {
-        ps = 'lngchk';
-      }
-      else{
-        var str = "";
-        str += "     ";
-        str += s[t-2].r;
-        str += s[t-2].i;
-        str += s[t].i;
-        atualizarConsole(str);
+      var str = "";
+      str += "     ";
+      str += s[t-2].r;
+      str += s[t-2].i;
+      str += s[t].i;
+      atualizarConsole(str);
         //call_read = true;
         //return;
-      }
       t = t - 3;
       break;
 

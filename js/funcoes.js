@@ -35,6 +35,7 @@ function atualizarConsole(string){
   string = document.getElementById("output").value + string;
   document.getElementById("output").value = string;
   scrollOutput();
+  debugger;
 }
 
 function changeOutput(){

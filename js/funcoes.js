@@ -1,6 +1,5 @@
 function runScript(e) {
   if (e.keyCode == 13) {
-    debugger;
     var input = pegaValorInput();
     //input.pop();
     atualizarConsole(input);
@@ -35,7 +34,6 @@ function atualizarConsole(string){
   string = document.getElementById("output").value + string;
   document.getElementById("output").value = string;
   scrollOutput();
-  debugger;
 }
 
 function changeOutput(){

@@ -5,12 +5,12 @@
   <title>Compilador</title>
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="css/codemirror.css">
-  <script src="js/bootstrap.min.js" type="text/javascript"> </script>
   <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js" type="text/javascript"> </script>
   <script src="js/javascript.js"></script>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 
   <!-- importação codemirror -->
   <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -127,8 +127,10 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 function getCode(){
   InputFile = editor.getValue();
   compiladorPascalS();
+  document.getElementById("output").value = "";
   mostrarModalOutput();
   setTimeout(function(){
+    call_read = false;
     interpret();
     scrollOutput();
 }, 300);

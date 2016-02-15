@@ -1,6 +1,5 @@
 function runScript(e) {
   if (e.keyCode == 13) {
-    debugger;
     var input = pegaValorInput();
     //input.pop();
     atualizarConsole(input);
@@ -10,7 +9,11 @@ function runScript(e) {
     interpret();
   }
 }
-
+function reexecute(){
+  limpaConsole();
+  call_read = false;
+  interpret();
+}
 function pegaValorInput() {
   return document.getElementById("scriptBox").value;
 
@@ -35,7 +38,6 @@ function atualizarConsole(string){
   string = document.getElementById("output").value + string;
   document.getElementById("output").value = string;
   scrollOutput();
-  debugger;
 }
 
 function changeOutput(){

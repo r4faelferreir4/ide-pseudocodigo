@@ -5,8 +5,8 @@ program Pascals; {1.6.75}
           Clausiusstr.55   CH-8006 Zurich    }
 { Omskrevet til TurboPascal v.4.0.
           B. Nielsen                         }
-
-labelrepeat
+for
+function
   99;
 const
   nkw = 27; { no. of key words                         }

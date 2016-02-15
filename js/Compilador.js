@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//lngchk
+//emit1(10)
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -38,12 +38,12 @@ var symbol1 =  ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "mi
 //var alfa = [alng+1];
 var object2;// = ["konstant", "variable", "type1", "prozedure", "funktion"];
 var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
-var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
-var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
+var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records", "strings"];
+var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records","strings"];
 var symset = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
 "lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
 "casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-var typeset = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records"];
+var typeset = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records", "strings"];
 function item(typ, ref){
   this.typ = typ;
   this.ref = ref;
@@ -422,7 +422,6 @@ function compiladorPascalS(){
           sy = "period";
           break;
           case "\'":
-          debugger;
           k = 0;
           do{
             NextCh();
@@ -761,10 +760,20 @@ function block(fsys, isfun, level){
       try{
         test(constbegsys, fsys, 50);
         if(constbegsys.indexOf(sy) != -1){
-          if (sy == "charcon"){
-            c.tp = "chars";
-            c.i = inum;
-            insymbol();
+          if (sy == "charcon" || sy == "stringsy"){
+            if (sy == "stringsy"){
+              c.tp = "strings";
+              var slicearray = stab.splice(inum, inum+sleng);
+              slicearray = slicearray.join("");
+              c.i = slicearray;
+              sx -= sleng;
+              insymbol();
+            }
+            else {
+              c.tp = "chars";
+              c.i = inum;
+              insymbol();
+            }
           }
           else {
             sign = 1;
@@ -1176,6 +1185,7 @@ function block(fsys, isfun, level){
       function selector(fsys, v){
         var x, a, j;
         try{
+          debugger;
           x = new item("", 1);
           do{
             if (sy == "period"){
@@ -1285,7 +1295,6 @@ function block(fsys, isfun, level){
                         Error(37);
                       x.typ = tab[k].typ;
                       x.ref = tab[k].ref;
-                      debugger;
                       if (tab[k].normal)
                         emit2(0, tab[k].lev, tab[k].adr);
                       else
@@ -1320,8 +1329,12 @@ function block(fsys, isfun, level){
         try{
           var result;
           if (types1.indexOf(a) > types1.indexOf("reals") || types1.indexOf(b) > types1.indexOf("reals")){
-            Error(33);
-            result =  "notyp";
+            if (a == "strings" || b == "strings")
+              result = "strings";
+            else {
+              Error(33);
+              result =  "notyp";
+            }
           }
           else
           if (a == "notyp" || b == "notyp")
@@ -1349,6 +1362,7 @@ function block(fsys, isfun, level){
       function expression(fsys, x){
         var y, op;
         y = new item("", 1);
+        debugger;
 
 
         function simpleexpression(fsys, x){
@@ -1365,7 +1379,6 @@ function block(fsys, isfun, level){
               function standfct(n){
                 var ts;
                 try{
-                  debugger;
                   if (sy == "lparent")
                     insymbol();
                   else
@@ -1523,7 +1536,7 @@ function block(fsys, isfun, level){
                     if (x.typ != "notyp")
                     Error(32);
                   }
-                  test(fsys, facbegsys, 6);
+                  test(fsys.concat(["untilsy"]), facbegsys, 6);
                 }
               }
               catch(err){
@@ -1594,8 +1607,10 @@ function block(fsys, isfun, level){
               op = sy;
               insymbol();
               term(fsys.concat(["plus", "minus"]), x);
-              if (types1.indexOf(x.typ) > types1.indexOf("reals"))
-                Error(33);
+              if (types1.indexOf(x.typ) > types1.indexOf("reals")){
+                if (x.typ != "strings")
+                  Error(33);
+              }
               else
                 if (op == "minus")
                   emit(36);
@@ -1618,6 +1633,7 @@ function block(fsys, isfun, level){
               else {
                 x.typ = resulttype(x.typ, y.typ);
                 switch (x.typ) {
+                  case "strings":
                   case "ints":
                     if (op == "plus")
                       emit(52);
@@ -1644,7 +1660,7 @@ function block(fsys, isfun, level){
             op = sy;
             insymbol();
             simpleexpression(fsys, y);
-            if (["notyp", "ints", "bools", "chars"].indexOf(x.typ) != -1 && x.typ == y.typ)
+            if (["notyp", "ints", "bools", "chars", "strings"].indexOf(x.typ) != -1 && x.typ == y.typ)
               switch (op) {
                 case "eql": emit(45);break;
                 case "neq": emit(46);break;
@@ -1654,6 +1670,18 @@ function block(fsys, isfun, level){
                 case "geq": emit(50);break;
               }
             else {
+              if (x.typ == "strings" || y.typ == "strings"){
+                if (x.typ == "chars" || y.typ == "chars"){
+                  switch (op) {
+                    case "eql": emit(45);break;
+                    case "neq": emit(46);break;
+                    case "lss": emit(47);break;
+                    case "leq": emit(48);break;
+                    case "gtr": emit(49);break;
+                    case "geq": emit(50);break;
+                  }
+                }
+              }
               if (x.typ == "ints"){
                 x.typ = "reals";
                 emit1(26,1);
@@ -1743,7 +1771,8 @@ function block(fsys, isfun, level){
           if (sy == "endsy")
             insymbol();
           else
-            Error(57);
+            if (sy != "elsesy")
+              Error(57);
         }
         catch(err){
           return err;
@@ -1947,13 +1976,13 @@ function block(fsys, isfun, level){
             i = loc(id);
             insymbol();
             if (i == 0)
-            cvt = "ints";
+              cvt = "ints";
             else
             if (tab[i].obj == "variable"){
               cvt = tab[i].typ;
               emit2(0, tab[i].lev, tab[i].adr);
               if (["notyp", "ints", "bools", "chars"].indexOf(cvt) == -1)
-              Error(18);
+                Error(18);
             }
             else {
               Error(37);
@@ -1961,26 +1990,33 @@ function block(fsys, isfun, level){
             }
           }
           else
-          skip(["becomes", "tosy", "downtosy", "dosy"].concat(fsys), 2);
-          if (sy == "becomes"){
+            skip(["ofsy", "tosy", "downtosy", "dosy"].concat(fsys), 2);
+          if (sy == "ofsy"){
             insymbol();
             expression(["tosy", "downtosy", "dosy"].concat(fsys), x);
             if (x.typ != cvt)
             Error(19);
           }
           else
-          skip(["tosy", "downtosy", "dosy"].concat(fsys), 51);
+            skip(["tosy"].concat(fsys), 51);
           f = 14;
           if (["tosy", "downtosy"].indexOf(sy) != -1){
             if (sy == "downtosy")
-            f = 16;
-            insymbol();
+              f = 16;
+          insymbol();
+          /*if (kode[lc-1].f == 24){
+            var number = kode[lc-1].y;
+            if (number < inum)
+              f = 14;
+            else
+              f = 16;
+          }*/
             expression(["dosy"].concat(fsys), x);
             if (x.typ != cvt)
-            Error(19);
+              Error(19);
           }
-          else
-          skip(["dosy"].concat(fsys), 55);
+          if(sy != "dosy")
+            skip(["dosy"].concat(fsys), 55);
           lc1 = lc;
           emit(f);
           if (sy == "dosy")
@@ -2017,7 +2053,6 @@ function block(fsys, isfun, level){
                 if (sy != "ident")
                 Error(2);
                 else {
-                  debugger;
                   i = loc(id);
                   insymbol();
                   if (i != 0)
@@ -2033,7 +2068,7 @@ function block(fsys, isfun, level){
                     emit2(f, tab[i].lev, tab[i].adr);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                     selector(fsys.concat(["comma", "rparent"]), x);
-                    if (["ints", "reals", "chars", "notyp"].indexOf(x.typ) != -1)
+                    if (["ints", "reals", "chars", "notyp", "strings"].indexOf(x.typ) != -1)
                     emit1(27, types1.indexOf(x.typ));
                     else
                     Error(40);
@@ -2248,10 +2283,10 @@ try{
   key[15] = 'nao'; key[16] = 'de';
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
-  key[21] = 'repete'; key[22] = 'entao';
-  key[23] = 'incrementa'; key[24] = 'tipo';
+  key[21] = 'repita'; key[22] = 'entao';
+  key[23] = 'incrementa'; key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
-  key[27] = 'enquanto';
+  key[27] = 'enquanto'; key[28] = 'ref';
   ksy[1] = "andsy"; ksy[2] = "arraysy";
   ksy[3] = 'beginsy'; ksy[4] = "casesy";
   ksy[5] = 'constsy'; ksy[6] = "idiv";
@@ -2265,7 +2300,7 @@ try{
   ksy[21] = 'repeatsy'; ksy[22] = 'thensy';
   ksy[23] = 'tosy'; ksy[24] = 'typesy';
   ksy[25] = 'untilsy'; ksy[26] = 'varsy';
-  ksy[27] = 'whilesy';
+  ksy[27] = 'whilesy'; ksy[28] = 'varsy';
   sps['+'] = 'plus'; sps['-'] = 'minus';
   sps['*'] = 'times'; sps['/'] = 'rdiv';
   sps['('] = 'lparent'; sps[')'] = 'rparent';
@@ -2278,12 +2313,12 @@ try{
   csps[6] = "=";  csps[7] = ","; csps[8] = "[";
   csps[9] = "]";  csps[10] = "#"; csps[11] = "&";
   csps[12] = ";";
-  constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident'];
+  constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident', 'stringsy'];
   typebegsys = ['ident', 'arraysy', 'recordsy'];
   blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
-  facbegsys = ['intcon', 'realcon', 'charcon', 'ident', 'lparent', 'notsy'];
+  facbegsys = ['intcon', 'realcon', 'charcon', 'stringsy', 'ident', 'lparent', 'notsy'];
   statbegsys = ['beginsy', 'ifsy', 'whilesy', 'repeatsy', 'forsy', 'casesy'];
-  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars'];
+  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars', 'strings'];
   lc = 0;
   ll = 0;
   cc = 0;
@@ -2300,8 +2335,8 @@ try{
   display[0] = 1;
   display[1] = 1;
   display[2] = 1;
-  iflag = false;
-  oflag = false;
+  iflag = true;
+  oflag = true;
   if (sy != "programsy"){
     console.log("Aplicação finalizada");
     return;
@@ -2316,7 +2351,8 @@ try{
       if (sy != "lparent")
       Error(9);
       else
-      do{
+      insymbol();
+      /*do{
         insymbol();
         if (sy != "ident")
         Error(2);
@@ -2330,7 +2366,7 @@ try{
           Error(0);
           insymbol();
         }
-      }while(sy == "comma");
+      }while(sy == "comma");*/
       if (sy == "rparent")
       insymbol();
       else
@@ -2346,6 +2382,7 @@ try{
   enter('caracter', "type1", "chars", 1);
   enter('logico', "type1", "bools", 1);
   enter('inteiro', "type1", "ints", 1);
+  enter('literal', 'type1', 'strings', 1)
   enter('abs', "funktion", "reals", 0);
   enter('sqr', "funktion", "reals", 2);
   enter('odd', "funktion", "bools", 4);
@@ -2365,7 +2402,7 @@ try{
   enter('eoln', "funktion", "bools", 18);
   enter('leia', "prozedure", "notyp", 1);
   //enter('leialn', "prozedure", "notyp", 2);
-  enter('escreve', "prozedure", "notyp", 3);
+  enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
   btab[1].last = t;
@@ -2413,20 +2450,22 @@ var b; //index base
 var h1, h2, h3, h4;
 var fld = new Array(4);//tamano padrão dos campos
 var display = new Array(lmax);
-var s = new Array(stacksize);
+var s = []//new Array(stacksize);
 var call_read = false;
 var output_console = [];    //Variável que irá imprimir na tela do console
 var read_ok = false;
-function record(i, r, b, c) {
+/*function record(i, r, b, c, s, e) {
   this.i = i;
   this.r = r;
   this.b = b;
   this.c = c;
+  this.s = s;
+  this.e = e;
 }
 //inicializa array com objetos do tipo record
 for (var i = 0; i < s.length; i++){
   s[i] = new record(1, 1, true, "c");
-}
+}*/
 function interpreter(){
   do {
     ir = kode[pc];
@@ -2435,12 +2474,13 @@ function interpreter(){
     //debugger;
     switch(ir.f){
       case 0:
+      debugger;
       t++;
       if (t > stacksize){
         ps = 'stkchk';
       }
       else{
-        s[t].i = display[ir.x] + ir.y;
+        s[t] = display[ir.x] + ir.y;
       }
       break;
 
@@ -2451,8 +2491,8 @@ function interpreter(){
       }
       else{
         var i1 = display[ir.x]+ir.y;
-        var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
-        s[t] = s1;
+        //var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
+        s[t] = s[i1];
 
       }
       break;
@@ -2464,8 +2504,8 @@ function interpreter(){
       }
       else{
         var i1 = s[display[ir.x]+ir.y].i;
-        var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
-        s[t] = s1;
+        //var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
+        s[t] = s[i1];
       }
       break;
 
@@ -2476,61 +2516,65 @@ function interpreter(){
       do{
         display[h1] = h3;
         h1--;
-        h3 = s[h3 + 2].i
+        h3 = s[h3 + 2];
       }
       while( h1 == h2);
       break;
 
       case 8:
       switch (ir.y) {
-        case 0: s[t].i = Math.abs(s[t].i); break;
-        case 1: s[t].r = Math.abs(s[t].r); break;
-        case 2: s[t].i = Math.pow(s[t].i, 2); break;
-        case 3: s[t].r = Math.pow(s[t].r, 2); break;
-        case 4: s[t].b = (s[t].i%2) != 0; break;
+        case 0: s[t] = Math.abs(s[t]); break;
+        case 1: s[t] = Math.abs(s[t]); break;
+        case 2: s[t] = Math.pow(s[t], 2); break;
+        case 3: s[t] = Math.pow(s[t], 2); break;
+        case 4: s[t] = (s[t]%2) != 0; break;
         case 5:
-        if (s[t].i < 0 || s[t].i > 63){
+        if (s[t] < 0 || s[t] > 63){
           ps = 'inxchk';
         }
         else
-        s[t].c = String.fromCharCode(s[t].i);
+        s[t] = String.fromCharCode(s[t]);
         break;
-        case 6: s[t].i = s[t].c.charCodeAt();  break;
+        case 6: s[t] = s[t].charCodeAt();  break;
         case 7:
-        var c = s[t].c.charCodeAt();
+        var c = s[t].charCodeAt();
         c++;
-        s[t].c = String.fromCharCode(c);
+        s[t] = String.fromCharCode(c);
         break;
         case 8:
-        var c = s[t].c.charCodeAt();
+        var c = s[t].charCodeAt();
         c--;
-        s[t].c = String.fromCharCode(c);
+        s[t] = String.fromCharCode(c);
         break;
-        case 9: s[t].i = Math.round(s[t].r); break;
-        case 10: s[t].i = Math.floor(s[t].r); break;
-        case 11: s[t].r = Math.sin(s[t].r); break;
-        case 12: s[t].r = Math.cos(s[t].r); break;
-        case 13: s[t].r = Math.exp(s[t].r); break;
-        case 14: s[t].r = Math.log(s[t].r); break;
-        case 15: s[t].r = Math.sqrt(s[t].r); break;
-        case 16: s[t].r = Math.atan(s[t].r); break;
+        case 9: s[t] = Math.round(s[t]); break;
+        case 10: s[t] = Math.floor(s[t]); break;
+        case 11: s[t] = Math.sin(s[t]); break;
+        case 12: s[t] = Math.cos(s[t]); break;
+        case 13: s[t] = Math.exp(s[t]); break;
+        case 14: s[t] = Math.log(s[t]); break;
+        case 15: s[t] = Math.sqrt(s[t]); break;
+        case 16: s[t] = Math.atan(s[t]); break;
       }//switch case 8
       break;
-      case 9: s[t].i = s[t].i + ir.y; break;
+      case 9: s[t] = s[t] + ir.y; break;
       case 10: pc = ir.y; break;//jump
-      case 11:
-      if (!s[t].b){
+      case 11:debugger;
+      if (!s[t])
         pc = ir.y;
-        t--;
-      }
+      t--;
       break;
       case 12:
-      h1 = s[t].i;
+      debugger;
+      h1 = s[t];
       t = t - 1;
       h2 = ir.y;
       h3 = 0;
       do {
         if (kode[h2].f != 13){
+          if (kode[h2].f == 10){
+            pc = h2 + 1;
+            break;
+          }
           h3 = 1;
           ps = 'caschk';
         }
@@ -2546,9 +2590,9 @@ function interpreter(){
       break;
 
       case 14:
-      h1 = s[t - 1].i;
-      if(h1 <= s[t].i){
-        s[s[t - 2].i].i = h1;
+      h1 = s[t - 1];
+      if(h1 <= s[t]){
+        s[s[t - 2]] = h1;
       }
       else{
         t = t - 3;
@@ -2557,10 +2601,10 @@ function interpreter(){
       break;
 
       case 15:
-      h2 = s[t - 2].i;
-      h1 = s[h2].i + 1;
-      if (h1 <= s[t].i){
-        s[h2].i = h1;
+      h2 = s[t - 2];
+      h1 = s[h2] + 1;
+      if (h1 <= s[t]){
+        s[h2] = h1;
         pc = ir.y;
       }
       else{
@@ -2569,9 +2613,9 @@ function interpreter(){
       break;
 
       case 16:
-      h1 = s[t - 1].i;
-      if (h1 >= s[t].i){
-        s[s[t - 2].i].i = h1;
+      h1 = s[t - 1];
+      if (h1 >= s[t]){
+        s[s[t - 2]] = h1;
       }
       else{
         pc = ir.y;
@@ -2580,10 +2624,10 @@ function interpreter(){
       break;
 
       case 17:
-      h2 = s[t - 2].i;
-      h1 = s[h2].i - 1;
-      if (h1 >= s[t].i){
-        s[h2].i = h1;
+      h2 = s[t - 2];
+      h1 = s[h2] - 1;
+      if (h1 >= s[t]){
+        s[h2] = h1;
         pc = ir.y
       }
       else{
@@ -2598,23 +2642,23 @@ function interpreter(){
       }
       else{
         t = t + 5;
-        s[t - 1].i = h1 - 1;
-        s[t].i = ir.y;
+        s[t - 1] = h1 - 1;
+        s[t] = ir.y;
       }
       break;
 
       case 19:
       h1 = t - ir.y; //{h1 points to base}
-      h2 = s[h1 + 4].i; //{h2 points to tab}
+      h2 = s[h1 + 4]; //{h2 points to tab}
       h3 = tab[h2].lev;
       display[h3 + 1] = h1;
-      h4 = s[h1 + 3].i + h1;
-      s[h1 + 1].i = pc;
-      s[h1 + 2].i = display[h3];
-      s[h1 + 3].i = b;
+      h4 = s[h1 + 3] + h1;
+      s[h1 + 1] = pc;
+      s[h1 + 2] = display[h3];
+      s[h1 + 3] = b;
 
       for (h3 = t+1;  h3 < h4;  h3++) {
-        s[h3].i = 0;
+        s[h3] = 0;
       }
 
       b = h1;
@@ -2625,7 +2669,7 @@ function interpreter(){
       case 20:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s[t].i;
+      h3 = s[t];
       if (h3 < h2){
         ps = 'inxchk';
       }
@@ -2635,7 +2679,7 @@ function interpreter(){
         }
         else{
           t--;
-          s[t].i = s[t].i + (h3 - h2);
+          s[t] = s[t] + (h3 - h2);
         }
       }
       break;
@@ -2643,7 +2687,7 @@ function interpreter(){
       case 21:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s[t].i;
+      h3 = s[t];
       if (h3 < h2) {
         ps = 'inxchk';
       }
@@ -2653,12 +2697,12 @@ function interpreter(){
         }
         else{
           t = t - 1;
-          s[t].i = s[t].i + (h3 - h2) * atab[h1].elsize;
+          s[t] = s[t] + (h3 - h2) * atab[h1].elsize;
         }
       }
       break;
       case 22:
-      h1 = s[t].i;
+      h1 = s[t];
       t--;
       h2 = ir.y + t;
       if(h2 > stacksize){
@@ -2667,19 +2711,19 @@ function interpreter(){
       else
       while (t < h2) {
         t++;
-        var s1 = new record(s[h1].i, s[h1].r, s[h1].b, s[h1].c);
-        s[t] = s1;
+        //var s1 = new record(s[h1].i, s[h1].r, s[h1].b, s[h1].c);
+        s[t] = s[h1];
         h1++;
       }
       break;
 
       case 23:
-      h1 = s[t - 1].i;
-      h2 = s[t].i;
+      h1 = s[t - 1];
+      h2 = s[t];
       h3 = h1 + ir.y;
       while (h1 < h3){
-        var s1 = new record(s[h2].i, s[h2].r, s[h2].b, s[h2].c);
-        s[h1] = s1;
+        //var s1 = new record(s[h2].i, s[h2].r, s[h2].b, s[h2].c);
+        s[h1] = s[h2];
         h1++;
         h2++;
       }
@@ -2692,7 +2736,7 @@ function interpreter(){
         ps = 'stkchk';
       }
       else{
-        s[t].i = ir.y;
+        s[t] = ir.y;
       }
       break;
 
@@ -2702,13 +2746,13 @@ function interpreter(){
         ps = 'stkchk';
       }
       else{
-        s[t].r = rconst[ir.y];
+        s[t] = rconst[ir.y];
       }
       break;
 
       case 26:
       h1 = t - ir.y;
-      s[h1].r = s[h1].i;
+      //s[h1] = s[h1];
       break;
 
       case 27:    //INSTRUÇÃO DE LEITURA
@@ -2719,7 +2763,7 @@ function interpreter(){
         switch (ir.y) {
           case 1:
           if (read_ok) {
-            s[s[t].i].i = Number(InputFile);
+            s[s[t]] = Number(InputFile);
             read_ok = false;
           }
           else{
@@ -2729,7 +2773,7 @@ function interpreter(){
           break;
           case 2:
           if (read_ok) {
-            s[s[t].i].r = Number(InputFile);
+            s[s[t]] = Number(InputFile);
             read_ok = false;
           }
           else{
@@ -2739,7 +2783,7 @@ function interpreter(){
           break;
           case 4:
           if (read_ok) {
-            s[s[t].i].c = InputFile;
+            s[s[t]] = InputFile;
             read_ok = false;
           }
           else{
@@ -2747,29 +2791,41 @@ function interpreter(){
             return;
           }
           break;
+          case 7:
+            if (read_ok) {
+              s[s[t]] = InputFile;
+              read_ok = false;
+            }
+            else{
+              call_read = true;
+              return;
+            }
+          break;
         }
       //}
       t--;
       break;
 
       case 28:
-      h1 = s[t].i;
+      h1 = s[t];
       h2 = ir.y;
       t--;
       chrcnt = chrcnt + h1;
       var string = "";
       do {
-        debugger;
         while (stab[h2] == "\\"){
           if (stab[h2+1] == "n"){
               window.setTimeout(atualizarConsole(string+"\n"), 1000);
               string = "";
               h2 += 2;
               h1 -= 2;
-              if (h1 <= 0)  break;
           }
-          else
+          else{
             string += stab[h2];
+            h1--;
+            h2++;
+          }
+          if (h1 <= 0)  break;
         }
         if (h1 <= 0) break;
         string += stab[h2];
@@ -2783,7 +2839,7 @@ function interpreter(){
 
       case 29:
       chrcnt = chrcnt + fld[ir.y];
-      switch (ir.y) {
+      /*switch (ir.y) {
         case 1:
         var str = "";
         str += s[t].i;
@@ -2810,13 +2866,17 @@ function interpreter(){
         //call_read = true;
         //return;
         break;
-      }
+      }*/
+      debugger;
+      var str = "";
+      str += s[t];
+      window.setTimeout(atualizarConsole(str), 1000);
       t = t - 1;
       break;
 
       case 30:
       chrcnt = chrcnt + s[t].i;
-      switch (ir.y) {
+      /*switch (ir.y) {
         case 1:
           var str = "";
           for (var p = 0; p < s[t].i; p++)
@@ -2853,7 +2913,12 @@ function interpreter(){
           //call_read = true;
           //return;
         break;
-      }
+      }*/
+      var str = "";
+      for (var p = 0; p < s[t]; p++)
+        str += " ";
+      str += s[t-1];
+      window.setTimeout(atualizarConsole(str), 1000);
       t = t - 2;
       break;
       case 31:
@@ -2862,27 +2927,28 @@ function interpreter(){
 
       case 32:
       t = b - 1;
-      pc = s[b + 1].i;
-      b = s[b + 3].i
+      pc = s[b + 1];
+      b = s[b + 3];
       break;
 
       case 33:
       t = b;
-      pc = s[b + 1].i;
-      b = s[b + 3].i;
+      pc = s[b + 1];
+      b = s[b + 3];
       break;
 
-      case 34: s[t] = s[s[t].i]; break;
-      case 35: s[t].b = !s[t].b; break;
-      case 36: s[t].i = -s[t].i; break;
+      case 34: s[t] = s[s[t]]; break;
+      case 35: s[t] = !s[t]; break;
+      case 36: s[t] = -s[t]; break;
 
       case 37:
-      chrcnt = chrcnt + s[t - 1].i;
+      chrcnt = chrcnt + s[t - 1];
       var str = "";
-      str += "     ";
-      str += s[t-2].r;
-      str += s[t-2].i;
-      str += s[t].i;
+      for(var p = 0; p < s[t-1]; p++)
+        str += " ";
+      str += s[t-2];
+      //str += s[t-1];
+      str += "."+s[t];
       atualizarConsole(str);
         //call_read = true;
         //return;
@@ -2890,134 +2956,137 @@ function interpreter(){
       break;
 
       case 38:
-      s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
-      s[s[t - 1].i] = s1;
+      //s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
+      s[s[t - 1]] = s[t];
       t = t - 2;
       break;
 
       case 39:
       t--;
-      s[t].b = s[t].r == s[t + 1].r;
+      s[t] = s[t] == s[t + 1];
       break;
 
       case 40:
       t--;
-      s[t].b = s[t].r == s[t + 1].r;
+      s[t] = s[t] != s[t + 1];
       break;
 
       case 41:
       t--;
-      s[t].b = s[t].r < s[t + 1].r;
+      s[t] = s[t] < s[t + 1];
       break;
 
       case 42:
       t--;
-      s[t].b = s[t].r <= s[t + 1].r;
+      s[t] = s[t] <= s[t + 1];
       break;
 
       case 43:
       t--;
-      s[t].b = s[t].r > s[t + 1].r;
+      s[t] = s[t] > s[t + 1];
       break;
 
       case 44:
       t--;
-      s[t].b = s[t].r >= s[t + 1].r;
+      s[t] = s[t] >= s[t + 1];
       break;
 
       case 45:
+      debugger;
       t--;
-      s[t].b = s[t].i == s[t + 1].i;
+      s[t] = s[t] == s[t + 1];
       break;
 
       case 46:
       t--;
-      s[t].b = s[t].i != s[t + 1].i;
+      s[t] = s[t] != s[t + 1];
       break;
 
       case 47:
       t--;
-      s[t].b = s[t].i < s[t + 1].i;
+      s[t] = s[t] < s[t + 1];
       break;
 
       case 48:
       t--;
-      s[t].b = s[t].i <= s[t + 1].i;
+      s[t] = s[t] <= s[t + 1];
       break;
 
       case 49:
       t--;
-      s[t].b = s[t].i > s[t + 1].i;
+      s[t] = s[t] > s[t + 1];
       break;
 
       case 50:
       t--;
-      s[t].b = s[t].i >= s[t + 1].i;
+      s[t] = s[t] >= s[t + 1];
       break;
 
       case 51:
       t--;
-      s[t].b = s[t].b || s[t + 1].b;
+      s[t] = s[t] || s[t + 1];
       break;
 
       case 52:
       t--;
-      s[t].i = s[t].i + s[t + 1].i;
+      s[t] = s[t] + s[t + 1];
       break;
 
       case 53:
       t--;
-      s[t].i = s[t].i - s[t + 1].i;
+      s[t] = s[t] - s[t + 1];
       break;
 
       case 54:
       t--;
-      s[t].r = s[t].r + s[t + 1].r;
+      s[t] = s[t] + s[t + 1];
       break;
 
       case 55:
       t--;
-      s[t].r = s[t].r - s[t + 1].r;
+      s[t] = s[t] - s[t + 1];
       break;
 
       case 56:
       t = t - 1;
-      s[t].b = s[t].b && s[t + 1].b;
+      s[t] = s[t] && s[t + 1];
       break;
 
       case 57:
       t--;
-      s[t].i = s[t].i * s[t + 1].i;
+      s[t] = s[t] * s[t + 1];
       break;
 
       case 58:
       t--;
-      if (s[t + 1].i == 0){
+      if (s[t + 1] == 0){
         ps = 'divchk';
+        atualizarConsole("ERRO! Divisão por 0");
       }
       else{
-        s[t].i = s[t].i / s[t + 1].i;
+        s[t] = s[t] / s[t + 1];
       }
       break;
 
       case 59:
       t--;
-      if(s[t + 1].i == 0){
+      if(s[t + 1] == 0){
         ps = 'divchk';
+        atualizarConsole("ERRO! Divisão por 0");
       }
       else{
-        s[t].i = s[t].i % s[t + 1].i;
+        s[t] = s[t] % s[t + 1];
       }
       break;
 
       case 60:
       t--;
-      s[t].r = s[t].r * s[t + 1].r;
+      s[t] = s[t] * s[t + 1];
       break;
 
       case 61:
       t--;
-      s[t].r = s[t].r / s[t + 1].r;
+      s[t] = s[t] / s[t + 1];
       break;
 
       case 62:
@@ -3029,16 +3098,15 @@ function interpreter(){
       //}
 
       case 63:
-      //      writeln;
-      lncnt++;
-      chrcnt = 0;
-        var string = "\n";
-        atualizarConsole(string);
+      //writeln;
+      //lncnt++;
+      //chrcnt = 0;
+        //var string = "\n";
+        //atualizarConsole(string);
         //call_read = true;
         //return;
       }//primeiro switch
-    }
-    while (ps == "run");
+    }while (ps == "run");
 }
 function interpret(){
   if (call_read){
@@ -3046,15 +3114,16 @@ function interpret(){
     interpreter();
   }
   else{
-    s[1].i = 0;
-    s[2].i = 0;
-    s[3].i = -1;
-    s[4].i = btab[1].last;
+    read_ok = false;
+    s[1] = 0;
+    s[2] = 0;
+    s[3] = -1;
+    s[4] = btab[1].last;
     b = 0;
     display[1] = 0;
     //debugger;
     t = btab[2].vsize - 1;
-    pc = tab[s[4].i].adr;
+    pc = tab[s[4]].adr;
     ps = 'run';
     lncnt = 0;
     ocnt = 0;
@@ -3070,7 +3139,7 @@ function interpret(){
     ocnt--;
     return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
   }
-    if (ps.indexOf("fin") == -1){
+    if (ps != "fin"){
       switch (ps) {
         case 'caschk': console.log('undefined case');   break;
         case 'divchk': console.log('division by 0');    break;

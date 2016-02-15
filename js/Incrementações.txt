@@ -1,0 +1,2 @@
+Eliminação função writeln e readln;
+Quebra de linha é realizada por "\n" na função write

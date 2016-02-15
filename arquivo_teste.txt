@@ -1,32 +1,87 @@
-program test(output);	(*teste comentario*)
-    const ten = 10; plus = '+';
-    type row = array [1..ten] of real;
-         complex = record re,im: real end;
-    var i, j: integer;
-        p: boolean;
-        z: complex;
-        matrix: array [-3..+3] of row;
-        pattern: array [1..5,1..5] of char;
+programa test();
+const
+	name = 'Jacons de Souza Morais';
+    j = 34;
+tipos
+	din = real;
+var
+	nome:literal;
+    idade, i:inteiro;
+inicio
+	escreva('\nInforme o nome da pessoa. ');
+	leia(nome);
+    escreva('\nInforme a idade da pessoa. ');
+    leia(i);
+    se (nome = name) entao
+    inicio
+    	escreva('\nO nome informado é o meu');
+    senao
+    inicio
+    	escreva('\nO nome informado não é meu');
+        nome := 'Ao invéz de' + nome + ' É ' + name;
+        escreva(nome);
+    fim;
+    i := 0;
+    enquanto (i <> 10) faca
+    inicio
+    	caso (i) de
+        	2: escreva('\nÉ dois');
+            3: escreva('\nÉ três');
+            4: escreva('\nÉ quatro');
+        fim;
+        escreva('\n', i);
+        i := i + 1;
+	fim;
+fim.
 
- procedure dummy(var i: integer; var z: complex);
-    var u,v: row;
-        hl,h2: record c: complex;r: row
-               end;
-
-    function null(x,y:real; z: complex): boolean;
-       var a: array ['a'..'z'] of complex;
-           u: char
-       begin while x<y do x := x+1.O;
-          null:=x=y
-       end;
-
-    begin 
-	p := null(hl.c.re, h2.c.im, z)
-    end;
-
- begin i := 85; j := 51;
-    repeat
-       if i > j then i := i-j else j := j-i
-    until i = j;
-    writeln(i)
- end.
+//Sequência de Fibonacci
+programa fibonacci();
+var
+	a, b, aux, i, n:inteiro;
+inicio
+	escreva('\nInforme o número de sequências para calcular. ');
+    leia(n);
+    a := 0;
+    b := 1;
+	aux := 0;
+	se (n > 2) entao
+    inicio
+    	para i de 2 incrementa n faca
+    	inicio
+           aux := a + b;
+           a := b;
+           b := aux;
+    	fim;
+    senao
+    inicio
+    	se (n > 0) entao
+        inicio
+        	aux := 1;
+        senao
+        inicio
+        	se (n = 0) entao
+            inicio
+            	aux := 0;
+            senao
+            inicio
+            	escreva('\nO numero informado é inválido. ');
+            fim;
+        fim;
+    fim;
+	escreva('\nO valor da sequência de fibonacci é ', aux);
+fim.
+//Calcular média
+programa media();
+var
+	p1, p2, total:real;
+    nome:literal;
+inicio
+	escreva('\nInforme o nome do aluno. ');
+    leia(nome);
+    escreva('\nInforme a nota P1 do aluno. ');
+    leia(p1);
+    escreva('\nInforme a nota P2 do aluno. ');
+    leia(p2);
+    total := (p1+p2)/2;
+    escreva('\nA nota do aluno ', nome, ' é ', total);
+fim.

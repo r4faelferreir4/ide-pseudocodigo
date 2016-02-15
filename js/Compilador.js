@@ -1998,6 +1998,7 @@ function block(fsys, isfun, level){
             Error(19);
           }
           else
+<<<<<<< HEAD
             skip(["tosy"].concat(fsys), 51);
           f = 14;
           if (["tosy", "downtosy"].indexOf(sy) != -1){
@@ -2005,16 +2006,33 @@ function block(fsys, isfun, level){
               f = 16;
           insymbol();
           /*if (kode[lc-1].f == 24){
+=======
+          skip(["tosy"].concat(fsys), 51);
+          f = 14;
+        //  if (["tosy", "downtosy"].indexOf(sy) != -1){
+        //    if (sy == "downtosy")
+        //      f = 16;
+            insymbol();
+          if (kode[lc-1].f == 24){
+>>>>>>> origin/master
             var number = kode[lc-1].y;
             if (number < inum)
               f = 14;
             else
               f = 16;
+<<<<<<< HEAD
           }*/
             expression(["dosy"].concat(fsys), x);
             if (x.typ != cvt)
               Error(19);
           }
+=======
+          }
+          expression(["dosy"].concat(fsys), x);
+          if (x.typ != cvt)
+          Error(19);
+          //}
+>>>>>>> origin/master
           if(sy != "dosy")
             skip(["dosy"].concat(fsys), 55);
           lc1 = lc;
@@ -2558,8 +2576,13 @@ function interpreter(){
       break;
       case 9: s[t] = s[t] + ir.y; break;
       case 10: pc = ir.y; break;//jump
+<<<<<<< HEAD
       case 11:debugger;
       if (!s[t])
+=======
+      case 11:
+      if (!s[t]){
+>>>>>>> origin/master
         pc = ir.y;
       t--;
       break;
@@ -2867,7 +2890,10 @@ function interpreter(){
         //return;
         break;
       }*/
+<<<<<<< HEAD
       debugger;
+=======
+>>>>>>> origin/master
       var str = "";
       str += s[t];
       window.setTimeout(atualizarConsole(str), 1000);

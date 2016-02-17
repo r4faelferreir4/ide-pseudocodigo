@@ -103,8 +103,62 @@
 
 
     </div>
+
+    <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" >
+      <div id="pilha" style="width:100%">
+        <table class="table table-bordered">
+          <thead>
+            <tr >
+              <th colspan="2">Pilha de execução</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>função a</td>
+            </tr>
+            <tr>
+              <td>função b</td>
+            </tr>
+            <tr>
+              <td>função c</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="vars">
+        <table class="table table-bordered" style="margin-bottom:5px !important;">
+          <thead>
+            <tr >
+              <th colspan="2">Variáveis</th>
+            </tr>
+            <tr>
+              <th>Nome</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td><input/></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td><input/></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td><input/></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-default">Salvar</button>
+      </div>
+    </div>
+
   </div><!-- fim do jumbotron -->
 </div>
+<div style="clear:both;"/>
 <br>
 <!--Debug painel -->
 <div class="panel panel-danger">
@@ -133,7 +187,7 @@ function getCode(){
     call_read = false;
     interpret();
     scrollOutput();
-}, 300);
+  }, 300);
 
 
 

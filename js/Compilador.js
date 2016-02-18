@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit1(10)<<
+//emit1(62)
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -316,15 +316,13 @@ function compiladorPascalS(){
     try{
       while(ch == " " || ch == "\t")  //Pula espaços em branco
         NextCh();
-      ch.toLowerCase(); //Torna palavras chave case insensitive
+      ch = ch.toLowerCase(); //Torna palavras chave case insensitive
       if(ch >= "a" && ch <= "z"){
         k = 0;
         id = "";      //Seta a variavel id com espaços em branco
         do{
-          if (k < alng){
             k++;
             id += ch;
-          }
           NextCh();
         }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")));
       i = key.indexOf(id);
@@ -923,6 +921,7 @@ function block(fsys, isfun, level){
               level++;
               display[level] = b;
               offset = 0;
+              debugger;
               while(sy != "endsy"){
                 if (sy == "ident"){
                   t0 = t;
@@ -949,8 +948,8 @@ function block(fsys, isfun, level){
                     tab[t0].adr = offset;
                     offset += elsz;
                   }
-                  if (sy == "semicolon")
-                    insymbol();
+                  //if (sy == "semicolon")
+                    //insymbol();
                 }
                 if (sy != "endsy"){
                   if (sy == "semicolon")
@@ -1209,6 +1208,14 @@ function block(fsys, isfun, level){
                     emit1(9, a);
                 }
                 insymbol();
+                if (sy == "lbrack" && v.typ == "strings"){
+                    insymbol();
+                    debugger;
+                    selector(fsys, v);
+                  }
+                else {
+                    Error("recordsy", "strings");
+                }
               }
             }
             else {    //Seletor do Array
@@ -1216,10 +1223,22 @@ function block(fsys, isfun, level){
                 Error(11);
               do{
                 insymbol();
-                expression(fsys.concat(["comma", "rbrack"]), x);
                 if (v.typ != "arrays")
-                  Error(28);
+                  if (v.typ == "strings" || v.typ == "chars"){
+                    if (v.typ == "strings")
+                      emit(34);
+                    expression(fsys.concat(["comma", "rbrack"]), x);
+                    if(x.typ != "ints")
+                      Error("assignment", "Valor incorreto na posição");
+                    else {
+                      v.ref = 1;
+                    }
+                  }
+                  else {
+                    Error(28);
+                  }
                 else {
+                  expression(fsys.concat(["comma", "rbrack"]), x);
                   a = v.ref;
                   if (atab[a].inxtyp != x.typ)
                     Error(26);
@@ -1416,6 +1435,9 @@ function block(fsys, isfun, level){
                         if (x.typ == "ints")
                           emit1(26,0);
                       break;
+                      case 19:
+
+                      break;
                     }
                     if (ts.indexOf(x.typ) != -1)
                     emit1(8, n);
@@ -1470,8 +1492,13 @@ function block(fsys, isfun, level){
                             f = 1;
                           emit2(f, tab[i].lev, tab[i].adr);
                           selector(fsys, x);
-                          if (stantyps.indexOf(x.typ) != -1)
+                          if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings")
                             emit(34);
+                          if (x.typ == "strings" && x.ref == 1){
+                            x.ref = 0;
+                            x.typ = "chars";
+                            emit(62);
+                          }
                         }
                         else {
                           if (stantyps.indexOf(x.typ) != -1)
@@ -1712,6 +1739,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
+          debugger;
           var x, y, f;
           x = new item("", 1);
           y = new item("", 1);
@@ -1722,8 +1750,10 @@ function block(fsys, isfun, level){
           else
             f = 1;
           emit2(f, lv, ad);
-          if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
+          if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+            x.typ = "chars";
             selector(["becomes", "eql"].concat(fsys), x);
+          }
           if (sy == "becomes")
             insymbol();
           else {
@@ -1733,8 +1763,19 @@ function block(fsys, isfun, level){
           }
           expression(fsys, y);
           if (x.typ == y.typ)
-            if (stantyps.indexOf(x.typ) != -1)
-              emit(38);
+            if (stantyps.indexOf(x.typ) != -1){
+              if(x.typ == "strings" && x.ref == 1){
+                Error("assignment", "Erro! Tentando armazenar string como caracter");
+              }
+              else{
+                if (tab[i].typ == "strings"){
+                  x.ref = 0;
+                  emit2(1, tab[i].lev, tab[i].adr);
+                  emit(63);
+                }
+                emit(38);
+              }
+            }
             else
               if(x.ref != y.ref)
                 Error(46);
@@ -1743,14 +1784,30 @@ function block(fsys, isfun, level){
                   emit1(23, atab[x.ref].size);
                 else
                   emit1(23, btab[x.ref].vsize);
-          else
-            if (x.typ == "reals" && y.typ == "ints"){
-              emit1(26,0);
-              emit(38);
+          else{
+            if(x.typ == 'strings'){
+              if (x.ref == 1){
+                if (y.typ != "chars"){
+                  Error("assignment", "Tentando atribuir um valor não caracter a uma posição de string");
+                }
+                else {
+                  x.ref = 0;
+                  emit2(1, tab[i].lev, tab[i].adr);
+                  emit(63);
+                  emit(38);
+                }
+              }
             }
-            else
-              if (x.typ != "notyp" && y.typ != "notyp")
-                Error(46);
+            else{
+              if (x.typ == "reals" && y.typ == "ints"){
+                emit1(26,0);
+                emit(38);
+              }
+              else
+                if (x.typ != "notyp" && y.typ != "notyp")
+                  Error(46);
+            }
+          }
         }
         catch(err){
           return err;
@@ -2391,9 +2448,10 @@ try{
   enter('ln', "funktion", "reals", 14);
   enter('sqrt', "funktion", "reals", 15);
   enter('arctan', "funktion", "reals", 16);
-  enter('eof', "funktion", "bools", 17);
-  enter('eoln', "funktion", "bools", 18);
+  //enter('eof', "funktion", "bools", 17);
+  //enter('eoln', "funktion", "bools", 18);
   enter('leia', "prozedure", "notyp", 1);
+  enter('tamanho', 'funktion', 'ints', 19);
   //enter('leialn', "prozedure", "notyp", 2);
   enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
@@ -2496,7 +2554,7 @@ function interpreter(){
         ps = 'stkchk';
       }
       else{
-        var i1 = s[display[ir.x]+ir.y].i;
+        var i1 = s[display[ir.x]+ir.y];
         //var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
         s[t] = s[i1];
       }
@@ -2868,7 +2926,7 @@ function interpreter(){
       break;
 
       case 30:
-      chrcnt = chrcnt + s[t].i;
+      chrcnt = chrcnt + s[t];
       /*switch (ir.y) {
         case 1:
           var str = "";
@@ -3083,21 +3141,12 @@ function interpreter(){
       break;
 
       case 62:
-      //if (eof(InputFile)){
-      //  ps = 'redchk';
-      //}
-      //else{
-      //  readln(InputFile);
-      //}
-
+        s[t-1] = s[t-1].charCodeAt(Number(s[t]));
+        t--;
+      break;
       case 63:
-      //writeln;
-      //lncnt++;
-      //chrcnt = 0;
-        //var string = "\n";
-        //atualizarConsole(string);
-        //call_read = true;
-        //return;
+      s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length)
+      t -= 2;
       }//primeiro switch
     }while (ps == "run");
 }
@@ -3149,7 +3198,7 @@ function interpret(){
         blkcnt--;
         if(blkcnt == 0){
           h1 = 0;
-          h2 = s[h1 + 4].i;
+          h2 = s[h1 + 4];
         }
         if (h1 != 0) {
           console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1].i);
@@ -3167,16 +3216,16 @@ function interpret(){
                 h3 = s[h1 + adr].i;
               }
               switch (tab[h2].typ) {
-                case 'ints': console.log("          "+s[h3].i); break;
+                case 'ints': console.log("          "+s[h3]); break;
                 case 'reals': console.log(s[h3].r);break
-                case 'bools': console.log("         "+s[h3].b);break
-                case 'chars': console.log("        "+s[h3].c);break
+                case 'bools': console.log("         "+s[h3]);break
+                case 'chars': console.log("        "+s[h3]);break
               }
             }
           }
           h2 = link;
         }
-        h1 = s[h1 + 3].i;
+        h1 = s[h1 + 3];
       } while (h1 < 0);
     }
     console.log("          " + ocnt + " steps");

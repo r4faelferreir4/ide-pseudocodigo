@@ -1456,7 +1456,6 @@ function block(fsys, isfun, level){
                       case 19:
                       ts = ["ints", "strings"];
                       if (x.typ == "strings"){
-                        //emit2(1, tab[ivar].lev, tab[ivar].adr);
                         emit(64);
                       }
                       else {
@@ -1468,9 +1467,52 @@ function block(fsys, isfun, level){
                           insymbol();
                           var y = new item("", 1);
                           expression(fsys.concat(["rparent"]), y);
-                          ts = ["ints", "strings", "chars"];
-                          emit(67);
+                          if (y.typ == "strings" || y.typ == "chars"){
+                            ts = ["ints", "strings", "chars"];
+                            emit(67);
+                          }
+                          else {
+                            Error("litbusca", "\nParâmetro incorreto");
+                          }
                         }
+                        else {
+                          Error("litbusca", "\nParâmetro incorreto");
+                        }
+                      break;
+                      case 21:
+                      if (sy == "comma"){
+                        insymbol();
+                        var y = new item("", 1);
+                        expression(fsys.concat(["comma", "rparent"]), y);
+                        if (sy == "comma"){
+                          insymbol();
+                          var z = new item("", 1);
+                          expression(fsys.concat(["comma", "rparent"]), z);
+                          if (x.typ == "strings"){
+                            if (y.typ == "ints"){
+                              if (z.typ == "strings"){
+                                ts = ["strings", "chars", "ints"];
+                                emit(63);
+                              }
+                              else {
+                                Error("litinsere", "\nTerceiro argumento precisa ser do tipo literal.");
+                              }
+                            }
+                            else {
+                              Error("litinsere", "Segundo argumento precisa ser do tipo inteiro. ");
+                            }
+                          }
+                          else {
+                            Error("litinsere", "\nPrimeiro argumento precisa ser do tipo literal. ");
+                          }
+                        }
+                        else {
+                          Error("litinsere", "\nEstá faltando o terceiro argumento ou uma vírgula. ");
+                        }
+                      }
+                      else {
+                        Error("litinsere", "\nEstá faltando o segundo argumento ou uma vírgula.");
+                      }
                       break;
                     }
                     if (ts.indexOf(x.typ) != -1)
@@ -2486,6 +2528,7 @@ try{
   enter('leia', "prozedure", "notyp", 1);
   enter('littamanho', 'funktion', 'ints', 19);
   enter('litbusca', "funktion", "ints", 20);
+  enter('litinsere', 'funktion', 'strings', 21);
   enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
@@ -3194,24 +3237,47 @@ function interpreter(){
         }
       break;
       case 63:
-      if (s[t-2] != 0){
-        if (s[t-2] <= s[t].length && s[t-2] >= (-s[t].length)){
-          if (s[t-2] > 0)
-            s[t-2]--;
-          if (s[t-2] != -1)
-            s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
-          else
-            s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
-          t -= 2;
+      if (typeof s[t-2] == "number"){
+        if (s[t-2] != 0){
+          if (s[t-2] <= s[t].length && s[t-2] >= (-s[t].length)){
+            if (s[t-2] > 0)
+              s[t-2]--;
+            if (s[t-2] != -1)
+              s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
+            else
+              s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
+            t -= 2;
+          }
+          else {
+            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
+            ps = "fin";
+          }
         }
         else {
-          atualizarConsole("\nNão é permitido acessar uma posição fora da string");
+          atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
           ps = "fin";
         }
       }
       else {
-        atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
-        ps = "fin";
+        if (s[t-1] != 0){
+          if (s[t-1] <= s[t-2].length && s[t-1] >= (-s[t-2].length)){
+            if (s[t-1] > 0)
+              s[t-1]--;
+            if (s[t-1] == -1)
+            s[t-2] = s[t-2]+s[t];
+            else
+              s[t-2]= s[t-2].slice(0, s[t-1]+1)+s[t]+s[t-2].slice(s[t-1]+1, s[t-2].length);
+            t -= 2;
+          }
+          else {
+            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
+            ps = "fin";
+          }
+        }
+        else {
+          atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
+          ps = "fin";
+        }
       }
       break;
       case 64:
@@ -3224,6 +3290,8 @@ function interpreter(){
         s[t] = s[t].toLowerCase();
       break;
       case 67:
+        if (typeof s[t] == "number")
+          s[t] = String.fromCharCode(s[t]);
         s[t-1] = s[t-1].indexOf(s[t]);
         if (s[t-1] == -1)
           s[t-1] = 0;

@@ -22,15 +22,6 @@
   <script async src="js/Compilador.js"></script>
   <link rel=stylesheet href="css/estilo.css"/>
 
-
-  <script>
-  function popitup(url){
-    newwindow = window.open (url,'name',"resizable=0,width=500,height=300");
-    if (window.focus) {newwindow.focus();}
-    return false;
-  }
-
-  </script>
 </head>
 <body>
   <div id="container">
@@ -61,17 +52,12 @@
         <form name="form">
           <textarea id="codebox"></textarea>
         </form>
-        <!--<input id="compilar" name="compilar" type="button" value="Compilar" onclick="return popitup('console.html')"/>-->
-        <!--<input id="compilar" class="btn btn-default btn-lg" name="compilar" type="button" value="Compilar" onclick="getCode();"/>-->
         <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
           <span class="glyphicon glyphicon-sort"></span> Depurar
         </button>
         <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="getCode();">
           <span class="glyphicon glyphicon-play"></span> Compilar
         </button>
-        <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
-        <span class="glyphicon glyphicon-play"></span> Compilar
-      </button>-->
 
       <button name="compilar" id="novo"type="button" class="btn btn-default" onclick="">
         <span class="glyphicon glyphicon-file"></span> Novo
@@ -106,22 +92,14 @@
 
     <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" >
       <div id="pilha" style="width:100%">
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="tab_logic">
           <thead>
             <tr >
               <th colspan="2">Pilha de execução</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>função a</td>
-            </tr>
-            <tr>
-              <td>função b</td>
-            </tr>
-            <tr>
-              <td>função c</td>
-            </tr>
+            <!-- inserir linhas pilha execucao-->
           </tbody>
         </table>
       </div>

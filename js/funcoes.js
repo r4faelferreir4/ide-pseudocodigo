@@ -72,3 +72,11 @@ function renderInput(bool) {
     document.getElementById("scriptBox").style.visibility = "hidden";
   }
 }
+
+function adicionarTabelaPilha(funcao) {
+  $('#tab_logic').append('<tr><td>'+ funcao + '</td></tr>');
+}
+
+function removerTopoPilha() {
+  document.getElementById("tab_logic").deleteRow(1);
+}

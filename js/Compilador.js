@@ -12,7 +12,7 @@ var kmax = 15;		//Numero maximos de digitos significativos
 var tmax = 100;		//Tamanho da tabela
 var bmax = 20;		//Tamanho da tabela de blocos
 var amax = 30;		//Tamanho da tabela de arranjos
-var c2max = 20		//Tamanho  da tabela de numeros constantes
+var c2max = 20;		//Tamanho  da tabela de numeros constantes
 var csmax = 30; 	//Numero máximo de casos
 var cmax = 850;		//Tamanho do código
 var lmax = 7;		//Nível máximo
@@ -20,7 +20,7 @@ var smax = 600;		//Tamanho da tabela de strings
 var ermax = 59;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
-var nmax = 32767	//281474976710655 2**48-1
+var nmax = 32767;	//281474976710655 2**48-1
 var lineleng = 300;	//Tamanho da linha de saída
 var linelimit = 500;
 var stacksize = 1500;
@@ -98,7 +98,7 @@ var stantyps;
 var display = [];
 var tab = [];
 var atab = [];
-var btab = []
+var btab = [];
 var stab = [];
 var rconst = new Array(c2max);
 var kode = [];
@@ -164,7 +164,7 @@ function compiladorPascalS(){
     Msg[26] = "index type"; Msg[27] = "indexbound";
     Msg[28] = "no array  "; Msg[29] = "type id   ";
     Msg[30] = "undef type"; Msg[31] = "no record ";
-    Msg[32] = "boole type"; Msg[33] = "arith type"
+    Msg[32] = "boole type"; Msg[33] = "arith type";
     Msg[34] = "inteiro   "; Msg[35] = "tipos     ";
     Msg[36] = "param type"; Msg[37] = "variab id ";
     Msg[38] = "string    "; Msg[39] = "N. de partes";
@@ -181,7 +181,7 @@ function compiladorPascalS(){
     k = 0;
     console.log("\n");
     console.log(" palavras chave");
-    while (errs.length != 0){        //Verificação se o vetor está vázio.
+    while (errs.length !== 0){        //Verificação se o vetor está vázio.
       while (!(k < ermax && k > 0))  //Verificação de k está entre os valores de erro cadastrados
       k++;
       console.log(k + "   " + Msg[k]);  //Exibindo erro no console
@@ -193,13 +193,12 @@ function compiladorPascalS(){
   //FUNÇÃO DE BUSCA DE CARACTERES
   function NextCh(){
     try{
-      if (InputFile[iln] == "")  iln++;
+      if (InputFile[iln] === "")  iln++;
       if (iln > indexmax && cc >= ll){
         throw new Error("Programa incompleto");
-        return;
       }
       if (cc == ll){
-        if (errpos != 0)
+        if (errpos !== 0)
         errpos = 0;
         if (iln < indexmax){
           ll = 0;
@@ -230,7 +229,7 @@ function compiladorPascalS(){
         ErrorMsg = str;
         switch(struct){
           case "assignment":
-            str += "\nEspera-se uma instrução desta forma:"
+            str += "\nEspera-se uma instrução desta forma:";
             str += "\n"+"<variável>"+":=".bold()+"<expressão>";
           break;
         }
@@ -298,13 +297,13 @@ function compiladorPascalS(){
             t = 1.0;
             d = 10.0;
             do{
-              while((s%2) == 0){      //Verifica se é par
+              while((s%2) === 0){      //Verifica se é par
                 s = s / 2;
                 d = Math.pow(d,2);
               }
               s--;
               t = d * t;
-            }while(s != 0);
+            }while(s !== 0);
             if(e >= 0)
               rnum = rnum * t;
             else
@@ -364,7 +363,7 @@ function compiladorPascalS(){
             }
             if (ch == "e")
             readscale();
-            if (e != 0)
+            if (e !== 0)
             AdjustScale();
           }
         }
@@ -374,7 +373,7 @@ function compiladorPascalS(){
             rnum = inum;
             e = 0;
             readscale();
-            if (e != 0)
+            if (e !== 0)
             AdjustScale();
           }
         }
@@ -443,7 +442,7 @@ function compiladorPascalS(){
             inum = stab[sx].charCodeAt();
           }
           else
-          if (k == 0){
+          if (k === 0){
             Error(38);
             sy = "charcon";
             inum = 0;
@@ -473,7 +472,6 @@ function compiladorPascalS(){
           break;
           case " ":
           return;
-          break;
           default:
           if (csps.indexOf(ch) != -1){
             sy = sps[ch];
@@ -504,7 +502,7 @@ function enter(x0, x1, x2, x3){
     tab[t].ref = 0;
     tab[t].normal = true;
     tab[t].lev = 0;
-    tab[t].adr = x3
+    tab[t].adr = x3;
   }
   catch(err){
     return err;
@@ -625,7 +623,7 @@ function printtables(){
   console.log("");
   console.log("código: ");
   for(i = 0; i < lc-1; i++){
-    if ((i % 5) == 0){
+    if ((i % 5) === 0){
       console.log("");
       console.log("      "+i);
     }
@@ -699,7 +697,7 @@ function block(fsys, isfun, level){
           //console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
           while(tab[j].name != id)
             j = tab[j].link;
-          if (j != 0)
+          if (j !== 0)
             Error(1);
           else {
             t++;
@@ -729,8 +727,8 @@ function block(fsys, isfun, level){
           while(tab[j].name != id)
             j = tab[j].link;
           i--;
-        }while(!((i < 0) || (j != 0)));
-        if (j == 0)
+        }while(!((i < 0) || (j !== 0)));
+        if (j === 0)
           Error(0);
         return j;
       }
@@ -785,7 +783,7 @@ function block(fsys, isfun, level){
             }
             if (sy == "ident"){
               x = loc(id);
-              if (x != 0)
+              if (x !== 0)
                 if (tab[x].obj != "konstant")
                   Error(25);
                 else{
@@ -888,7 +886,7 @@ function block(fsys, isfun, level){
         if (typebegsys.indexOf(sy) != -1){
           if (sy == "ident"){
             x = loc(id);
-            if (x != 0)
+            if (x !== 0)
               if (tab[x].obj != "type1")
                 Error(29);
               else {
@@ -1008,7 +1006,7 @@ function block(fsys, isfun, level){
             else {
               x = loc(id);
               insymbol();
-              if (x != 0)
+              if (x !== 0)
                 if (tab[x].obj != "type1")
                   Error(29);
                 else {
@@ -1202,12 +1200,12 @@ function block(fsys, isfun, level){
                   tab[0].name = id;
                   while(tab[j].name != id)
                     j = tab[j].link;
-                  if (j == 0)
+                  if (j === 0)
                     Error(0);
                   v.typ = tab[j].typ;
                   v.ref = tab[j].ref;
                   a = tab[j].adr;
-                  if (a != 0)
+                  if (a !== 0)
                     emit1(9, a);
                 }
                 insymbol();
@@ -1312,7 +1310,7 @@ function block(fsys, isfun, level){
                   else {
                     k = loc(id);
                     insymbol();
-                    if (k != 0){
+                    if (k !== 0){
                       if (tab[k].obj != "variable")
                         Error(37);
                       x.typ = tab[k].typ;
@@ -1545,7 +1543,7 @@ function block(fsys, isfun, level){
                       break;
                       case "funktion":
                         x.typ = tab[i].typ;
-                        if (tab[i].lev != 0)
+                        if (tab[i].lev !== 0)
                           call(fsys,i);
                         else
                           standfct(tab[i].adr);
@@ -1886,7 +1884,7 @@ function block(fsys, isfun, level){
           else {
             Error(52);
             if (sy == "dosy")
-              insymbol;
+              insymbol();
           }
           statement(fsys.concat(["elsesy"]));
           if (sy == "elsesy"){
@@ -1915,8 +1913,8 @@ function block(fsys, isfun, level){
           this.lc = lc;
         }
         //inicializa array com objetos do tipo caserecord
-        for (var i = 0; i < csmax; i++){
-          casetab[i] = new CaseRecord(0,0);
+        for (var a = 0; i < csmax; i++){
+          casetab[a] = new CaseRecord(0,0);
         }
         var exittab = new Array(csmax);
         debugger;
@@ -2067,7 +2065,7 @@ function block(fsys, isfun, level){
           if (sy == "ident"){
             i = loc(id);
             insymbol();
-            if (i == 0)
+            if (i === 0)
               cvt = "ints";
             else
             if (tab[i].obj == "variable"){
@@ -2140,7 +2138,7 @@ function block(fsys, isfun, level){
                 else {
                   i = loc(id);
                   insymbol();
-                  if (i != 0)
+                  if (i !== 0)
                   if (tab[i].obj != "variable")
                   Error(37);
                   else{
@@ -2224,7 +2222,7 @@ function block(fsys, isfun, level){
           case "ident":
           i = loc(id);
           insymbol();
-          if (i != 0)
+          if (i !== 0)
           switch (tab[i].obj) {
             case "konstant":
             case "type1":
@@ -2234,7 +2232,7 @@ function block(fsys, isfun, level){
             assignment(tab[i].lev, tab[i].adr);
             break;
             case "prozedure":
-            if (tab[i].lev != 0)
+            if (tab[i].lev !== 0)
             call(fsys,i);
             else
             standproc(tab[i].adr);
@@ -2293,7 +2291,7 @@ function block(fsys, isfun, level){
       if (sy == "ident"){
         x = loc(id);
         insymbol();
-        if (x != 0)
+        if (x !== 0)
         if (tab[x].obj != "type1")
         Error(29);
         else
@@ -2467,7 +2465,7 @@ try{
   enter('caracter', "type1", "chars", 1);
   enter('logico', "type1", "bools", 1);
   enter('inteiro', "type1", "ints", 1);
-  enter('literal', 'type1', 'strings', 1)
+  enter('literal', 'type1', 'strings', 1);
   enter('abs', "funktion", "reals", 0);
   enter('sqr', "funktion", "reals", 2);
   enter('odd', "funktion", "bools", 4);
@@ -2537,7 +2535,7 @@ var b; //index base
 var h1, h2, h3, h4;
 var fld = new Array(4);//tamano padrão dos campos
 var display = new Array(lmax);
-var s = []//new Array(stacksize);
+var s = [];//new Array(stacksize);
 var call_read = false;
 var output_console = [];    //Variável que irá imprimir na tela do console
 var read_ok = false;
@@ -2614,7 +2612,7 @@ function interpreter(){
         case 1: s[t] = Math.abs(s[t]); break;
         case 2: s[t] = Math.pow(s[t], 2); break;
         case 3: s[t] = Math.pow(s[t], 2); break;
-        case 4: s[t] = (s[t]%2) != 0; break;
+        case 4: s[t] = (s[t]%2) !== 0; break;
         case 5:
         if (s[t] < 0 || s[t] > 63){
           ps = 'inxchk';
@@ -2629,7 +2627,7 @@ function interpreter(){
         s[t] = String.fromCharCode(c);
         break;
         case 8:
-        var c = s[t].charCodeAt();
+        c = s[t].charCodeAt();
         c--;
         s[t] = String.fromCharCode(c);
         break;
@@ -2674,7 +2672,7 @@ function interpreter(){
           else
           h2 += 2;
         }
-      }while (h3 == 0);
+      }while (h3 === 0);
       break;
       case 14:
       h1 = s[t - 1];
@@ -2715,7 +2713,7 @@ function interpreter(){
       h1 = s[h2] - 1;
       if (h1 >= s[t]){
         s[h2] = h1;
-        pc = ir.y
+        pc = ir.y;
       }
       else{
         t = t - 3;
@@ -3146,7 +3144,7 @@ function interpreter(){
 
       case 58:
       t--;
-      if (s[t + 1] == 0){
+      if (s[t + 1] === 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
       }
@@ -3157,7 +3155,7 @@ function interpreter(){
 
       case 59:
       t--;
-      if(s[t + 1] == 0){
+      if(s[t + 1] === 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
       }
@@ -3178,7 +3176,7 @@ function interpreter(){
 
       case 62:
         debugger;
-        if (s[t] != 0){
+        if (s[t] !== 0){
           if (s[t] <= s[t-1].length && s[t] >= (-s[t-1].length)){
             if (s[t] > 0)
               s[t]--;
@@ -3192,7 +3190,7 @@ function interpreter(){
         }
         else {
           atualizarConsole("\nNão é permitido acessar uma posição 0 na string");
-          ps = "fin"
+          ps = "fin";
         }
       break;
       case 63:
@@ -3283,15 +3281,15 @@ function interpret(){
       do {
         //writeln;
         blkcnt--;
-        if(blkcnt == 0){
+        if(blkcnt === 0){
           h1 = 0;
           h2 = s[h1 + 4];
         }
-        if (h1 != 0) {
+        if (h1 !== 0) {
           console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1].i);
         }
         h2 = btab[tab[h2].ref].last;
-        while (h2 != 0) {
+        while (h2 !== 0) {
           //  with tab[h2] do
           if (tab[h2].obj == 'variable'){
             if (stantyps.indexOf(tab[h2].typ) != -1){
@@ -3304,9 +3302,9 @@ function interpret(){
               }
               switch (tab[h2].typ) {
                 case 'ints': console.log("          "+s[h3]); break;
-                case 'reals': console.log(s[h3].r);break
-                case 'bools': console.log("         "+s[h3]);break
-                case 'chars': console.log("        "+s[h3]);break
+                case 'reals': console.log(s[h3].r);break;
+                case 'bools': console.log("         "+s[h3]);break;
+                case 'chars': console.log("        "+s[h3]);break;
               }
             }
           }

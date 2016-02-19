@@ -15,7 +15,7 @@
 }
 #containerCode{
   width:100%;
-  height: 400px;
+  min-height: 400px;
   background-color:#E4E4E4;
 }
 #container{

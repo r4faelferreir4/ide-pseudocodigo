@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit1(62)
+//emit1(62)debugger
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -922,7 +922,7 @@ function block(fsys, isfun, level){
               level++;
               display[level] = b;
               offset = 0;
-              debugger;
+              //debugger;
               while(sy != "endsy"){
                 if (sy == "ident"){
                   t0 = t;
@@ -1185,7 +1185,7 @@ function block(fsys, isfun, level){
       function selector(fsys, v){
         var x, a, j;
         try{
-          debugger;
+          //debugger;
           x = new item("", 1);
           do{
             if (sy == "period"){
@@ -1211,7 +1211,7 @@ function block(fsys, isfun, level){
                 insymbol();
                 if (sy == "lbrack" && v.typ == "strings"){
                     insymbol();
-                    debugger;
+                    //debugger;
                     selector(fsys, v);
                   }
                 else {
@@ -1382,7 +1382,7 @@ function block(fsys, isfun, level){
       function expression(fsys, x){
         var y, op;
         y = new item("", 1);
-        debugger;
+        //debugger;
 
 
         function simpleexpression(fsys, x){
@@ -1811,7 +1811,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          debugger;
+          //debugger;
           var x, y, f;
           x = new item("", 1);
           y = new item("", 1);
@@ -1959,7 +1959,7 @@ function block(fsys, isfun, level){
           casetab[a] = new CaseRecord(0,0);
         }
         var exittab = new Array(csmax);
-        debugger;
+        //debugger;
         function caselabel(){
           try{
             var lab, k;
@@ -2602,7 +2602,7 @@ function interpreter(){
     //debugger;
     switch(ir.f){
       case 0:
-      debugger;
+      //debugger;
       t++;
       if (t > stacksize){
         ps = 'stkchk';
@@ -2687,13 +2687,13 @@ function interpreter(){
       case 9: s[t] = s[t] + ir.y; break;
       case 10: pc = ir.y; break;//jump
       case 11:
-      debugger;
+      //debugger;
       if (!s[t])
         pc = ir.y;
       t--;
       break;
       case 12:
-      debugger;
+      //debugger;
       h1 = s[t];
       t--;
       h2 = ir.y;
@@ -2995,7 +2995,9 @@ function interpreter(){
         //return;
         break;
       }*/
-      debugger;
+      //debugger;
+      if (ir.y == 4)
+        s[t] = String.fromCharCode(s[t]);
       var str = "";
       str += s[t];
       window.setTimeout(atualizarConsole(str), 1000);
@@ -3120,7 +3122,7 @@ function interpreter(){
       break;
 
       case 45:
-      debugger;
+      //debugger;
       t--;
       s[t] = s[t] == s[t + 1];
       break;
@@ -3218,7 +3220,7 @@ function interpreter(){
       break;
 
       case 62:
-        debugger;
+        //debugger;
         if (s[t] !== 0){
           if (s[t] <= s[t-1].length && s[t] >= (-s[t-1].length)){
             if (s[t] > 0)

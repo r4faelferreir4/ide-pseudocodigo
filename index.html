@@ -166,7 +166,7 @@
     <h3 class="panel-title">Debug</h3>
   </div>
   <div class="panel-body">
-    ...
+  <textarea id="panel-error" disabled="true"></textarea>
   </div>
 </div>
 <!--fim debug painel -->
@@ -180,14 +180,23 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 <script async>
 function getCode(){
   InputFile = editor.getValue();
+  isOk = true;
+  isDone = false;
   compiladorPascalS();
   document.getElementById("output").value = "";
-  mostrarModalOutput();
-  setTimeout(function(){
-    call_read = false;
-    interpret();
-    scrollOutput();
-  }, 300);
+  if (isOk && isDone){
+    mostrarModalOutput();
+    setTimeout(function(){
+      call_read = false;
+      interpret();
+      scrollOutput();
+    }, 300);
+  }
+  else {
+    if (isDone){
+      mostraErro();
+    }
+  }
 
 
 

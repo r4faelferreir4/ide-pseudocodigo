@@ -1,12 +1,14 @@
 function runScript(e) {
   if (e.keyCode == 13) {
-    var input = pegaValorInput();
-    //input.pop();
-    atualizarConsole(input);
-    InputFile = input;
-    limpaInput();
-    read_ok = true;
-    interpret();
+    if (call_read){
+      var input = pegaValorInput();
+      //input.pop();
+      atualizarConsole(input);
+      InputFile = input;
+      limpaInput();
+      read_ok = true;
+      interpret();
+    }
   }
 }
 function reexecute(){
@@ -23,12 +25,12 @@ function limpaInput() {
   document.getElementById("scriptBox").value = "";
 }
 
-function adcionarSaida(string) {
+/*function adcionarSaida(string) {
   output_console.push(string);
   output_console.shift();
   atualizarConsole();
   //document.getElementById("output").value = output_console.join("\n");
-}
+}*/
 
 function limpaConsole() {
   document.getElementById("output").value = "";
@@ -38,6 +40,10 @@ function atualizarConsole(string){
   string = document.getElementById("output").value + string;
   document.getElementById("output").value = string;
   scrollOutput();
+}
+
+function mostraErro(){
+  document.getElementById("panel-error").value = MsgErro;
 }
 
 function changeOutput(){

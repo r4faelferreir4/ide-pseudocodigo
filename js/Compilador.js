@@ -103,8 +103,10 @@ var stab = [];
 var rconst = new Array(c2max);
 var kode = [];
 var iln = 0;  //contador de caracteres total
-
 var indexmax;  //Tamanho total do código
+var isOk = true;    //Verifica se o código foi compilado corretamente
+var isDone = false; //Verifica se o código foi compilado
+var MsgErro = ""; //Mensagem de erro para o usuário.
 
 function initArray(){
   var j = 0;
@@ -220,17 +222,18 @@ function compiladorPascalS(){
     }
   }
   //Função Error
-  function Error(n){
+  function Error(struct, str){
     try{
       debugger;
-      if (errpos == 0) {
-        console.log(" ****");
-      }
-      if(cc > errpos){
-        console.log( "Caracter \'" +ch+"\' na linha "+iln+"após "+id );//write(' ': cc - errpos, '^', n: 2);
-        console.log("errpos "+errpos+"código "+n);
-        errpos = cc + 3; //errpos := cc + 3;
-        errs = errs.concat(n);//errs := errs + [n]
+      if (isOk){
+        isOk = false;
+        ErrorMsg = str;
+        switch(struct){
+          case "assignment":
+            str += "\nEspera-se uma instrução desta forma:"
+            str += "\n"+"<variável>"+":=".bold()+"<expressão>";
+          break;
+        }
       }
     }
     catch(err){
@@ -1402,8 +1405,8 @@ function block(fsys, isfun, level){
                     insymbol();
                   else
                     Error(9);
-                  if (n < 17){
-                    expression(fsys.concat["lparent"], x);
+                  if (n < 20){
+                    expression(fsys.concat(["rparent"]), x);
                     switch (n) {
                       case 0:
                       case 2:
@@ -1435,7 +1438,33 @@ function block(fsys, isfun, level){
                         if (x.typ == "ints")
                           emit1(26,0);
                       break;
+                      case 17:
+                        ts = ["strings"];
+                        if (x.typ == "strings"){
+                          emit(65);
+                        }
+                        else {
+                          Error("litmaiusculo", "\nErro, parâmetro incorreto");
+                        }
+                      break;
+                      case 18:
+                        ts = ["strings"];
+                        if (x.typ == "strings"){
+                          emit(66);
+                        }
+                        else {
+                          Error("litminusculo", "\nErro, parâmetro incorreto");
+                        }
+                      break;
                       case 19:
+                      ts = ["ints", "strings"];
+                      if (x.typ == "strings"){
+                        //emit2(1, tab[ivar].lev, tab[ivar].adr);
+                        emit(64);
+                      }
+                      else {
+                        Error("tamliteral", "\nVariável informada de tipo incorreto.");
+                      }
 
                       break;
                     }
@@ -1528,17 +1557,24 @@ function block(fsys, isfun, level){
                     }
                   }
                   else
-                  if (["charcon", "intcon", "realcon"].indexOf(sy) != -1){
+                  if (["charcon", "intcon", "realcon", "stringsy"].indexOf(sy) != -1){
                     if (sy == "realcon"){
                       x.typ = "reals";
                       EnterReal(rnum);
                       emit1(25, c1);
                     }
                     else {
-                      if (sy == "charcon")
-                      x.typ = "chars";
-                      else
-                      x.typ = "ints";
+                      if (sy != "stringsy"){
+                        if (sy == "charcon")
+                        x.typ = "chars";
+                        else
+                        x.typ = "ints";
+                      }
+                      else {
+                        inum = stab.splice(sx-sleng, sleng);
+                        inum = inum.join("");
+                        x.typ = "strings";
+                      }
                       emit1(24, inum);
                     }
                     x.ref = 0;
@@ -1563,7 +1599,7 @@ function block(fsys, isfun, level){
                     if (x.typ != "notyp")
                     Error(32);
                   }
-                  test(fsys.concat(["untilsy"]), facbegsys, 6);
+                  test(fsys.concat(["untilsy", "stringsy"]), facbegsys, 6);
                 }
               }
               catch(err){
@@ -1701,11 +1737,11 @@ function block(fsys, isfun, level){
                 if (x.typ == "chars" || y.typ == "chars"){
                   switch (op) {
                     case "eql": emit(45);break;
-                    case "neq": emit(46);break;
+                    //case "neq": emit(46);break;
                     case "lss": emit(47);break;
-                    case "leq": emit(48);break;
+                    //case "leq": emit(48);break;
                     case "gtr": emit(49);break;
-                    case "geq": emit(50);break;
+                    //case "geq": emit(50);break;
                   }
                 }
               }
@@ -1757,7 +1793,7 @@ function block(fsys, isfun, level){
           if (sy == "becomes")
             insymbol();
           else {
-            Error(51);
+            Error("assignment", "Está faltando o operador \'"+":=".bold()+'\'');
             if (sy == "eql")
             insymbol();
           }
@@ -1770,8 +1806,10 @@ function block(fsys, isfun, level){
               else{
                 if (tab[i].typ == "strings"){
                   x.ref = 0;
-                  emit2(1, tab[i].lev, tab[i].adr);
-                  emit(63);
+                  if (y.typ == "chars"){
+                    emit2(1, tab[i].lev, tab[i].adr);
+                    emit(63);
+                  }
                 }
                 emit(38);
               }
@@ -1793,7 +1831,8 @@ function block(fsys, isfun, level){
                 else {
                   x.ref = 0;
                   emit2(1, tab[i].lev, tab[i].adr);
-                  emit(63);
+                  if (y.typ == "chars")
+                    emit(63);
                   emit(38);
                 }
               }
@@ -2448,10 +2487,10 @@ try{
   enter('ln', "funktion", "reals", 14);
   enter('sqrt', "funktion", "reals", 15);
   enter('arctan', "funktion", "reals", 16);
-  //enter('eof', "funktion", "bools", 17);
-  //enter('eoln', "funktion", "bools", 18);
+  enter('litmaiusculo', "funktion", "strings", 17);
+  enter('litminusculo', "funktion", "strings", 18);
   enter('leia', "prozedure", "notyp", 1);
-  enter('tamanho', 'funktion', 'ints', 19);
+  enter('littamanho', 'funktion', 'ints', 19);
   //enter('leialn', "prozedure", "notyp", 2);
   enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
@@ -2461,6 +2500,7 @@ try{
   btab[1].psize = 0;
   btab[1].vsize = 0;
   block(blockbegsys.concat(statbegsys), false, 1);
+  isDone = true;
   if (sy != "period")
     Error(22);
   emit(31);
@@ -3145,8 +3185,22 @@ function interpreter(){
         t--;
       break;
       case 63:
-      s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length)
+      if (s[t-2] != -1)
+        s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
+      else
+        s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
       t -= 2;
+      break;
+      case 64:
+        s[t] = s[t].length;
+      break;
+      case 65:
+        s[t] = s[t].toUpperCase();
+      break;
+      case 66:
+        s[t] = s[t].toLowerCase();
+      break;
+
       }//primeiro switch
     }while (ps == "run");
 }

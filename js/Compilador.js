@@ -1405,8 +1405,7 @@ function block(fsys, isfun, level){
                     insymbol();
                   else
                     Error(9);
-                  if (n < 20){
-                    expression(fsys.concat(["rparent"]), x);
+                    expression(fsys.concat(["rparent", "comma"]), x);
                     switch (n) {
                       case 0:
                       case 2:
@@ -1465,7 +1464,15 @@ function block(fsys, isfun, level){
                       else {
                         Error("tamliteral", "\nVariável informada de tipo incorreto.");
                       }
-
+                      break;
+                      case 20:
+                        if (x.typ == "strings"){
+                          insymbol();
+                          var y = new item("", 1);
+                          expression(fsys.concat(["rparent"]), y);
+                          ts = ["ints", "strings", "chars"];
+                          emit(67);
+                        }
                       break;
                     }
                     if (ts.indexOf(x.typ) != -1)
@@ -1473,17 +1480,6 @@ function block(fsys, isfun, level){
                     else
                     if (x.typ != "notyp")
                     Error(48);
-                  }
-                  else {
-                    if (sy != "ident")
-                    Error(2);
-                    else
-                    if (id != "input")
-                    Error(0);
-                    else
-                    insymbol();
-                    emit1(8, n);
-                  }
                   x.typ = tab[i].typ;
                   if (sy == "rparent")
                   insymbol();
@@ -2491,7 +2487,7 @@ try{
   enter('litminusculo', "funktion", "strings", 18);
   enter('leia', "prozedure", "notyp", 1);
   enter('littamanho', 'funktion', 'ints', 19);
-  //enter('leialn', "prozedure", "notyp", 2);
+  enter('litbusca', "funktion", "ints", 20);
   enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
@@ -3181,15 +3177,44 @@ function interpreter(){
       break;
 
       case 62:
-        s[t-1] = s[t-1].charCodeAt(Number(s[t]));
-        t--;
+        debugger;
+        if (s[t] != 0){
+          if (s[t] <= s[t-1].length && s[t] >= (-s[t-1].length)){
+            if (s[t] > 0)
+              s[t]--;
+            s[t-1] = s[t-1].charCodeAt(Number(s[t]));
+            t--;
+          }
+          else {
+            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
+            ps = "fin";
+          }
+        }
+        else {
+          atualizarConsole("\nNão é permitido acessar uma posição 0 na string");
+          ps = "fin"
+        }
       break;
       case 63:
-      if (s[t-2] != -1)
-        s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
-      else
-        s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
-      t -= 2;
+      if (s[t-2] != 0){
+        if (s[t-2] <= s[t].length && s[t-2] >= (-s[t].length)){
+          if (s[t-2] > 0)
+            s[t-2]--;
+          if (s[t-2] != -1)
+            s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
+          else
+            s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
+          t -= 2;
+        }
+        else {
+          atualizarConsole("\nNão é permitido acessar uma posição fora da string");
+          ps = "fin";
+        }
+      }
+      else {
+        atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
+        ps = "fin";
+      }
       break;
       case 64:
         s[t] = s[t].length;
@@ -3199,6 +3224,14 @@ function interpreter(){
       break;
       case 66:
         s[t] = s[t].toLowerCase();
+      break;
+      case 67:
+        s[t-1] = s[t-1].indexOf(s[t]);
+        if (s[t-1] == -1)
+          s[t-1] = 0;
+        else
+          s[t-1]++;
+        t--;
       break;
 
       }//primeiro switch

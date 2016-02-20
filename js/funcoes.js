@@ -26,10 +26,10 @@ function limpaInput() {
 }
 
 /*function adcionarSaida(string) {
-  output_console.push(string);
-  output_console.shift();
-  atualizarConsole();
-  //document.getElementById("output").value = output_console.join("\n");
+output_console.push(string);
+output_console.shift();
+atualizarConsole();
+//document.getElementById("output").value = output_console.join("\n");
 }*/
 
 function limpaConsole() {
@@ -53,17 +53,17 @@ function changeOutput(){
   interpret();
 }
 
-  function mostrarModalOutput(){
-    $('#modalOutput').modal('show');
-  }
+function mostrarModalOutput(){
+  $('#modalOutput').modal('show');
+}
 
-  function esconderModalOutput(){
-    $('#modalOutput').modal('hide');
-  }
+function esconderModalOutput(){
+  $('#modalOutput').modal('hide');
+}
 
-  function scrollOutput(){
-    document.getElementById('output').scrollTop=document.getElementById('output').scrollHeight;
-  }
+function scrollOutput(){
+  document.getElementById('output').scrollTop=document.getElementById('output').scrollHeight;
+}
 
 function renderInput(bool) {
   if (bool) {
@@ -74,7 +74,11 @@ function renderInput(bool) {
 }
 
 function adicionarTabelaPilha(funcao) {
-  $('#tab_logic').append('<tr><td>'+ funcao + '</td></tr>');
+  /*$('#tab_logic').append('<tr><td>'+ funcao + '</td></tr>');*/
+  var table = document.getElementById("tab_logic");
+  var row = table.insertRow(1);
+  var cell1 = row.insertCell(0);
+  cell1.innerHTML = funcao;
 }
 
 function removerTopoPilha() {

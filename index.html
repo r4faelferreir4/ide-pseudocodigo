@@ -57,10 +57,10 @@
         <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
           <span class="glyphicon glyphicon-sort"></span> Depurar
         </button>
+
         <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="getCode();">
           <span class="glyphicon glyphicon-play"></span> Compilar
         </button>
-
         <!--<button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="adicionarTabelaPilha('t');">
           <span class="glyphicon glyphicon-play"></span> Add Row
         </button>
@@ -71,10 +71,13 @@
         <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
         <span class="glyphicon glyphicon-play"></span> Compilar
       </button>-->
-
       <button name="compilar" id="novo"type="button" class="btn btn-default" onclick="">
         <span class="glyphicon glyphicon-file"></span> Novo
       </button>
+      <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="download('arquivo.txt', 'text/plain')">
+        <span class="glyphicon glyphicon-floppy-disk"></span> Salvar
+      </button>
+
 
       <!-- Modal -->
       <div class="modal fade" id="modalOutput" role="dialog">

@@ -84,3 +84,11 @@ function adicionarTabelaPilha(funcao) {
 function removerTopoPilha() {
   document.getElementById("tab_logic").deleteRow(1);
 }
+
+function download(name, type) {
+    var a = document.createElement("a");
+    var file = new Blob([editor.getValue()], {type: type});
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click();
+}

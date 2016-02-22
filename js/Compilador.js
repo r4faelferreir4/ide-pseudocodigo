@@ -2115,7 +2115,7 @@ function block(fsys, isfun, level){
             if (tab[i].obj == "variable"){
               cvt = tab[i].typ;
               emit2(0, tab[i].lev, tab[i].adr);
-              if (["notyp", "ints", "bools", "chars"].indexOf(cvt) == -1)
+              if (["notyp", "ints", "bools", "chars", "reals"].indexOf(cvt) == -1)
                 Error(18);
             }
             else {
@@ -2127,25 +2127,75 @@ function block(fsys, isfun, level){
             skip(["ofsy", "tosy", "downtosy", "dosy"].concat(fsys), 2);
           if (sy == "ofsy"){
             insymbol();
-            expression(["tosy", "downtosy", "dosy"].concat(fsys), x);
+            expression(["untilsy", "downtosy", "dosy"].concat(fsys), x);
             if (x.typ != cvt)
             Error(19);
           }
           else
-            skip(["tosy"].concat(fsys), 51);
+            skip(["untilsy"].concat(fsys), 51);
           f = 14;
-          if (["tosy", "downtosy"].indexOf(sy) != -1){
-            if (sy == "downtosy")
-              f = 16;
+          if (sy == "untilsy"){
             insymbol();
-            expression(["dosy"].concat(fsys), x);
-            if (x.typ != cvt)
-              Error(19);
+            var p;
+            p = new item("", 1);
+            expression(fsys.concat(["stepsy"]), p);
+            if (p.typ != cvt)
+              Error("para", "Tipo de valor informado incorreto");
+            else{
+              if (sy == "stepsy"){
+                insymbol();
+                if (sy == "minus"){
+                  insymbol();
+                  if (sy == "intcon" || sy == "realcon"){
+                    if (sy == "intcon"){
+                      if (cvt == "ints")
+                        emit1(24, inum);
+                      else
+                        Error("para", "Erro, tipo do passo incompatível com a variável inicial");
+                    }
+                    else{
+                      if (cvt == "reals")
+                        emit1(24, rnum);
+                      else
+                        Error("para", "Erro, tipo do passo incompatível com a variável inicial");
+                    }
+                  }
+                  emit(36);
+                }
+                else {
+                  if (sy == "intcon" || sy == "realcon"){
+                    if (sy == "intcon"){
+                      if (cvt == "ints")
+                        emit1(24, inum);
+                      else
+                        Error("para", "Erro, tipo do passo incompatível com a variável inicial");
+                    }
+                    else{
+                      if (cvt == "reals")
+                        emit1(24, rnum);
+                      else
+                        Error("para", "Erro, tipo do passo incompatível com a variável inicial");
+                    }
+                  }
+
+                }
+                if (p.typ != cvt) {
+                  Error("para", "Valor informado para o passo precisa ser um número inteiro");
+                }
+              }
+              else {
+                emit1(24, 1);
+              }
+            }
           }
-          else
-            skip(["dosy"].concat(fsys), 55);
+          else {
+            Error("para", "É necessário informar um ponto de parada para a estrutura \'para\'");
+          }
           lc1 = lc;
+          if (kode[lc-1].f == 36)
+            f = 16;
           emit(f);
+          insymbol();
           if (sy == "dosy")
             insymbol();
           else
@@ -2414,6 +2464,7 @@ try{
   key[23] = 'incrementa'; key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
+  key[29] = "passo";
   ksy[1] = "andsy"; ksy[2] = "arraysy";
   ksy[3] = 'beginsy'; ksy[4] = "casesy";
   ksy[5] = 'constsy'; ksy[6] = "idiv";
@@ -2428,6 +2479,7 @@ try{
   ksy[23] = 'tosy'; ksy[24] = 'typesy';
   ksy[25] = 'untilsy'; ksy[26] = 'varsy';
   ksy[27] = 'whilesy'; ksy[28] = 'varsy';
+  ksy[29] = "stepsy";
   sps['+'] = 'plus'; sps['-'] = 'minus';
   sps['*'] = 'times'; sps['/'] = 'rdiv';
   sps['('] = 'lparent'; sps[')'] = 'rparent';
@@ -2721,20 +2773,20 @@ function interpreter(){
       }while (h3 === 0);
       break;
       case 14:
-      h1 = s[t - 1];
-      if(h1 <= s[t]){
-        s[s[t - 2]] = h1;
+      h1 = s[t - 2];
+      if(h1 <= s[t-1]){
+        s[s[t - 3]] = h1;
       }
       else{
-        t = t - 3;
+        t = t - 4;
         pc = ir.y;
       }
       break;
 
       case 15:
-      h2 = s[t - 2];
-      h1 = s[h2] + 1;
-      if (h1 <= s[t]){
+      h2 = s[t - 3];
+      h1 = s[h2] + s[t];
+      if (h1 <= s[t-1]){
         s[h2] = h1;
         pc = ir.y;
       }
@@ -2744,20 +2796,20 @@ function interpreter(){
       break;
 
       case 16:
-      h1 = s[t - 1];
-      if (h1 >= s[t]){
-        s[s[t - 2]] = h1;
+      h1 = s[t - 2];
+      if (h1 >= s[t-1]){
+        s[s[t - 3]] = h1;
       }
       else{
         pc = ir.y;
-        t = t - 3;
+        t = t - 4;
       }
       break;
 
       case 17:
-      h2 = s[t - 2];
-      h1 = s[h2] - 1;
-      if (h1 >= s[t]){
+      h2 = s[t - 3];
+      h1 = s[h2] + s[t];
+      if (h1 >= s[t-1]){
         s[h2] = h1;
         pc = ir.y;
       }

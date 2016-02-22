@@ -84,11 +84,45 @@ function adicionarTabelaPilha(funcao) {
 function removerTopoPilha() {
   document.getElementById("tab_logic").deleteRow(1);
 }
+function saveFile(){
+  var p;
+  var str="";
+  for (p=0; p < tab.length; p++){
+    str+=tab[p].name;
+    str+=",";
+    str+=tab[p].link;
+    str+=",";
+    str+= tab[p].obj;
+    str+=",";
+    str+=tab[p].typ;
+    str+=",";
+    str+=tab[p].ref;
+    str+=",";
+    str+=tab[p].normal;
+    str+=",";
+    str+= tab[p].lev;
+    str+=",";
+    str+=tab[p].adr;
+    str+="\n";
+  }
+  return str;
+
+}
 
 function download(name, type) {
-    var a = document.createElement("a");
-    var file = new Blob([editor.getValue()], {type: type});
-    a.href = URL.createObjectURL(file);
-    a.download = name;
-    a.click();
+  if(isDone){
+    if (isOk){
+      var a = document.createElement("a");
+      var file = new Blob(saveFile(), {type: type});
+      a.href = URL.createObjectURL(file);
+      a.download = name;
+      a.click();
+    }
+    else {
+      alert("Ainda existem erros no código a serem solucionados");
+    }
+  }
+  else {
+    alert("Você precisa compilar o código antes!");
+  }
 }

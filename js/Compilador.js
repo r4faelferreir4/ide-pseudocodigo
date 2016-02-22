@@ -6,8 +6,8 @@
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
-var emax = 322;		//Exponente máximo para numeros reais
-var emin = -292;	//Exponente minimo para numeros reais
+var emax = 500;		//Exponente máximo para numeros reais
+var emin = -500;	//Exponente minimo para numeros reais
 var kmax = 15;		//Numero maximos de digitos significativos
 var tmax = 100;		//Tamanho da tabela
 var bmax = 20;		//Tamanho da tabela de blocos
@@ -226,13 +226,14 @@ function compiladorPascalS(){
       debugger;
       if (isOk){
         isOk = false;
-        ErrorMsg = str;
+        str = "";
         switch(struct){
           case "assignment":
             str += "\nEspera-se uma instrução desta forma:";
             str += "\n"+"<variável>"+":=".bold()+"<expressão>";
           break;
         }
+        ErrorMsg = str;
       }
     }
     catch(err){
@@ -287,7 +288,7 @@ function compiladorPascalS(){
       var s, d, t;
       try{
         if ((k+e) > emax){
-          Error(21);          //Erro maximo expoente para numero real
+          Error("", "Número \'"+(k+e)+"\' é muito grande");          //Erro maximo expoente para numero real
         }
         else{
           if ((k+e) < emin)
@@ -326,6 +327,7 @@ function compiladorPascalS(){
             k++;
             id += ch;
           NextCh();
+          ch = ch.toLowerCase();
         }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")));
       i = key.indexOf(id);
       if (i != -1)
@@ -1018,7 +1020,7 @@ function block(fsys, isfun, level){
                     sz = 1;
                 }
             }
-            test(["semicolon", "rparent"], ["comma", "ident"].concat(fsys), 14);
+            test(["semicolon", "rparent"], ["ident", "comma"].concat(fsys), 14);
           }
           else
             Error(5);
@@ -1459,7 +1461,7 @@ function block(fsys, isfun, level){
                         emit(64);
                       }
                       else {
-                        Error("tamliteral", "\nVariável informada de tipo incorreto.");
+                        Error("littamanho", "\nVariável informada de tipo incorreto.");
                       }
                       break;
                       case 20:
@@ -2595,6 +2597,7 @@ for (var i = 0; i < s.length; i++){
   s[i] = new record(1, 1, true, "c");
 }*/
 function interpreter(){
+  adicionarTabelaPilha(progname);
   do {
     ir = kode[pc];
     pc++;
@@ -2792,6 +2795,7 @@ function interpreter(){
       b = h1;
       t = h4;
       pc = tab[h2].adr;
+      adicionarTabelaPilha(tab[h2].name);
       break;
 
       case 20:
@@ -3053,18 +3057,21 @@ function interpreter(){
       break;
       case 31:
       ps = 'fin';
+      removerTopoPilha();
       break;
 
       case 32:
       t = b - 1;
       pc = s[b + 1];
       b = s[b + 3];
+      removerTopoPilha();
       break;
 
       case 33:
       t = b;
       pc = s[b + 1];
       b = s[b + 3];
+      removerTopoPilha();
       break;
 
       case 34: s[t] = s[s[t]]; break;
@@ -3304,6 +3311,7 @@ function interpreter(){
 
       }//primeiro switch
     }while (ps == "run");
+
 }
 function interpret(){
   if (call_read){

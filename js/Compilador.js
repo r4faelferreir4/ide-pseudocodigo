@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit1(62)debugger
+//emit1(62)sleng
 //VARIÁVEIS CONSTANTES
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -124,7 +124,7 @@ function initArray(){
   j = 0;
   console.log("atab iniciada");
   do{
-    btab[j] = {last: 1, lastpar: 1, psize: 1, vsize: 1};
+    btab[j] = {last: 0, lastpar: 0, psize: 0, vsize: 0};
     j++;
   }while(j < bmax);
   j = 0;
@@ -1187,7 +1187,7 @@ function block(fsys, isfun, level){
       function selector(fsys, v){
         var x, a, j;
         try{
-          //debugger;
+          debugger;
           x = new item("", 1);
           do{
             if (sy == "period"){
@@ -1216,9 +1216,6 @@ function block(fsys, isfun, level){
                     //debugger;
                     selector(fsys, v);
                   }
-                else {
-                    Error("recordsy", "strings");
-                }
               }
             }
             else {    //Seletor do Array
@@ -1566,6 +1563,10 @@ function block(fsys, isfun, level){
                             x.typ = "chars";
                             emit(62);
                           }
+                          else{
+                            if (x.typ == "strings" && x.ref == 0)
+                              emit(34);
+                          }
                         }
                         else {
                           if (stantyps.indexOf(x.typ) != -1)
@@ -1610,6 +1611,7 @@ function block(fsys, isfun, level){
                       }
                       else {
                         inum = stab.splice(sx-sleng, sleng);
+                        sx -= sleng;
                         inum = inum.join("");
                         x.typ = "strings";
                       }
@@ -1813,8 +1815,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          //debugger;
-          var x, y, f;
+          var x, y, f,op="", assign=1;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
           x = new item("", 1);
           y = new item("", 1);
           x.typ = tab[i].typ;
@@ -1831,9 +1832,78 @@ function block(fsys, isfun, level){
           if (sy == "becomes")
             insymbol();
           else {
-            Error("assignment", "Está faltando o operador \'"+":=".bold()+'\'');
-            if (sy == "eql")
-            insymbol();
+            if (sy == "comma"){
+              while(sy == "comma"){
+                insymbol();
+                var p = loc(id);
+                if (p == 0)
+                  Error("assignment", "Variável não declarada");
+                if (tab[p].typ == tab[i].typ){
+                  if (tab[p].normal)
+                    f = 0;
+                  else
+                    f = 1;
+                  emit2(f, tab[p].lev, tab[p].adr);
+                  assign++;
+                }
+                else {
+                  Error("assignment", "Atribuições multiplas só podem ser feitas com variáveis do mesmo tipo");
+                  break;
+                }
+                insymbol();
+                if (sy in ["lbrack", "lparent", "period"])
+                  Error("assignment", "Atribuição multipla não suporta posições de arranjos e strings");
+              }
+              if(sy == "becomes")
+                insymbol();
+            }
+            else{
+              switch (sy) {
+                case "plus":
+                  op = "plus";
+                  insymbol();
+                  if (sy == "eql"){
+                    emit2(1, tab[i].lev, tab[i].adr);
+                    insymbol();
+                  }
+                break;
+                case "minus":
+                  op = "minus";
+                  insymbol();
+                  if (sy == "eql"){
+                    emit2(1, tab[i].lev, tab[i].adr);
+                    insymbol();
+                  }
+                  else
+                    Error("assignment", "Operador de atribuição desconhecido");
+                break;
+                case "times":
+                  op = "mult";
+                  insymbol();
+                  if (sy == "eql"){
+                    emit2(1, tab[i].lev, tab[i].adr);
+                    insymbol();
+                  }
+                  else
+                    Error("assignment", "Operador de atribuição desconhecido");
+                break;
+                case "rdiv":
+                  op = "div";
+                  insymbol();
+                  if (sy == "eql"){
+                    emit2(1, tab[i].lev, tab[i].adr);
+                    insymbol();
+                  }
+                  else
+                    Error("assignment", "Operador de atribuição desconhecido");
+                break;
+                default:
+                  Error("assignment", "Está faltando o operador \'"+":=".bold()+'\'');
+                  if (sy == "eql")
+                    insymbol();
+
+              }
+            }
           }
           expression(fsys, y);
           if (x.typ == y.typ)
@@ -1849,7 +1919,15 @@ function block(fsys, isfun, level){
                     emit(63);
                   }
                 }
-                emit(38);
+                if (op == "plus")
+                  emit(52);
+                if (op == "minus")
+                  emit(53);
+                if (op == "mult")
+                  emit(57);
+                if (op == "div")
+                  emit(58);
+                emit1(38, assign);
               }
             }
             else
@@ -1871,14 +1949,14 @@ function block(fsys, isfun, level){
                   emit2(1, tab[i].lev, tab[i].adr);
                   if (y.typ == "chars")
                     emit(63);
-                  emit(38);
+                  emit1(38, assign);
                 }
               }
             }
             else{
               if (x.typ == "reals" && y.typ == "ints"){
                 emit1(26,0);
-                emit(38);
+                emit(38, assign);
               }
               else
                 if (x.typ != "notyp" && y.typ != "notyp")
@@ -3145,9 +3223,20 @@ function interpreter(){
       break;
 
       case 38:
+      debugger;
       //s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
-      s[s[t - 1]] = s[t];
-      t = t - 2;
+      if (ir.y == 1){
+        s[s[t - 1]] = s[t];
+        t = t - 2;
+      }
+      else {
+        for(var i = 1; i <= ir.y; i++){
+          s[s[t-1]] = s[t];
+          s[t-1] = s[t];
+          t--;
+        }
+        t--;
+      }
       break;
 
       case 39:

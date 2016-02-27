@@ -107,6 +107,32 @@ var indexmax;  //Tamanho total do código
 var isOk = true;    //Verifica se o código foi compilado corretamente
 var isDone = false; //Verifica se o código foi compilado
 var MsgErro = ""; //Mensagem de erro para o usuário.
+function Ttab(name, link, obj, typ, ref, normal, lev, adr){
+  this.name = name;
+  this.link = link;
+  this.obj = obj;
+  this.typ = typ;
+  this.ref = ref;
+  this.normal = normal;
+  this.lev = lev;
+  this.adr = adr;
+}
+function Tatab(inxtyp, eltyp, elref, low, high, elsize, size){
+  this.inxtyp = inxtyp;
+  this.eltyp = eltyp;
+  this.elref = elref;
+  this.low = low;
+  this.high = high;
+  this.elsize = elsize;
+  this.size = size;
+}
+
+function Tbtab(last, lastpar, psize, vsize){
+  this.last = last;
+  this.lastpar = lastpar;
+  this.psize = psize;
+  this.vsize = vsize;
+}
 
 function initArray(){
   var j = 0;
@@ -1212,8 +1238,6 @@ function block(fsys, isfun, level){
                 }
                 insymbol();
                 if (sy == "lbrack" && v.typ == "strings"){
-                    insymbol();
-                    //debugger;
                     selector(fsys, v);
                   }
               }
@@ -2538,7 +2562,7 @@ try{
   key[15] = 'nao'; key[16] = 'de';
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
-  key[21] = 'repita'; key[22] = 'entao';
+  key[21] = 'repete'; key[22] = 'entao';
   key[23] = 'incrementa'; key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
@@ -2737,37 +2761,17 @@ function interpreter(){
       case 0:
       //debugger;
       t++;
-      if (t > stacksize){
-        ps = 'stkchk';
-      }
-      else{
-        s[t] = display[ir.x] + ir.y;
-      }
+      s[t] = display[ir.x] + ir.y;
       break;
 
       case 1:
       t = t + 1;
-      if (t > stacksize){
-        ps = 'stkchk';
-      }
-      else{
-        var i1 = display[ir.x]+ir.y;
-        //var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
-        s[t] = s[i1];
-
-      }
+      s[t] = s[display[ir.x]+ir.y];
       break;
 
       case 2:
       t++;
-      if (t > stacksize){
-        ps = 'stkchk';
-      }
-      else{
-        var i1 = s[display[ir.x]+ir.y];
-        //var s1 = new record(s[i1].i, s[i1].r, s[i1].b, s[i1].c);
-        s[t] = s[i1];
-      }
+      s[t] = s[display[ir.x]+ir.y];
       break;
 
       case 3:
@@ -2784,18 +2788,12 @@ function interpreter(){
 
       case 8:
       switch (ir.y) {
-        case 0: s[t] = Math.abs(s[t]); break;
+        case 0: s[t] = Math.floor(Math.abs(s[t])); break;
         case 1: s[t] = Math.abs(s[t]); break;
-        case 2: s[t] = Math.pow(s[t], 2); break;
+        case 2: s[t] = Math.floor(Math.pow(s[t], 2)); break;
         case 3: s[t] = Math.pow(s[t], 2); break;
-        case 4: s[t] = (s[t]%2) !== 0; break;
-        case 5:
-        if (s[t] < 0 || s[t] > 63){
-          ps = 'inxchk';
-        }
-        else
-        s[t] = String.fromCharCode(s[t]);
-        break;
+        case 4: s[t] = (s[t]%2) != 0; break;
+        case 5: s[t] = String.fromCharCode(s[t]); break;
         case 6: s[t] = s[t].charCodeAt();  break;
         case 7:
         var c = s[t].charCodeAt();
@@ -2839,6 +2837,7 @@ function interpreter(){
           }
           h3 = 1;
           ps = 'caschk';
+          return;
         }
         else{
           if (kode[h2].y == h1){
@@ -2900,6 +2899,7 @@ function interpreter(){
       h1 = btab[tab[ir.y].ref].vsize;
       if (t + h1 > stacksize){
         ps = 'stkchk';
+        return;
       }
       else{
         t = t + 5;
@@ -2934,10 +2934,12 @@ function interpreter(){
       h3 = s[t];
       if (h3 < h2){
         ps = 'inxchk';
+        return;
       }
       else{
         if (h3 > atab[h1].high){
           ps = 'inxchk';
+          return;
         }
         else{
           t--;
@@ -2952,10 +2954,12 @@ function interpreter(){
       h3 = s[t];
       if (h3 < h2) {
         ps = 'inxchk';
+        return;
       }
       else{
         if (h3 > atab[h1].high){
           ps = 'inxchk';
+          return;
         }
         else{
           t = t - 1;
@@ -2969,6 +2973,7 @@ function interpreter(){
       h2 = ir.y + t;
       if(h2 > stacksize){
         ps = 'stkchk';
+        return;
       }
       else
       while (t < h2) {
@@ -2996,6 +3001,7 @@ function interpreter(){
       t++;
       if (t > stacksize){
         ps = 'stkchk';
+        return;
       }
       else{
         s[t] = ir.y;
@@ -3006,6 +3012,7 @@ function interpreter(){
       t++;
       if (t > stacksize){
         ps = 'stkchk';
+        return;
       }
       else{
         s[t] = rconst[ir.y];
@@ -3025,7 +3032,7 @@ function interpreter(){
         switch (ir.y) {
           case 1:
           if (read_ok) {
-            s[s[t]] = Number(InputFile);
+            s[s[t]] = Math.floor(Number(InputFile));
             read_ok = false;
           }
           else{
@@ -3188,6 +3195,7 @@ function interpreter(){
       case 31:
       ps = 'fin';
       removerTopoPilha();
+      return;
       break;
 
       case 32:
@@ -3223,7 +3231,6 @@ function interpreter(){
       break;
 
       case 38:
-      debugger;
       //s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
       if (ir.y == 1){
         s[s[t - 1]] = s[t];
@@ -3340,6 +3347,7 @@ function interpreter(){
       if (s[t + 1] === 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
+        return;
       }
       else{
         s[t] = s[t] / s[t + 1];
@@ -3351,6 +3359,7 @@ function interpreter(){
       if(s[t + 1] === 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
+        return;
       }
       else{
         s[t] = s[t] % s[t + 1];
@@ -3379,11 +3388,13 @@ function interpreter(){
           else {
             atualizarConsole("\nNão é permitido acessar uma posição fora da string");
             ps = "fin";
+            return;
           }
         }
         else {
           atualizarConsole("\nNão é permitido acessar uma posição 0 na string");
           ps = "fin";
+          return;
         }
       break;
       case 63:
@@ -3401,11 +3412,13 @@ function interpreter(){
           else {
             atualizarConsole("\nNão é permitido acessar uma posição fora da string");
             ps = "fin";
+            return;
           }
         }
         else {
           atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
           ps = "fin";
+          return;
         }
       }
       else {
@@ -3422,11 +3435,13 @@ function interpreter(){
           else {
             atualizarConsole("\nNão é permitido acessar uma posição fora da string");
             ps = "fin";
+            return;
           }
         }
         else {
           atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
           ps = "fin";
+          return;
         }
       }
       break;
@@ -3451,8 +3466,7 @@ function interpreter(){
       break;
 
       }//primeiro switch
-    }while (ps == "run");
-
+    }while (true);
 }
 function interpret(){
   if (call_read){

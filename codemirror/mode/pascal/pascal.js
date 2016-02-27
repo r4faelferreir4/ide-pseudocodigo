@@ -14,12 +14,12 @@ CodeMirror.defineMode("pascal", function() {
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
-  var keywords = words("programa fim var const procedimento funcao inicio inteiro real logico " +
-                       "enquanto fimenquanto escreva e ou xou nao repita leia " +
-                       "para fimpara se entao fimse retorne de ate passo senao " +
-					   "caracter string vtor registro fimprocedimento fimfuncao fimregistro verdadeiro falso ");
-					   
-	
+  var keywords = words("programa fim var const procedimento funcao inicio inteiro real logico literal enumerado ponteiro " +
+                       "enquanto fimenquanto escreva e ou xou nao repete leia " +
+                       "para fimpara se entao fimse retorne de ate passo senao faca " +
+					   "caracter string arranjo registro fimprocedimento fimfuncao fimregistro verdadeiro falso ");
+
+
 
 
   var atoms = {"null": true};
@@ -47,8 +47,8 @@ CodeMirror.defineMode("pascal", function() {
       stream.eatWhile(/[\w\.]/);
       return "number";
     }
-    if (ch == "/") {
-      if (stream.eat("/")) {
+    if (ch == "(") {
+      if (stream.eat("*")) {
         stream.skipToEnd();
         return "comment";
       }

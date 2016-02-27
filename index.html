@@ -54,12 +54,12 @@
         </form>
         <!--<input id="compilar" name="compilar" type="button" value="Compilar" onclick="return popitup('console.html')"/>-->
         <!--<input id="compilar" class="btn btn-default btn-lg" name="compilar" type="button" value="Compilar" onclick="getCode();"/>-->
-        <button name="depurar" id="depurar"type="button" class="btn btn-default" onclick="">
-          <span class="glyphicon glyphicon-sort"></span> Depurar
+        <button name="depurar" id="depurar"type="button" class="btn btn-default" title="Depurar" onclick="">
+          <span class="glyphicon glyphicon-sort"></span>
         </button>
 
-        <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="getCode();">
-          <span class="glyphicon glyphicon-play"></span> Compilar
+        <button name="depurar" id="compilar"type="button" class="btn btn-default" title="Compilar" onclick="getCode();">
+          <span class="glyphicon glyphicon-play"></span>
         </button>
         <!--<button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="adicionarTabelaPilha('t');">
           <span class="glyphicon glyphicon-play"></span> Add Row
@@ -71,11 +71,14 @@
         <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
         <span class="glyphicon glyphicon-play"></span> Compilar
       </button>-->
-      <button name="compilar" id="novo"type="button" class="btn btn-default" onclick="upload();">
-        <span class="glyphicon glyphicon-file"></span> Carregar Arquivo de Instruções
+      <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
+        <span class="glyphicon glyphicon-upload"></span>
       </button>
-      <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="download('arquivo.pse', 'application/octet-stream')">
-        <span class="glyphicon glyphicon-floppy-disk"></span> Salvar Arquivo de Instruções
+
+      <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
+
+      <button name="depurar" id="compilar"type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" onclick="download('arquivo.pse', 'application/octet-stream')">
+        <span class="glyphicon glyphicon-floppy-disk"></span>
       </button>
 
 

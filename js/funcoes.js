@@ -1,3 +1,10 @@
+
+//ao clicar no botao abre janela para selecionar arquivo
+document.getElementById('novo').onclick = function() {
+    document.getElementById('my_file').click();
+};
+
+
 function runScript(e) {
   if (e.keyCode == 13) {
     if (call_read){
@@ -108,7 +115,7 @@ function toBinary(i, len){
     return -1;
   }
   if (op == -1)
-    str = "1"+str.slice(1, str.length);
+  str = "1"+str.slice(1, str.length);
   return str;
 }
 function toInt(str){
@@ -145,54 +152,54 @@ function toTab(){
     obj = toInt("0"+strTOTAL.slice(x, x += 3));
     switch (obj) {
       case 1:
-        obj = "konstant";
+      obj = "konstant";
       break;
       case 2:
-        obj = "variable";
+      obj = "variable";
       break;
       case 3:
-        obj = "type1";
+      obj = "type1";
       break;
       case 4:
-        obj = "prozedure";
+      obj = "prozedure";
       break;
       case 5:
-        obj = "funktion";
+      obj = "funktion";
       break;
     }
     typ = toInt("0"+strTOTAL.slice(x, x += 4));
     switch (typ) {
       case 1:
-        typ = "notyp";
+      typ = "notyp";
       break;
       case 2:
-        typ = "ints";
+      typ = "ints";
       break;
       case 3:
-        typ = "reals";
+      typ = "reals";
       break;
       case 4:
-        typ = "bools";
+      typ = "bools";
       break;
       case 5:
-        typ = "chars";
+      typ = "chars";
       break;
       case 6:
-        typ = "strings";
+      typ = "strings";
       break;
       case 7:
-        typ = "enums";
+      typ = "enums";
       break;
       case 8:
-        typ = "pointers";
+      typ = "pointers";
       break;
     }
     ref = toInt(strTOTAL.slice(x, x += 32));
     normal = toInt(strTOTAL.slice(x, x += 1));
     if (normal == 0)
-      normal = true;
+    normal = true;
     else
-      normal = false;
+    normal = false;
     lev = toInt(strTOTAL.slice(x, x += 8));
     adr = toInt(strTOTAL.slice(x, x += 32));
     tab[p] = new Ttab(name, link, obj, typ, ref, normal, lev, adr);
@@ -204,67 +211,67 @@ function toTab(){
     inxtyp = toInt("0"+strTOTAL.slice(x, x += 4));
     switch (inxtyp) {
       case 1:
-        inxtyp = "notyp";
+      inxtyp = "notyp";
       break;
       case 2:
-        inxtyp = "ints";
+      inxtyp = "ints";
       break;
       case 3:
-        inxtyp = "reals";
+      inxtyp = "reals";
       break;
       case 4:
-        inxtyp = "bools";
+      inxtyp = "bools";
       break;
       case 5:
-        inxtyp = "chars";
+      inxtyp = "chars";
       break;
       case 6:
-        inxtyp = "arrays";
+      inxtyp = "arrays";
       break;
       case 7:
-        inxtyp = "records";
+      inxtyp = "records";
       break;
       case 8:
-        inxtyp = "strings";
+      inxtyp = "strings";
       break;
       case 9:
-        inxtyp = "enums";
+      inxtyp = "enums";
       break;
       case 10:
-        inxtyp = "pointers";
+      inxtyp = "pointers";
       break;
     }
     eltyp = toInt("0"+strTOTAL.slice(x, x += 4));
     switch (eltyp) {
       case 1:
-        eltyp = "notyp";
+      eltyp = "notyp";
       break;
       case 2:
-        eltyp = "ints";
+      eltyp = "ints";
       break;
       case 3:
-        eltyp = "reals";
+      eltyp = "reals";
       break;
       case 4:
-        eltyp = "bools";
+      eltyp = "bools";
       break;
       case 5:
-        eltyp = "chars";
+      eltyp = "chars";
       break;
       case 6:
-        eltyp = "arrays";
+      eltyp = "arrays";
       break;
       case 7:
-        eltyp = "records";
+      eltyp = "records";
       break;
       case 8:
-        eltyp = "strings";
+      eltyp = "strings";
       break;
       case 9:
-        eltyp = "enums";
+      eltyp = "enums";
       break;
       case 10:
-        eltyp = "pointers";
+      eltyp = "pointers";
       break;
     }
     elref = toInt(strTOTAL.slice(x, x += 32));
@@ -317,7 +324,7 @@ function saveFile(){
   for (p=0; p < tab.length; p++){
     //debugger;
     if (tab[p].name == "" && tab[p].adr == 44)
-      break;
+    break;
     strtab += toBinary(tab[p].name.length, 8);
     for(j = 0; j < tab[p].name.length; j++){
       strtab += toBinary(tab[p].name.charCodeAt(j), 8);
@@ -325,45 +332,45 @@ function saveFile(){
     strtab += toBinary(tab[p].link, 32);
     switch (tab[p].obj) {
       case "konstant":
-        strtab += toBinary(1, 3);
+      strtab += toBinary(1, 3);
       break;
       case "variable":
-        strtab += toBinary(2, 3);
+      strtab += toBinary(2, 3);
       break;
       case "type1":
-        strtab += toBinary(3, 3);
+      strtab += toBinary(3, 3);
       break;
       case "prozedure":
-        strtab += toBinary(4, 3);
+      strtab += toBinary(4, 3);
       break;
       case "funktion":
-        strtab += toBinary(5,3);
+      strtab += toBinary(5,3);
       break;
     }
     switch (tab[p].typ) {
       case "notyp":
-        strtab += toBinary(1, 4);
+      strtab += toBinary(1, 4);
       break;
       case "ints":
-        strtab += toBinary(2, 4);
+      strtab += toBinary(2, 4);
       break;
       case "reals":
-        strtab += toBinary(3, 4);
+      strtab += toBinary(3, 4);
       break;
       case "bools":
-        strtab += toBinary(4, 4);
+      strtab += toBinary(4, 4);
       break;
       case "chars":
-        strtab += toBinary(5, 4);
+      strtab += toBinary(5, 4);
       break;
       case "strings":
-        strtab += toBinary(6, 4);
+      strtab += toBinary(6, 4);
       break;
       case "enums":
-        strtab += toBinary(7, 4);
+      strtab += toBinary(7, 4);
       break;
       case "pointers":
-        strtab += toBinary(8, 4);
+      strtab += toBinary(8, 4);
       break;
       default:
     }
@@ -376,69 +383,69 @@ function saveFile(){
   itab = p;
   for(p=0; p< atab.length; p++){
     if (atab[p].inxtyp == "")
-      break;
+    break;
     switch (atab[p].inxtyp) {
       case "notyp":
-        stratab += toBinary(1, 4);
+      stratab += toBinary(1, 4);
       break;
       case "ints":
-        stratab += toBinary(2, 4);
+      stratab += toBinary(2, 4);
       break;
       case "reals":
-        stratab += toBinary(3, 4);
+      stratab += toBinary(3, 4);
       break;
       case "bools":
-        stratab += toBinary(4, 4);
+      stratab += toBinary(4, 4);
       break;
       case "chars":
-        stratab += toBinary(5, 4);
+      stratab += toBinary(5, 4);
       break;
       case "arrays":
-        stratab += toBinary(6, 4);
+      stratab += toBinary(6, 4);
       break;
       case "records":
-        stratab += toBinary(7, 4);
+      stratab += toBinary(7, 4);
       break;
       case "strings":
-        stratab += toBinary(8, 4);
+      stratab += toBinary(8, 4);
       break;
       case "enums":
-        stratab += toBinary(9, 4);
+      stratab += toBinary(9, 4);
       break;
       case "pointers":
-        stratab += toBinary(10, 4);
+      stratab += toBinary(10, 4);
       break;
     }
     switch (atab[p].eltyp) {
       case "notyp":
-        stratab += toBinary(1, 4);
+      stratab += toBinary(1, 4);
       break;
       case "ints":
-        stratab += toBinary(2, 4);
+      stratab += toBinary(2, 4);
       break;
       case "reals":
-        stratab += toBinary(3, 4);
+      stratab += toBinary(3, 4);
       break;
       case "bools":
-        stratab += toBinary(4, 4);
+      stratab += toBinary(4, 4);
       break;
       case "chars":
-        stratab += toBinary(5, 4);
+      stratab += toBinary(5, 4);
       break;
       case "arrays":
-        stratab += toBinary(6, 4);
+      stratab += toBinary(6, 4);
       break;
       case "records":
-        stratab += toBinary(7, 4);
+      stratab += toBinary(7, 4);
       break;
       case "strings":
-        stratab += toBinary(8, 4);
+      stratab += toBinary(8, 4);
       break;
       case "enums":
-        stratab += toBinary(9, 4);
+      stratab += toBinary(9, 4);
       break;
       case "pointers":
-        stratab += toBinary(10, 4);
+      stratab += toBinary(10, 4);
       break;
     }
     stratab += toBinary(atab[p].elref, 32);
@@ -455,7 +462,7 @@ function saveFile(){
   istab--;
   for(p = 1; p < btab.length; p++){
     if (btab[p].psize == 0 && btab[p].vsize == 0)
-      break;
+    break;
     strbtab += toBinary(btab[p].last, 32);
     strbtab += toBinary(btab[p].lastpar, 32);
     strbtab += toBinary(btab[p].psize, 32);
@@ -464,7 +471,7 @@ function saveFile(){
   ibtab = p;
   for(p=0; p<kode.length; p++){
     if (kode[p].f == 31)
-      break;
+    break;
     strkode += toBinary(kode[p].f, 8);
     strkode += toBinary(kode[p].x, 16);
     if (typeof kode[p].y == "string"){
@@ -492,27 +499,29 @@ function saveFile(){
 
 }
 var strTOTAL = "";
-function upload(){
-  var x = document.createElement("INPUT");
-  x.setAttribute("type", "file");
-  /*x.onload = function loadFile(){
-    var reader = new FileReader();
-    var files = x.value;
-    console.log(files.name);
-  };*/
-  x.onload = function(fileLoadedEvent) {
-    var textFromFileLoaded = fileLoadedEvent.target.result;
-    var texto = textFromFileLoaded;
-    debugger;
-    fileReader.readAsText(fileToLoad);
+
+var openFile = function(event) {
+  var input = event.target;
+
+  var reader = new FileReader();
+  reader.onload = function(){
+    var text = reader.result;
+    alert(binaryToWords(text));
   };
-  x.click();
-	var fileToLoad = x.files[0];
-	var fileReader = new FileReader();
+  reader.readAsText(input.files[0]);
+};
 
-
-
+//funcao encontrada http://stackoverflow.com/a/29975326/5165064
+function binaryToWords(str) {
+  if(str.match(/[10]{8}/g)){
+    var wordFromBinary = str.match(/([10]{8}|\s+)/g).map(function(fromBinary){
+      return String.fromCharCode(parseInt(fromBinary, 2) );
+    }).join('');
+    return wordFromBinary;
+  }
 }
+
+
 function download(name, type) {
   if(isDone){
     if (isOk){

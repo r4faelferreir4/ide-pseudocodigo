@@ -91,7 +91,9 @@ function adicionarTabelaPilha(funcao) {
 function removerTopoPilha() {
   document.getElementById("tab_logic").deleteRow(1);
 }
+var lenBinary = 0;
 function toBinary(i, len){
+  lenBinary += len;
   var str="", temp, op = 1;
   if (i < 0){
     i = -i;
@@ -128,7 +130,7 @@ function toInt(str){
   }
 }
 
-function toTab(){
+function toTab(strTOTAL){
   debugger;
   var iKode, iTab, iStab, iBtab, iAtab, x = 0, p, aux, i;
   var name, link, obj, typ, ref, normal, lev, adr;
@@ -138,7 +140,7 @@ function toTab(){
   iBtab = toInt(strTOTAL.slice(x, x += 64));
   iStab = toInt(strTOTAL.slice(x, x += 64));
   //CRIANDO A ESTRUTURA tab
-  tab = [];
+  var tab1 = [];
   for(p = 0; p < iTab; p++){
     aux = toInt(strTOTAL.slice(x, x += 8));
     name = "";
@@ -202,8 +204,20 @@ function toTab(){
     normal = false;
     lev = toInt(strTOTAL.slice(x, x += 8));
     adr = toInt(strTOTAL.slice(x, x += 32));
-    tab[p] = new Ttab(name, link, obj, typ, ref, normal, lev, adr);
+    tab1[p] = new Ttab(name, link, obj, typ, ref, normal, lev, adr);
   }
+  debugger;
+  var ix = 0;
+  while(ix < iTab){
+    if (tab[ix].f != tab1[ix].f)
+      console.log("Diferença em "+ ix + " na função f.");
+    if (tab[ix].x != tab1[ix].x)
+      console.log("Diferença em " + ix + " em x.");
+    if (tab[ix].y != tab1[ix].y)
+      console.log("Diferença em " + ix + " em y.");
+    ix++;
+  }
+  debugger;
   //CRIANDO A ESTRUTURA atab
   atab = [];
   for (p = 0; p < iAtab; p++){
@@ -300,6 +314,7 @@ function toTab(){
 
   //CRIANDO A kode
   kode = [];
+  debugger;
   for (p = 0; p < iKode; p++){
     var f, y, z;
     f = toInt(strTOTAL.slice(x, x += 8));
@@ -317,9 +332,10 @@ function toTab(){
     }
     kode[p] = new order(f, z, y);
   }
+  return true;
 }
 function saveFile(){
-  var j, p, itab, istab, iatab, ibtab, ikode;
+  var j, p, itab, istab, iatab, ibtab, ikode, strTOTAL="";
   var str="", strtab="", strstab = "", strkode="", strbtab = "", stratab = "";
   for (p=0; p < tab.length; p++){
     //debugger;
@@ -495,10 +511,11 @@ function saveFile(){
   str += toBinary(ibtab, 64);
   str += toBinary(istab, 64);
   strTOTAL = str+strtab+stratab+strstab+strbtab+strkode;
+  console.log(lenBinary);
+  console.log(strTOTAL.length);
   return strTOTAL;
 
 }
-var strTOTAL = "";
 
 var openFile = function(event) {
   var input = event.target;
@@ -506,7 +523,11 @@ var openFile = function(event) {
   var reader = new FileReader();
   reader.onload = function(){
     var text = reader.result;
-    alert(binaryToWords(text));
+    var sucess = toTab(text);
+    if (sucess){
+      isDone = true;
+      isOk = true;
+    }
   };
   reader.readAsText(input.files[0]);
 };

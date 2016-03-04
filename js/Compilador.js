@@ -785,7 +785,7 @@ function block(fsys, isfun, level){
       var x, sign;
       //c = conrec;
       //c.tp = "notyp"
-      //c.i = 0;
+      //c.i = 0;debugger
       try{
         test(constbegsys, fsys, 50);
         if(constbegsys.indexOf(sy) != -1){
@@ -982,7 +982,7 @@ function block(fsys, isfun, level){
                   //if (sy == "semicolon")
                     //insymbol();
                 }
-                if (sy != "endsy"){
+                /*if (sy != "endsy"){
                   if (sy == "semicolon")
                     insymbol();
                   else {
@@ -990,8 +990,8 @@ function block(fsys, isfun, level){
                     if (sy == "comma")
                       insymbol();
                   }
-                  test(["ident", "endsy","semicolon"], fsys, 6);
-                }
+                  //test(["ident", "endsy","semicolon"], fsys, 6);*/
+                //}
               }
               btab[xtype.rf].vsize = offset;
               xtype.sz = offset;
@@ -1212,10 +1212,9 @@ function block(fsys, isfun, level){
     function statement(fsys){
       var i;
 
-      function selector(fsys, v){
+      function selector(fsys, v, assign){
         var x, a, j;
         try{
-          debugger;
           x = new item("", 1);
           do{
             if (sy == "period"){
@@ -1240,7 +1239,10 @@ function block(fsys, isfun, level){
                 }
                 insymbol();
                 if (sy == "lbrack" && v.typ == "strings"){
-                    selector(fsys, v);
+                    if (v.typ == "strings" || v.typ == "arrays")
+                      selector(fsys, v, assign);
+                    else
+                      Error("Erro");
                   }
               }
             }
@@ -1249,9 +1251,9 @@ function block(fsys, isfun, level){
                 Error(11);
               do{
                 insymbol();
-                if (v.typ != "arrays")
+                if (v.typ != "arrays"){
                   if (v.typ == "strings" || v.typ == "chars"){
-                    if (v.typ == "strings")
+                    if (v.typ == "strings" && !assign)
                       emit(34);
                     expression(fsys.concat(["comma", "rbrack"]), x);
                     if(x.typ != "ints")
@@ -1263,6 +1265,7 @@ function block(fsys, isfun, level){
                   else {
                     Error(28);
                   }
+                }
                 else {
                   expression(fsys.concat(["comma", "rbrack"]), x);
                   a = v.ref;
@@ -1286,7 +1289,7 @@ function block(fsys, isfun, level){
               }
             }
           }while(["lbrack", "lparent", "period"].indexOf(sy) != -1);
-          test(fsys.concat("ident"), "", 6);
+          test(fsys.concat("ident", "plus", "minus", "rdiv", "times"), "", 6);
         }
         catch(err){
           return err;
@@ -1345,7 +1348,7 @@ function block(fsys, isfun, level){
                       else
                         emit2(1, tab[k].lev, tab[k].adr);
                       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-                        selector(fsys.concat(["comma", "colon", "rparent"]), x);
+                        selector(fsys.concat(["comma", "colon", "rparent"]), x, false);
                       if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
                         Error(36);
                     }
@@ -1581,7 +1584,7 @@ function block(fsys, isfun, level){
                           else
                             f = 1;
                           emit2(f, tab[i].lev, tab[i].adr);
-                          selector(fsys, x);
+                          selector(fsys, x, false);
                           if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings")
                             emit(34);
                           if (x.typ == "strings" && x.ref == 1){
@@ -1861,7 +1864,6 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          debugger;
           var x, y, f,op="", assign=1;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
           x = new item("", 1);
           y = new item("", 1);
@@ -1876,9 +1878,10 @@ function block(fsys, isfun, level){
             if (x.typ == "strings"){
               x.typ = "chars";
             }
-            if (atab[x.ref].eltyp == "strings")
-              emit2(f,lv,ad);
-            selector(["becomes", "eql"].concat(fsys), x);
+            //if (atab[x.ref].eltyp == "strings")
+            //  emit2(f,lv,ad);
+            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
+            //lc--; //Retorno da instrução 34 em kode
           }
           if (sy == "becomes")
             insymbol();
@@ -1957,6 +1960,7 @@ function block(fsys, isfun, level){
             }
           }
           expression(fsys, y);
+          debugger;
           if (x.typ == y.typ)
             if (stantyps.indexOf(x.typ) != -1){
               if(x.typ == "strings" && x.ref == 1){
@@ -1998,14 +2002,25 @@ function block(fsys, isfun, level){
                   Error("assignment", "Tentando atribuir um valor não caracter a uma posição de string");
                 }
                 else {
-                  x.ref = 0;
-                  emit2(1, tab[i].lev, tab[i].adr);
-                  if (y.typ == "chars")
+                  //x.ref = 0;
+
+                  if (y.typ == "chars"){
+                    if (tab[i].typ != "arrays")
+                      emit2(1, tab[i].lev, tab[i].adr);
+                    else {
+                      emit1(70, 3);   //Copia o valor abaixo do topo da pilha para o topo da pilha
+                      emit(34);
+                    }
                     emit(63);
+                  }
                   if (x.typ == "ints")
                     emit1(8, 10);
                   emit1(38, assign);
                 }
+              }
+              else {
+                emit1(8, 5);
+                emit1(38, assign);
               }
             }
             else{
@@ -2028,18 +2043,18 @@ function block(fsys, isfun, level){
         try{
           insymbol();
           statement(["semicolon", "endsy"].concat(fsys));
-          while (["semicolon"].concat(statbegsys).indexOf(sy) != -1){
+          while (sy != "endsy"){
             /*if (sy == "semicolon")
             insymbol();
             else
             Error(14);*/
             statement(["semicolon", "endsy"].concat(fsys));
           }
-          if (sy == "endsy")
+          /*if (sy == "endsy")
             insymbol();
           else
             if (sy != "elsesy")
-              Error(57);
+              Error(57);*/
         }
         catch(err){
           return err;
@@ -2271,7 +2286,7 @@ function block(fsys, isfun, level){
             insymbol();
             var p;
             p = new item("", 1);
-            expression(fsys.concat(["stepsy"]), p);
+            expression(fsys.concat(["stepsy", "dosy"]), p);
             if (p.typ != cvt)
               Error("para", "Tipo de valor informado incorreto");
             else{
@@ -2315,6 +2330,7 @@ function block(fsys, isfun, level){
                 if (p.typ != cvt) {
                   Error("para", "Valor informado para o passo precisa ser um número inteiro");
                 }
+                insymbol();
               }
               else {
                 emit1(24, 1);
@@ -2328,15 +2344,18 @@ function block(fsys, isfun, level){
           if (kode[lc-1].f == 36)
             f = 16;
           emit(f);
-          insymbol();
           if (sy == "dosy")
             insymbol();
           else
-            Error(54);
+              Error(54);
           lc2 = lc;
           statement(fsys);
           emit1(f+1, lc2);
           kode[lc1].y = lc;
+          if (sy == "endsy")
+            insymbol();
+          else
+            Error("forstatement", "Está faltando um end");
         }
         catch(err){
           return err;
@@ -2377,7 +2396,7 @@ function block(fsys, isfun, level){
                     f = 1;
                     emit2(f, tab[i].lev, tab[i].adr);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
-                    selector(fsys.concat(["comma", "rparent"]), x);
+                    selector(fsys.concat(["comma", "rparent"]), x, false);
                     if (["ints", "reals", "chars", "notyp", "strings"].indexOf(x.typ) != -1)
                     emit1(27, types1.indexOf(x.typ));
                     else
@@ -2560,6 +2579,9 @@ function block(fsys, isfun, level){
         statement(["semicolon", "endsy"].concat(fsys));
 
     }
+    debugger;
+    if (ch != "?")
+      insymbol();
   /*  if (sy == "endsy")
     insymbol();
     else
@@ -2784,7 +2806,6 @@ for (var i = 0; i < s.length; i++){
   s[i] = new record(1, 1, true, "c");
 }*/
 function interpreter(){
-  adicionarTabelaPilha(progname);
   do {
     debugger;
     ir = kode[pc];
@@ -3488,7 +3509,7 @@ function interpreter(){
       case 66:
         s[t] = s[t].toLowerCase();
       break;
-      case 67:
+      case 67:    //busca um caracter ou string no topo da pilha em uma string em t-1
         if (typeof s[t] == "number")
           s[t] = String.fromCharCode(s[t]);
         s[t-1] = s[t-1].indexOf(s[t]);
@@ -3498,13 +3519,17 @@ function interpreter(){
           s[t-1]++;
         t--;
       break;
-      case 68:
+      case 68:    //Avaliação curta do operador 'ou'
         if (s[t])
           pc = ir.y;
       break;
-      case 69:
+      case 69:    //Avaliação curta do operador 'e'
         if (!s[t])
           pc = ir.y;
+      break;
+      case 70:    //Sendo t o topo da pilha, copia o valor t-ir.y para o novo topo da pilha
+        t++;
+        s[t] = s[t-ir.y];
       break;
 
       }//primeiro switch
@@ -3535,7 +3560,8 @@ function interpret(){
     fld[2] = 22;
     fld[3] = 10;
     fld[4] = 1;
-      interpreter();
+    adicionarTabelaPilha(progname);
+    interpreter();
   }
   if (call_read){
     pc--;
@@ -3543,6 +3569,7 @@ function interpret(){
     return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
   }
     if (ps != "fin"){
+      removerTopoPilha();
       switch (ps) {
         case 'caschk': console.log('undefined case');   break;
         case 'divchk': console.log('division by 0');    break;
@@ -3562,7 +3589,7 @@ function interpret(){
           h2 = s[h1 + 4];
         }
         if (h1 !== 0) {
-          console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1].i);
+          console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1]);
         }
         h2 = btab[tab[h2].ref].last;
         while (h2 !== 0) {

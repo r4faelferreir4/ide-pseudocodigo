@@ -80,6 +80,7 @@ function renderInput(bool) {
   }
 }
 
+//funcoes para pilha
 function adicionarTabelaPilha(funcao) {
   /*$('#tab_logic').append('<tr><td>'+ funcao + '</td></tr>');*/
   var table = document.getElementById("tab_logic");
@@ -91,6 +92,33 @@ function adicionarTabelaPilha(funcao) {
 function removerTopoPilha() {
   document.getElementById("tab_logic").deleteRow(1);
 }
+//fim funcoes para pilha
+
+//funcoes para pilha de variaveis
+//array de objetos
+var arrayObjetoTabela = [];
+//objeto auxiliar
+function objetoTabela(posNome,posValor){
+  this.posNome = posNome;
+  this.posValor = posValor;
+  this.novoValor = "";
+  this.idinput = "inpt_"+posValor;
+}
+function adicionarObjetoVar(posNome,posValor){
+    objeto = new objetoTabela(posNome,posValor);
+    arrayObjetoTabela.push(objeto);
+    adicionarTabelaVar(pos);
+}
+function adicionarTabelaVar(objeto) {
+  var table = document.getElementById("tab_var");
+  var row = table.insertRow(2);
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  cell1.innerHTML = tab[objeto.posNome];
+  cell2.innerHTML = "<input type='text' value='"+ s[objeto.posValor] +"' id='"+ objeto.idinput +"'>";
+}
+//fim funcoes para pilha de variaveis
+
 var lenBinary = 0;
 function toBinary(i, len){
   lenBinary += len;
@@ -110,7 +138,7 @@ function toBinary(i, len){
     do{
       str = "0"+str;
       temp = len - str.length;
-    }while(temp != 0);
+    }while(temp !== 0);
   }
   else if (temp < 0) {
     console.log("Numero de bits informado não comporta o valor convertido.");
@@ -339,7 +367,7 @@ function saveFile(){
   var str="", strtab="", strstab = "", strkode="", strbtab = "", stratab = "";
   for (p=0; p < tab.length; p++){
     //debugger;
-    if (tab[p].name == "" && tab[p].adr == 44)
+    if (tab[p].name === "" && tab[p].adr === 44)
     break;
     strtab += toBinary(tab[p].name.length, 8);
     for(j = 0; j < tab[p].name.length; j++){
@@ -398,7 +426,7 @@ function saveFile(){
   }
   itab = p;
   for(p=0; p< atab.length; p++){
-    if (atab[p].inxtyp == "")
+    if (atab[p].inxtyp === "")
     break;
     switch (atab[p].inxtyp) {
       case "notyp":
@@ -477,7 +505,7 @@ function saveFile(){
   istab = stab.length;
   istab--;
   for(p = 1; p < btab.length; p++){
-    if (btab[p].psize == 0 && btab[p].vsize == 0)
+    if (btab[p].psize === 0 && btab[p].vsize === 0)
     break;
     strbtab += toBinary(btab[p].last, 32);
     strbtab += toBinary(btab[p].lastpar, 32);

@@ -1,7 +1,7 @@
 
 //ao clicar no botao abre janela para selecionar arquivo
 document.getElementById('novo').onclick = function() {
-    document.getElementById('my_file').click();
+  document.getElementById('my_file').click();
 };
 
 
@@ -104,11 +104,15 @@ function objetoTabela(posNome,posValor){
   this.novoValor = "";
   this.idinput = "inpt_"+posValor;
 }
+//cria objeto tabela e verifica se existe os valores para adicionar na tabela
 function adicionarObjetoVar(posNome,posValor){
-    objeto = new objetoTabela(posNome,posValor);
-    arrayObjetoTabela.push(objeto);
-    adicionarTabelaVar(pos);
+  objeto = new objetoTabela(posNome,posValor);
+  if (s[objeto.posValor] !== undefined && tab[objeto.posNome] !== undefined) {
+
+  }  arrayObjetoTabela.push(objeto);
+  adicionarTabelaVar(objeto);
 }
+
 function adicionarTabelaVar(objeto) {
   var table = document.getElementById("tab_var");
   var row = table.insertRow(2);
@@ -116,7 +120,26 @@ function adicionarTabelaVar(objeto) {
   var cell2 = row.insertCell(1);
   cell1.innerHTML = tab[objeto.posNome];
   cell2.innerHTML = "<input type='text' value='"+ s[objeto.posValor] +"' id='"+ objeto.idinput +"'>";
+  desativarTabelaVar();
 }
+function desativarTabelaVar(){
+  $("#tab_var").find("input").attr("disabled", "disabled");
+}
+
+function ativarTabelaVar(){
+  $("#tab_var").find("input").removeAttr('disabled');
+}
+
+function removerTopoPilhaVar() {
+  if (document.getElementById("tab_var").getElementsByTagName("tr").length > 2) {
+    document.getElementById("tab_var").deleteRow(2);
+  }
+}
+
+function removerTodaPilhaVar(){
+   $("#tab_var tr:gt(1)").remove();
+}
+
 //fim funcoes para pilha de variaveis
 
 var lenBinary = 0;
@@ -238,11 +261,11 @@ function toTab(strTOTAL){
   var ix = 0;
   while(ix < iTab){
     if (tab[ix].f != tab1[ix].f)
-      console.log("Diferença em "+ ix + " na função f.");
+    console.log("Diferença em "+ ix + " na função f.");
     if (tab[ix].x != tab1[ix].x)
-      console.log("Diferença em " + ix + " em x.");
+    console.log("Diferença em " + ix + " em x.");
     if (tab[ix].y != tab1[ix].y)
-      console.log("Diferença em " + ix + " em y.");
+    console.log("Diferença em " + ix + " em y.");
     ix++;
   }
   debugger;

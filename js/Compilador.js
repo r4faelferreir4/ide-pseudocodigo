@@ -107,11 +107,12 @@ var indexmax;  //Tamanho total do código
 var isOk = true;    //Verifica se o código foi compilado corretamente
 var isDone = false; //Verifica se o código foi compilado
 var MsgErro = ""; //Mensagem de erro para o usuário.
-function Ttab(name, link, obj, typ, ref, normal, lev, adr){
+function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
   this.name = name;
   this.link = link;
   this.obj = obj;
   this.typ = typ;
+  this.xtyp = xtyp;
   this.ref = ref;
   this.normal = normal;
   this.lev = lev;
@@ -138,7 +139,7 @@ function initArray(){
   var j = 0;
   console.log("iniciando tab");
   do{
-    tab[j] =  {name: "", link: 1, obj: [""], typ: [""], ref: 1, normal: true, lev: 1, adr: 44};
+    tab[j] =  {name: "", link: 1, obj: [""], typ: [""], xtyp: [""], ref: 1, normal: true, lev: 1, adr: 44};
     j++;
   }while(j < tmax);
   j = 0;
@@ -253,13 +254,14 @@ function compiladorPascalS(){
       if (isOk){
         isOk = false;
         str = "";
+        str += "Um erro foi encontrado";
         switch(struct){
           case "assignment":
             str += "\nEspera-se uma instrução desta forma:";
             str += "\n"+"<variável>"+":=".bold()+"<expressão>";
           break;
         }
-        ErrorMsg = str;
+        MsgErro = str;
       }
     }
     catch(err){
@@ -510,7 +512,8 @@ function compiladorPascalS(){
           else{
             Error(24);
             NextCh();
-            insymbol();
+            if (ch != "?")
+              insymbol();
             return;
           }
         }
@@ -1015,9 +1018,9 @@ function block(fsys, isfun, level){
         tp = "notyp";
         rf = 0;
         sz = 0;
-        test(["ident", "varsy"], fsys.concat(["rparent"]), 7);
-        while (sy == "ident" || sy == "varsy"){
-          if (sy != "varsy")
+        test(["ident", "refsy"], fsys.concat(["rparent"]), 7);
+        while (sy == "ident" || sy == "refsy"){
+          if (sy != "refsy")
             valpar = true;
           else{
             insymbol();
@@ -1074,7 +1077,7 @@ function block(fsys, isfun, level){
         }
         if (sy == "rparent"){
           insymbol();
-          test(["semicolon", "colon"], fsys, 6);
+          test(["varsy","beginsy","semicolon", "colon"], fsys, 6);
         }
         else
           Error(4);
@@ -1169,7 +1172,10 @@ function block(fsys, isfun, level){
             tab[t0].ref = xtype.rf;
             tab[t0].lev = level;
             tab[t0].adr = dx;
-            tab[t0].normal = true;
+            if (xtype.tp != "pointers")
+              tab[t0].normal = true;
+            else
+              tab[t0].normal = false;
             dx += xtype.sz;
           }
           //TestSemicolon();
@@ -1561,7 +1567,17 @@ function block(fsys, isfun, level){
               try{
                 x.typ = "notyp";
                 x.ref = 0;
-                test(facbegsys, fsys, 58);
+                test(facbegsys.concat(["andsy", "times"]), fsys, 58);
+                var reference = false;  //Atribuição de endereço em ponteiro
+                var ireference = false; //Leitura de valor de ponteiro
+                if (sy == "andsy"){
+                  insymbol();
+                  reference = true;
+                }
+                if (sy == "times"){
+                  insymbol();
+                  ireference = true;
+                }
                 while (facbegsys.indexOf(sy) != -1){
                   if (sy == "ident"){
                     i = loc(id);
@@ -1578,37 +1594,57 @@ function block(fsys, isfun, level){
                       case "variable":
                         x.typ = tab[i].typ;
                         x.ref = tab[i].ref;
-                        if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+                        if (!reference){ //Não está atribuindo endereço
+                          if (x.typ == "pointers")
+                            x.typ = tab[i].xtyp;
+                          if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+                            if (tab[i].normal)
+                              f = 0;
+                            else
+                              f = 1;
+                            emit2(f, tab[i].lev, tab[i].adr);
+                            selector(fsys, x, false);
+                            if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings")
+                              emit(34);
+                            if (x.typ == "strings" && x.ref == 1){
+                              x.ref = 0;
+                              x.typ = "chars";
+                              emit(62);
+                            }
+                            else{
+                              if (x.typ == "strings" && x.ref == 0)
+                                emit(34);
+                            }
+                          }
+                          else {
+                            if (stantyps.indexOf(x.typ) != -1)
+                              if(tab[i].normal)
+                                f = 1;
+                              else
+                                f = 2;
+                            else
+                              if (tab[i].normal)
+                                f = 0;
+                              else
+                                f = 1;
+                            if (ireference && f > 0)
+                              f--;    //O programador quer acessar o valor do ponteiro e não da variável apontada
+                            emit2(f, tab[i].lev, tab[i].adr);
+                          }
+                        }
+                        else {
+                          x.typ = "pointers";
                           if (tab[i].normal)
                             f = 0;
                           else
                             f = 1;
                           emit2(f, tab[i].lev, tab[i].adr);
-                          selector(fsys, x, false);
-                          if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings")
-                            emit(34);
-                          if (x.typ == "strings" && x.ref == 1){
-                            x.ref = 0;
-                            x.typ = "chars";
-                            emit(62);
+                          if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+                            if (x.typ == "strings"){
+                              x.typ = "chars";
+                            }
+                            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
                           }
-                          else{
-                            if (x.typ == "strings" && x.ref == 0)
-                              emit(34);
-                          }
-                        }
-                        else {
-                          if (stantyps.indexOf(x.typ) != -1)
-                            if(tab[i].normal)
-                              f = 1;
-                            else
-                              f = 2;
-                          else
-                            if (tab[i].normal)
-                              f = 0;
-                            else
-                              f = 1;
-                          emit2(f, tab[i].lev, tab[i].adr);
                         }
                       break;
                       case "type1":
@@ -1878,10 +1914,7 @@ function block(fsys, isfun, level){
             if (x.typ == "strings"){
               x.typ = "chars";
             }
-            //if (atab[x.ref].eltyp == "strings")
-            //  emit2(f,lv,ad);
             selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
-            //lc--; //Retorno da instrução 34 em kode
           }
           if (sy == "becomes")
             insymbol();
@@ -1912,42 +1945,50 @@ function block(fsys, isfun, level){
                 insymbol();
             }
             else{
+              if (sy == 'plus' || sy == "minus" || sy == "times" || sy == "rdiv"){
+                if (stantyps.indexOf(x.typ) != -1)
+                  if(tab[i].normal)
+                    f = 1;
+                  else
+                    f = 2;
+                else
+                  if (tab[i].normal)
+                    f = 0;
+                  else
+                    f = 1;
+                emit2(f, tab[i].lev, tab[i].adr);
+              }
               switch (sy) {
                 case "plus":
                   op = "plus";
                   insymbol();
-                  if (sy == "eql"){
-                    emit2(1, tab[i].lev, tab[i].adr);
+                  if (sy == "eql")
                     insymbol();
-                  }
+                  else
+                    Error();
                 break;
                 case "minus":
                   op = "minus";
                   insymbol();
-                  if (sy == "eql"){
-                    emit2(1, tab[i].lev, tab[i].adr);
+                  debugger;
+                  if (sy == "eql")
                     insymbol();
-                  }
                   else
                     Error("assignment", "Operador de atribuição desconhecido");
                 break;
                 case "times":
                   op = "mult";
                   insymbol();
-                  if (sy == "eql"){
-                    emit2(1, tab[i].lev, tab[i].adr);
+                  if (sy == "eql")
                     insymbol();
-                  }
                   else
                     Error("assignment", "Operador de atribuição desconhecido");
                 break;
                 case "rdiv":
                   op = "div";
                   insymbol();
-                  if (sy == "eql"){
-                    emit2(1, tab[i].lev, tab[i].adr);
+                  if (sy == "eql")
                     insymbol();
-                  }
                   else
                     Error("assignment", "Operador de atribuição desconhecido");
                 break;
@@ -1970,7 +2011,17 @@ function block(fsys, isfun, level){
                 if (tab[i].typ == "strings"){
                   x.ref = 0;
                   if (y.typ == "chars"){
-                    emit2(1, tab[i].lev, tab[i].adr);
+                    if (stantyps.indexOf(x.typ) != -1)
+                      if(tab[i].normal)
+                        f = 1;
+                      else
+                        f = 2;
+                    else
+                      if (tab[i].normal)
+                        f = 0;
+                      else
+                        f = 1;
+                    emit2(f, tab[i].lev, tab[i].adr);
                     emit(63);
                   }
                 }
@@ -2029,7 +2080,9 @@ function block(fsys, isfun, level){
                 emit(38, assign);
               }
               else
-                if (x.typ != "notyp" && y.typ != "notyp")
+                if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
+                  emit(38);
+                else
                   Error(46);
             }
           }
@@ -2575,8 +2628,14 @@ function block(fsys, isfun, level){
       insymbol();
       else
       Error(14);*/
-      if (statbegsys.concat(["ident"]).indexOf(sy) != -1)
+      if (statbegsys.concat(["ident"]).indexOf(sy) != -1 && ch != "?")
         statement(["semicolon", "endsy"].concat(fsys));
+      else {
+        insymbol();
+        Error();
+        if (ch == "?")
+          break;
+      }
 
     }
     debugger;
@@ -2635,7 +2694,7 @@ try{
   ksy[21] = 'repeatsy'; ksy[22] = 'thensy';
   ksy[23] = 'tosy'; ksy[24] = 'typesy';
   ksy[25] = 'untilsy'; ksy[26] = 'varsy';
-  ksy[27] = 'whilesy'; ksy[28] = 'varsy';
+  ksy[27] = 'whilesy'; ksy[28] = 'refsy';
   ksy[29] = "stepsy";
   sps['+'] = 'plus'; sps['-'] = 'minus';
   sps['*'] = 'times'; sps['/'] = 'rdiv';
@@ -2719,6 +2778,7 @@ try{
   enter('logico', "type1", "bools", 1);
   enter('inteiro', "type1", "ints", 1);
   enter('literal', 'type1', 'strings', 1);
+  enter("ponteiro", "type1", "pointers", 1);
   enter('abs', "funktion", "reals", 0);
   enter('sqr', "funktion", "reals", 2);
   enter('odd', "funktion", "bools", 4);
@@ -2826,7 +2886,7 @@ function interpreter(){
 
       case 2:
       t++;
-      s[t] = s[display[ir.x]+ir.y];
+      s[t] = s[s[display[ir.x]+ir.y]];
       break;
 
       case 3:

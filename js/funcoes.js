@@ -92,6 +92,11 @@ function adicionarTabelaPilha(funcao) {
 function removerTopoPilha() {
   document.getElementById("tab_logic").deleteRow(1);
 }
+
+function removerTodaPilhaFuncoes(){
+   $("#tab_logic tr:gt(0)").remove();
+}
+
 //fim funcoes para pilha
 
 //funcoes para pilha de variaveis

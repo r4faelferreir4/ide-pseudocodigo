@@ -23,7 +23,12 @@ var xmax = 1000;	//131071 2**17 - 1
 var nmax = 32767;	//281474976710655 2**48-1
 var lineleng = 300;	//Tamanho da linha de saída
 var linelimit = 500;
-var stacksize = 1500;
+var stacksize = (1024*1024)*5;   //5 megabytes de espaço
+var TAM_REAL = 8;   //Tamanho em bytes do tipo real
+var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
+var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
+var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
+
 
 //TIPOS DEFINIDOS
 
@@ -2773,11 +2778,11 @@ try{
   enter('', "variable", "notyp", 0);
   enter('falso', "konstant", "bools", 0);
   enter('verdadeiro', "konstant", "bools", 1);
-  enter('real', "type1", "reals", 1);
-  enter('caracter', "type1", "chars", 1);
-  enter('logico', "type1", "bools", 1);
-  enter('inteiro', "type1", "ints", 1);
-  enter('literal', 'type1', 'strings', 1);
+  enter('real', "type1", "reals", TAM_REAL);
+  enter('caracter', "type1", "chars", TAM_CHAR);
+  enter('logico', "type1", "bools", TAM_BOOL);
+  enter('inteiro', "type1", "ints", TAM_INT);
+  enter('string', 'type1', 'strings', 1);
   enter("ponteiro", "type1", "pointers", 1);
   enter('abs', "funktion", "reals", 0);
   enter('sqr', "funktion", "reals", 2);
@@ -2807,6 +2812,7 @@ try{
   btab[1].lastpar = 1;
   btab[1].psize = 0;
   btab[1].vsize = 0;
+  debugger;
   block(blockbegsys.concat(statbegsys), false, 1);
   isDone = true;
   /*if (sy != "period")

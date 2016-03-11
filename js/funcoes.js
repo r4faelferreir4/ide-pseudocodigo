@@ -66,7 +66,7 @@ function lista(next, c){
 }
 
 function alocaString(str, head){
-  if (str != undefined && head != undefined){
+  if (str !== undefined && head !== undefined){
     head.c = str.charAt();   //Definindo o inicio da lista
     var i = 1;
     var length = str.length;
@@ -81,10 +81,10 @@ function alocaString(str, head){
 
 function lenString(head){
   var len = 1;
-  if (head.c == "" && head.next == undefined)
-    return 0;
+  if (head.c === "" && head.next === undefined)
+  return 0;
   else {
-    while(head.next != undefined){
+    while(head.next !== undefined){
       head = head.next;
       len++;
     }
@@ -97,7 +97,7 @@ function getString(head){
   debugger;
   if (typeof head == "object"){
     str += head.c;
-    while (head.next != undefined){
+    while (head.next !== undefined){
       head = head.next;
       str += head.c;
     }
@@ -113,11 +113,11 @@ function getChar(head, pos){
       len = lenString(head);
       pos = len + pos + 1;
     }
-    while(head != undefined){
+    while(head !== undefined){
       if (i == pos)
-        return head.c;
+      return head.c;
       else
-        head = head.next;
+      head = head.next;
       i++;
     }
   }
@@ -125,7 +125,7 @@ function getChar(head, pos){
 
 function alocaVetor(){
   var i = 0;
-  while(str_tab[i] != undefined){
+  while(str_tab[i] !== undefined){
     i++;
   }
   str_tab[i] = new lista();
@@ -139,13 +139,13 @@ function setChar(head, char, pos){
       len = lenString(head);
       pos = len + pos + 1;
     }
-    while(head != undefined){
+    while(head !== undefined){
       if (i == pos){
         head.c = char;
         return true;
       }
       else
-        head = head.next;
+      head = head.next;
       i++;
     }
     return false;
@@ -186,7 +186,7 @@ function removerTopoPilha() {
 }
 
 function removerTodaPilhaFuncoes(){
-   $("#tab_logic tr:gt(0)").remove();
+  $("#tab_logic tr:gt(0)").remove();
 }
 
 //fim funcoes para pilha
@@ -203,11 +203,11 @@ function objetoTabela(posNome,posValor){
 }
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
 function adicionarObjetoVar(posNome,posValor){
-  objeto = new objetoTabela(posNome,posValor);
-  if (s[objeto.posValor] !== undefined && tab[objeto.posNome] !== undefined) {
-
-  }  arrayObjetoTabela.push(objeto);
-  adicionarTabelaVar(objeto);
+  if (tab[posNome] !== undefined && s[posValor] !== undefined) {
+    objeto = new objetoTabela(posNome,posValor);
+    adicionarTabelaVar(objeto);
+    arrayObjetoTabela.push(objeto);
+  }
 }
 
 function adicionarTabelaVar(objeto) {
@@ -216,7 +216,7 @@ function adicionarTabelaVar(objeto) {
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
   cell1.innerHTML = tab[objeto.posNome];
-  cell2.innerHTML = "<input type='text' value='"+ s[objeto.posValor] +"' id='"+ objeto.idinput +"'>";
+  cell2.innerHTML = "<input type='text' value='"+ s[objeto.posValor] +"'name='"+objeto.idinput+"' id='"+ objeto.idinput +"'>";
   desativarTabelaVar();
 }
 function desativarTabelaVar(){
@@ -234,7 +234,22 @@ function removerTopoPilhaVar() {
 }
 
 function removerTodaPilhaVar(){
-   $("#tab_var tr:gt(1)").remove();
+  $("#tab_var tr:gt(1)").remove();
+  arrayObjetoTabela = [];
+}
+
+function salvar(){
+  for (var i = 0; i < arrayObjetoTabela.length; i++) {
+    var objeto = arrayObjetoTabela[i];
+    var input = document.getElementById(objeto.idinput);
+    if (input !== null && input !== undefined) {
+      objeto.novoValor = input.value;
+      if (s[objeto.posValor] !== objeto.novoValor) {
+        s[objeto.posValor] = objeto.novoValor;
+      }
+    }
+  }
+  desativarTabelaVar();
 }
 
 //fim funcoes para pilha de variaveis

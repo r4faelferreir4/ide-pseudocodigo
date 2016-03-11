@@ -60,6 +60,98 @@ function changeOutput(){
   interpret();
 }
 
+function lista(next, c){
+  this.next = next;
+  this.c = c;
+}
+
+function alocaString(str, head){
+  if (str != undefined && head != undefined){
+    head.c = str.charAt();   //Definindo o inicio da lista
+    var i = 1;
+    var length = str.length;
+    while(i < length){
+      head.next = new lista();
+      head = head.next;
+      head.c = str.charAt(i);
+      i++;
+    }
+  }
+}
+
+function lenString(head){
+  var len = 1;
+  if (head.c == "" && head.next == undefined)
+    return 0;
+  else {
+    while(head.next != undefined){
+      head = head.next;
+      len++;
+    }
+    return len;
+  }
+}
+
+function getString(head){
+  var str= "";
+  debugger;
+  if (typeof head == "object"){
+    str += head.c;
+    while (head.next != undefined){
+      head = head.next;
+      str += head.c;
+    }
+    return str;
+  }
+}
+
+function getChar(head, pos){
+  var str = "", i = 1, len;
+  debugger;
+  if (typeof head == "object"){
+    if (pos < 0){
+      len = lenString(head);
+      pos = len + pos + 1;
+    }
+    while(head != undefined){
+      if (i == pos)
+        return head.c;
+      else
+        head = head.next;
+      i++;
+    }
+  }
+}
+
+function alocaVetor(){
+  var i = 0;
+  while(str_tab[i] != undefined){
+    i++;
+  }
+  str_tab[i] = new lista();
+  return i;
+}
+
+function setChar(head, char, pos){
+  var i = 1, len;
+  if (typeof head == "object"){
+    if (pos < 0){
+      len = lenString(head);
+      pos = len + pos + 1;
+    }
+    while(head != undefined){
+      if (i == pos){
+        head.c = char;
+        return true;
+      }
+      else
+        head = head.next;
+      i++;
+    }
+    return false;
+  }
+}
+
 function mostrarModalOutput(){
   $('#modalOutput').modal('show');
 }

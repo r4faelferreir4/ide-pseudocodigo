@@ -1,8 +1,8 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//emit1(62)sleng
 //VARIÁVEIS CONSTANTES
+var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
@@ -15,7 +15,7 @@ var amax = 30;		//Tamanho da tabela de arranjos
 var c2max = 20;		//Tamanho  da tabela de numeros constantes
 var csmax = 30; 	//Numero máximo de casos
 var cmax = 850;		//Tamanho do código
-var lmax = 7;		//Nível máximo
+var lmax = 10;		//Nível máximo
 var smax = 600;		//Tamanho da tabela de strings
 var ermax = 59;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
@@ -28,7 +28,7 @@ var TAM_REAL = 8;   //Tamanho em bytes do tipo real
 var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
-
+var str_tab = [];
 
 //TIPOS DEFINIDOS
 
@@ -53,10 +53,11 @@ function item(typ, ref){
   this.typ = typ;
   this.ref = ref;
 }
-function order(f, x, y){
+function order(f, x, y, z){
   this.f = f;
   this.x = x;
   this.y = y;
+  this.z = z;
 }
 function conrec(tp, i, r){
   this.tp = tp;
@@ -162,15 +163,11 @@ function initArray(){
   j = 0;
   console.log("btab iniciada");
   do{
-    kode[j] = new order(0, 0, 0);
+    kode[j] = new order(0, 0, 0, 0);
     j++;
   }while( j < cmax);
   j = 0;
   console.log("kode iniciada");
-  do{
-    output_console[j] = "";
-    j++;
-  }while(j < 15);
 }
 
 function compiladorPascalS(){
@@ -628,13 +625,14 @@ function emit1(fct, b){
   }
 }//emit1
 
-function emit2(fct, a, b){
+function emit2(fct, a, b, c){
   try{
     if (lc == cmax)
       fatal(6);
     kode[lc].f = fct;
     kode[lc].x = a;
     kode[lc].y = b;
+    kode[lc].z = c;
     lc++;
   }
   catch(err){
@@ -791,9 +789,6 @@ function block(fsys, isfun, level){
 
     function constant(fsys, c){
       var x, sign;
-      //c = conrec;
-      //c.tp = "notyp"
-      //c.i = 0;debugger
       try{
         test(constbegsys, fsys, 50);
         if(constbegsys.indexOf(sy) != -1){
@@ -960,7 +955,6 @@ function block(fsys, isfun, level){
               level++;
               display[level] = b;
               offset = 0;
-              //debugger;
               while(sy != "endsy"){
                 if (sy == "ident"){
                   t0 = t;
@@ -1265,7 +1259,7 @@ function block(fsys, isfun, level){
                 if (v.typ != "arrays"){
                   if (v.typ == "strings" || v.typ == "chars"){
                     if (v.typ == "strings" && !assign)
-                      emit(34);
+                      emit1(34, TAM_INT);
                     expression(fsys.concat(["comma", "rbrack"]), x);
                     if(x.typ != "ints")
                       Error("assignment", "Valor incorreto na posição");
@@ -1338,7 +1332,7 @@ function block(fsys, isfun, level){
                   }
                   else
                     if (x.typ == "ints" && tab[cp].typ == "reals")
-                      emit1(26,0);
+                      emit1(26,TAM_INT);
                     else
                       if (x.typ != "notyp")
                         Error(36);
@@ -1357,7 +1351,7 @@ function block(fsys, isfun, level){
                       if (tab[k].normal)
                         emit2(0, tab[k].lev, tab[k].adr);
                       else
-                        emit2(1, tab[k].lev, tab[k].adr);
+                        emit2(1, tab[k].lev, tab[k].adr, tab[k].typ);
                       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                         selector(fsys.concat(["comma", "colon", "rparent"]), x, false);
                       if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
@@ -1404,12 +1398,12 @@ function block(fsys, isfun, level){
                 result =  "ints";
               else {
                 result = "reals";
-                emit1(26, 1);
+                emit1(26, TAM_REAL);
               }
             else {
               result =  "reals";
               if (b == "ints")
-                emit1(26, 0);
+                emit1(26, TAM_INT);
             }
             return result;
         }
@@ -1421,8 +1415,6 @@ function block(fsys, isfun, level){
       function expression(fsys, x){
         var y, op;
         y = new item("", 1);
-        //debugger;
-
 
         function simpleexpression(fsys, x){
           var y, op;
@@ -1472,7 +1464,7 @@ function block(fsys, isfun, level){
                       case 16:
                         ts = ["ints", "reals"];
                         if (x.typ == "ints")
-                          emit1(26,0);
+                          emit1(26,TAM_INT);
                       break;
                       case 17:
                         ts = ["strings"];
@@ -1607,10 +1599,18 @@ function block(fsys, isfun, level){
                               f = 0;
                             else
                               f = 1;
-                            emit2(f, tab[i].lev, tab[i].adr);
+                            emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
                             selector(fsys, x, false);
-                            if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings")
-                              emit(34);
+                            if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings"){
+                              var ltyp;
+                              switch (x.typ) {
+                                case "reals": ltyp = TAM_REAL;break;
+                                case "ints":ltyp = TAM_INT;break;
+                                case "bools":ltyp = TAM_BOOL;break;
+                                case "chars":ltyp = TAM_CHAR;break;
+                              }
+                              emit1(34, ltyp);
+                            }
                             if (x.typ == "strings" && x.ref == 1){
                               x.ref = 0;
                               x.typ = "chars";
@@ -1618,7 +1618,7 @@ function block(fsys, isfun, level){
                             }
                             else{
                               if (x.typ == "strings" && x.ref == 0)
-                                emit(34);
+                                emit1(34, TAM_INT);
                             }
                           }
                           else {
@@ -1634,7 +1634,7 @@ function block(fsys, isfun, level){
                                 f = 1;
                             if (ireference && f > 0)
                               f--;    //O programador quer acessar o valor do ponteiro e não da variável apontada
-                            emit2(f, tab[i].lev, tab[i].adr);
+                            emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
                           }
                         }
                         else {
@@ -1643,7 +1643,7 @@ function block(fsys, isfun, level){
                             f = 0;
                           else
                             f = 1;
-                          emit2(f, tab[i].lev, tab[i].adr);
+                          emit2(f, tab[i].lev, tab[i].adr. tab[i].typ);
                           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                             if (x.typ == "strings"){
                               x.typ = "chars";
@@ -1743,11 +1743,11 @@ function block(fsys, isfun, level){
                 else
                 if(op == "rdiv"){
                   if (x.typ == "ints"){
-                    emit1(26,1);
+                    emit1(26,TAM_REAL);
                     x.typ = "reals";
                   }
                   if(y.typ == "ints"){
-                    emit1(26,0);
+                    emit1(26,TAM_INT);
                     y.typ = "reals";
                   }
                   if (x.typ == "reals" && y.typ == "reals")
@@ -1877,12 +1877,12 @@ function block(fsys, isfun, level){
               }
               if (x.typ == "ints"){
                 x.typ = "reals";
-                emit1(26,1);
+                emit1(26,TAM_REAL);
               }
               else
               if(y.typ == "ints"){
                 y.typ = "reals";
-                emit1(26,0);
+                emit1(26,TAM_INT);
               }
               if (x.typ == "reals" && y.typ == "reals")
               switch (op) {
@@ -1914,7 +1914,7 @@ function block(fsys, isfun, level){
             f = 0;
           else
             f = 1;
-          emit2(f, lv, ad);
+          emit2(f, lv, ad, "ints");
           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
             if (x.typ == "strings"){
               x.typ = "chars";
@@ -1935,7 +1935,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                  emit2(f, tab[p].lev, tab[p].adr);
+                  emit2(f, tab[p].lev, tab[p].adr, tab[p].typ);
                   assign++;
                 }
                 else {
@@ -1961,7 +1961,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                emit2(f, tab[i].lev, tab[i].adr);
+                emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
               }
               switch (sy) {
                 case "plus":
@@ -1975,6 +1975,7 @@ function block(fsys, isfun, level){
                 case "minus":
                   op = "minus";
                   insymbol();
+                  if(debug)
                   debugger;
                   if (sy == "eql")
                     insymbol();
@@ -2006,6 +2007,7 @@ function block(fsys, isfun, level){
             }
           }
           expression(fsys, y);
+          if(debug)
           debugger;
           if (x.typ == y.typ)
             if (stantyps.indexOf(x.typ) != -1){
@@ -2026,7 +2028,7 @@ function block(fsys, isfun, level){
                         f = 0;
                       else
                         f = 1;
-                    emit2(f, tab[i].lev, tab[i].adr);
+                    emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
                     emit(63);
                   }
                 }
@@ -2038,9 +2040,19 @@ function block(fsys, isfun, level){
                   emit(57);
                 if (op == "div")
                   emit(58);
-                if (x.typ == "ints")
-                  emit1(8, 10);
-                emit1(38, assign);
+                var len = TAM_INT;
+                switch (x.typ) {
+                  case "reals":
+                    len = TAM_REAL;
+                  break;
+                  case "bools":
+                    len = TAM_BOOL;
+                  break;
+                  case "chars":
+                    len = TAM_CHAR;
+                  break;
+                }
+                emit2(38, len, assign);
               }
             }
             else
@@ -2058,35 +2070,35 @@ function block(fsys, isfun, level){
                   Error("assignment", "Tentando atribuir um valor não caracter a uma posição de string");
                 }
                 else {
-                  //x.ref = 0;
-
-                  if (y.typ == "chars"){
-                    if (tab[i].typ != "arrays")
-                      emit2(1, tab[i].lev, tab[i].adr);
-                    else {
-                      emit1(70, 3);   //Copia o valor abaixo do topo da pilha para o topo da pilha
-                      emit(34);
+                  if (tab[i].typ != "arrays")
+                    emit2(1, tab[i].lev, tab[i].adr, tab[i].typ);
+                  else {
+                    var ltyp;
+                    switch (y.typ) {
+                      case "reals":ltyp = TAM_REAL;break;
+                      case "ints":ltyp = TAM_INT;break;
+                      case "bools":ltyp = TAM_BOOL;break;
+                      case "chars":ltyp = TAM_CHAR;break;
                     }
-                    emit(63);
+                    emit1(34, ltyp);
                   }
-                  if (x.typ == "ints")
-                    emit1(8, 10);
-                  emit1(38, assign);
+                  emit(63);
+                  emit2(38, TAM_INT, assign);
                 }
               }
               else {
                 emit1(8, 5);
-                emit1(38, assign);
+                emit2(38, TAM_INT, assign);
               }
             }
             else{
               if (x.typ == "reals" && y.typ == "ints"){
-                emit1(26,0);
-                emit(38, assign);
+                emit1(26,TAM_INT);
+                emit2(38, TAM_REAL, assign);
               }
               else
                 if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
-                  emit(38);
+                  emit2(38, TAM_INT, assign);
                 else
                   Error(46);
             }
@@ -2452,7 +2464,7 @@ function block(fsys, isfun, level){
                     f = 0;
                     else
                     f = 1;
-                    emit2(f, tab[i].lev, tab[i].adr);
+                    emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                     selector(fsys.concat(["comma", "rparent"]), x, false);
                     if (["ints", "reals", "chars", "notyp", "strings"].indexOf(x.typ) != -1)
@@ -2643,6 +2655,7 @@ function block(fsys, isfun, level){
       }
 
     }
+    if(debug)
     debugger;
     if (ch != "?")
       insymbol();
@@ -2782,7 +2795,7 @@ try{
   enter('caracter', "type1", "chars", TAM_CHAR);
   enter('logico', "type1", "bools", TAM_BOOL);
   enter('inteiro', "type1", "ints", TAM_INT);
-  enter('string', 'type1', 'strings', 1);
+  enter('string', 'type1', 'strings', TAM_INT);
   enter("ponteiro", "type1", "pointers", 1);
   enter('abs', "funktion", "reals", 0);
   enter('sqr', "funktion", "reals", 2);
@@ -2812,6 +2825,7 @@ try{
   btab[1].lastpar = 1;
   btab[1].psize = 0;
   btab[1].vsize = 0;
+  if(debug)
   debugger;
   block(blockbegsys.concat(statbegsys), false, 1);
   isDone = true;
@@ -2855,24 +2869,14 @@ var b; //index base
 var h1, h2, h3, h4;
 var fld = new Array(4);//tamano padrão dos campos
 var display = new Array(lmax);
-var s = [];//new Array(stacksize);
+var stack = new ArrayBuffer(stacksize);
+var s = new DataView(stack);//new Array(stacksize);
 var call_read = false;
-var output_console = [];    //Variável que irá imprimir na tela do console
 var read_ok = false;
-/*function record(i, r, b, c, s, e) {
-  this.i = i;
-  this.r = r;
-  this.b = b;
-  this.c = c;
-  this.s = s;
-  this.e = e;
-}
-//inicializa array com objetos do tipo record
-for (var i = 0; i < s.length; i++){
-  s[i] = new record(1, 1, true, "c");
-}*/
+
 function interpreter(){
   do {
+    if(debug)
     debugger;
     ir = kode[pc];
     pc++;
@@ -2880,19 +2884,48 @@ function interpreter(){
     //debugger;
     switch(ir.f){
       case 0:
-      //debugger;
-      t++;
-      s[t] = display[ir.x] + ir.y;
+      s.setInt32(t, (display[ir.x]+ir.y));
+      t += TAM_INT;
       break;
 
       case 1:
-      t = t + 1;
-      s[t] = s[display[ir.x]+ir.y];
+      switch (ir.z) {
+        case "reals":
+        s.setFloat64(t, s.getFloat64(display[ir.x]+ir.y));
+        t += TAM_REAL;
+        break;
+        case "chars":
+        s.setUint8(t, s.getUint8(display[ir.x]+ir.y));
+        t += TAM_CHAR;
+        break;
+        case "bools":
+        s.setUint8(t, s.getUint8(display[ir.x]+ir.y));
+        t += TAM_BOOL;
+        break;
+        default:
+        s.setInt32(t, s.getInt32(display[ir.x]+ir.y));
+        t += TAM_INT;
+      }
       break;
 
       case 2:
-      t++;
-      s[t] = s[s[display[ir.x]+ir.y]];
+      switch (ir.z) {
+        case "reals":
+        s.setFloat64(t, s.getFloat64(s.getInt32(display[ir.x]+ir.y)));
+        t += TAM_REAL;
+        break;
+        case "chars":
+        s.setUint8(t, s.getUint8(s.getInt32(display[ir.x]+ir.y)));
+        t += TAM_CHAR;
+        break;
+        case "bools":
+        s.setUint8(t, s.getUint8(s.getInt32(display[ir.x]+ir.y)));
+        t += TAM_BOOL;
+        break;
+        default:
+        s.setInt32(t, s.getInt32(s.getInt32(display[ir.x]+ir.y)));
+        t += TAM_INT;
+      }
       break;
 
       case 3:
@@ -2902,52 +2935,83 @@ function interpreter(){
       do{
         display[h1] = h3;
         h1--;
-        h3 = s[h3 + 2];
+        h3 = s.getInt32(h3 + 2);
       }
       while( h1 == h2);
       break;
 
       case 8:
       switch (ir.y) {
-        case 0: s[t] = Math.floor(Math.abs(s[t])); break;
-        case 1: s[t] = Math.abs(s[t]); break;
-        case 2: s[t] = Math.floor(Math.pow(s[t], 2)); break;
-        case 3: s[t] = Math.pow(s[t], 2); break;
-        case 4: s[t] = (s[t]%2) != 0; break;
-        case 5: s[t] = String.fromCharCode(s[t]); break;
-        case 6: s[t] = s[t].charCodeAt();  break;
+        case 0:
+          s.setInt32(t-TAM_INT, Math.abs(s.getInt32(t-TAM_INT)));
+        break;
+        case 1:
+          s.setFloat64(t-TAM_REAL, Math.abs(s.getFloat64(t-TAM_REAL)));
+        break;
+        case 2:
+          s.setInt32(t-TAM_INT, Math.pow(s.getInt32(t-TAM_INT), 2));
+        break;
+        case 3:
+          s.setFloat64(t-TAM_REAL, Math.pow(s.getFloat64(t-TAM_REAL), 2));
+        break;
+        case 4:
+          s.setInt8(t-TAM_INT, (s.getInt32(t-TAM_INT)%2 != 0));
+          t -= 3;//Alocação de um valor inteiro de 4 bytes em um de 1 byte, libera 3 bytes
+        break;
+        case 5:
+          s.setUint8(t-TAM_INT, s.getInt32(t-TAM_INT));
+          t -= 3; //Alocação de um valor inteiro de 4 bytes em um de 1 byte, libera 3 bytes
+        break;
+        case 6:
+          s.setInt32(t-TAM_CHAR, s.getInt8(t-TAM_CHAR));
+          t += 3;   //Converção de caratere para inteiro, alocação de mais 3 bytes
+        break;
         case 7:
-        var c = s[t].charCodeAt();
-        c++;
-        s[t] = String.fromCharCode(c);
+          s.setUint8(t-TAM_CHAR, (s.getInt8(t-TAM_CHAR)+1));
         break;
         case 8:
-        c = s[t].charCodeAt();
-        c--;
-        s[t] = String.fromCharCode(c);
+          s.setUint8(t-TAM_CHAR, (s.getInt8(t-TAM_CHAR)-1));
         break;
-        case 9: s[t] = Math.round(s[t]); break;
-        case 10: s[t] = Math.floor(s[t]); break;
-        case 11: s[t] = Math.sin(s[t]); break;
-        case 12: s[t] = Math.cos(s[t]); break;
-        case 13: s[t] = Math.exp(s[t]); break;
-        case 14: s[t] = Math.log(s[t]); break;
-        case 15: s[t] = Math.sqrt(s[t]); break;
-        case 16: s[t] = Math.atan(s[t]); break;
+        case 9:
+          s.setInt32(t-TAM_REAL, Math.round(s.getFloat64(t-TAM_REAL)));
+          t -= 4;   //Converte real para inteiro e libera 4 bytes
+        break;
+        case 10:
+          s.setInt32(t-TAM_REAL, Math.floor(s.getFloat64(t-TAM_REAL)));
+          t -= 4; //Converte real para inteiro e libera 4 bytes
+        break;
+        case 11:
+          s.setFloat64(t-TAM_REAL, Math.sin(s.getFloat64(t - TAM_REAL)));
+        break;
+        case 12:
+          s.setFloat64(t-TAM_REAL, Math.cos(s.getFloat64(t-TAM_REAL)));
+        break;
+        case 13:
+          s.setFloat64(t-TAM_REAL, Math.exp(s.getFloat64(t-TAM_REAL)));
+        break;
+        case 14:
+          s.setFloat64(t-TAM_REAL, Math.log(s.getFloat64(t-TAM_REAL)));
+        break;
+        case 15:
+          s.setFloat64(t-TAM_REAL, Math.sqrt(s.getFloat64(t-TAM_REAL)));
+        break;
+        case 16:
+          s.setFloat64(t-TAM_REAL, Math.atan(s.getFloat64(t-TAM_REAL)));
+        break;
       }//switch case 8
       break;
-      case 9: s[t] = s[t] + ir.y; break;
-      case 10: pc = ir.y; break;//jump
-      case 11:
-      //debugger;
-      if (!s[t])
-        pc = ir.y;
-      t--;
+      case 9:
+        s.setInt32(t-TAM_INT, s.getInt32(t-TAM_REAL) + ir.y); //offset
       break;
-      case 12:
-      //debugger;
-      h1 = s[t];
-      t--;
+      case 10: pc = ir.y; break;//jump
+      case 11:    //conditional jump (if)
+      if (!s.getInt8(t-TAM_BOOL))
+        pc = ir.y;
+      t -= TAM_BOOL;
+      break;
+      case 12:    //switch
+      h1 = s.getInt32(t-TAM_INT);
+      t -= TAM_INT;   //Libera 4 bytes
       h2 = ir.y;
       h3 = 0;
       do {
@@ -2971,48 +3035,48 @@ function interpreter(){
       }while (h3 === 0);
       break;
       case 14:
-      h1 = s[t - 2];
-      if(h1 <= s[t-1]){
-        s[s[t - 3]] = h1;
+      h1 = s.getInt32(t - TAM_INT*3);
+      if(h1 <= s.getInt32(t-TAM_INT*2)){
+        s.setInt32(s.getInt32(t - TAM_INT*4), h1);
       }
       else{
-        t = t - 4;
+        t -= TAM_INT*4;
         pc = ir.y;
       }
       break;
 
       case 15:
-      h2 = s[t - 3];
-      h1 = s[h2] + s[t];
-      if (h1 <= s[t-1]){
-        s[h2] = h1;
+      h2 = s.getInt32(t - TAM_INT * 4);
+      h1 = s.getInt32(h2) + s.getInt32(t-TAM_INT);
+      if (h1 <= s.getInt32(t-TAM_INT * 2)){
+        s.setInt32(h2, h1);
         pc = ir.y;
       }
       else{
-        t = t - 3;
+        t -= TAM_INT * 3;
       }
       break;
 
       case 16:
-      h1 = s[t - 2];
-      if (h1 >= s[t-1]){
-        s[s[t - 3]] = h1;
+      h1 = s.getInt32(t- TAM_INT * 3);
+      if (h1 >= s.getInt32(t - TAM_INT * 2)){
+        s.setInt32(s.getInt32(t - TAM_INT * 4), h1);
       }
       else{
         pc = ir.y;
-        t = t - 4;
+        t -= TAM_INT * 4;
       }
       break;
 
       case 17:
-      h2 = s[t - 3];
-      h1 = s[h2] + s[t];
-      if (h1 >= s[t-1]){
-        s[h2] = h1;
+      h2 = s.getInt32(t - TAM_INT * 4);
+      h1 = s.getInt32(h2) + s.getInt32(t - TAM_INT);
+      if (h1 >= s.getInt32(t - TAM_INT * 2)){
+        s.setInt32(h2, h1);
         pc = ir.y;
       }
       else{
-        t = t - 3;
+        t -= TAM_INT * 3;
       }
       break;
 
@@ -3023,26 +3087,24 @@ function interpreter(){
         return;
       }
       else{
-        t = t + 5;
-        s[t - 1] = h1 - 1;
-        s[t] = ir.y;
+        t = t + TAM_INT * 5;
+        s.setInt32(t- TAM_INT * 2, h1-1);
+        s.setInt32(t - TAM_INT, ir.y);
       }
       break;
 
       case 19:
       h1 = t - ir.y; //{h1 points to base}
-      h2 = s[h1 + 4]; //{h2 points to tab}
+      h2 = s.getInt32(h1 + 4*TAM_INT); //{h2 points to tab}
       h3 = tab[h2].lev;
       display[h3 + 1] = h1;
-      h4 = s[h1 + 3] + h1;
-      s[h1 + 1] = pc;
-      s[h1 + 2] = display[h3];
-      s[h1 + 3] = b;
+      h4 = s.getInt32(h1 + 3*TAM_INT) + h1;
+      s.setInt32(h1 + 1*TAM_INT, pc);
+      s.setInt32(h1 + 2*TAM_INT, display[h3]);
+      s.setInt32(h1 + 3*TAM_INT, b);
 
-      for (h3 = t+1;  h3 < h4;  h3++) {
-        s[h3] = 0;
-      }
-
+      for (h3 = t+TAM_INT;  h3 < h4;  h3+=TAM_INT)
+        s.setInt32(h3, 0);
       b = h1;
       t = h4;
       pc = tab[h2].adr;
@@ -3052,7 +3114,7 @@ function interpreter(){
       case 20:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s[t];
+      h3 = s.getInt32(t-TAM_INT);
       if (h3 < h2){
         ps = 'inxchk';
         return;
@@ -3063,8 +3125,8 @@ function interpreter(){
           return;
         }
         else{
-          t--;
-          s[t] = s[t] + (h3 - h2);
+          t -= TAM_INT;
+          s.setInt32(t-TAM_INT, s.getInt32(t-TAM_INT)+(h3-h2));
         }
       }
       break;
@@ -3072,7 +3134,7 @@ function interpreter(){
       case 21:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s[t];
+      h3 = s.getInt32(t-TAM_INT);
       if (h3 < h2) {
         ps = 'inxchk';
         return;
@@ -3083,14 +3145,14 @@ function interpreter(){
           return;
         }
         else{
-          t = t - 1;
-          s[t] = s[t] + (h3 - h2) * atab[h1].elsize;
+          t -= TAM_INT;
+          s.setInt32(t-TAM_INT, s.getInt32(t-TAM_INT) + (h3 - h2) * atab[h1].elsize);
         }
       }
       break;
       case 22:
-      h1 = s[t];
-      t--;
+      h1 = s.getInt32(t-TAM_INT);
+      t -= TAM_INT;
       h2 = ir.y + t;
       if(h2 > stacksize){
         ps = 'stkchk';
@@ -3098,51 +3160,59 @@ function interpreter(){
       }
       else
       while (t < h2) {
-        t++;
+        t += TAM_INT;
         //var s1 = new record(s[h1].i, s[h1].r, s[h1].b, s[h1].c);
-        s[t] = s[h1];
-        h1++;
+        s.setInt32(t-TAM_INT, s.getInt32(h1));
+        h1 += TAM_INT;
       }
       break;
 
       case 23:
-      h1 = s[t - 1];
-      h2 = s[t];
+      h1 = s.getInt32(t - 2*TAM_INT);
+      h2 = s.getInt32(t-TAM_INT);
       h3 = h1 + ir.y;
       while (h1 < h3){
         //var s1 = new record(s[h2].i, s[h2].r, s[h2].b, s[h2].c);
-        s[h1] = s[h2];
-        h1++;
-        h2++;
+        s.setInt32(h1, s.getInt32(h2));
+        h1 += TAM_INT;
+        h2 += TAM_INT;
       }
-      t = t - 2;
+      t -= 2 * TAM_INT;
       break;
 
       case 24:
-      t++;
       if (t > stacksize){
         ps = 'stkchk';
         return;
       }
       else{
-        s[t] = ir.y;
+        s.setInt32(t, ir.y);
+        t += TAM_INT;
       }
       break;
 
       case 25:
-      t++;
       if (t > stacksize){
         ps = 'stkchk';
         return;
       }
       else{
-        s[t] = rconst[ir.y];
+        s.setFloat64(t, rconst[ir.y]);
+        t += TAM_REAL;
       }
       break;
 
       case 26:
-      h1 = t - ir.y;
-      //s[h1] = s[h1];
+      if (ir.y == TAM_INT){
+        h1 = t-TAM_INT - ir.y;
+        s.setFloat64(h1, s.getInt32(h1));
+        t += TAM_INT;   //Conversão inteiro para real, aloca mais 4 bytes
+      }
+      else if(ir.y == TAM_REAL){
+        s.setFloat64(t-TAM_INT, s.getFloat64(t-TAM_REAL));    //Movimenta o valor real 4 bytes à frente
+        s.setFloat64(t-TAM_REAL-TAM_INT, s.getInt32(t-TAM_REAL-TAM_INT)); //Converte o penúltimo dado de inteiro para real
+        t += TAM_INT; //Avança 4 bytes a frente por causa da conversão inteiro/real
+      }
       break;
 
       case 27:    //INSTRUÇÃO DE LEITURA
@@ -3153,7 +3223,7 @@ function interpreter(){
         switch (ir.y) {
           case 1:
           if (read_ok) {
-            s[s[t]] = Math.floor(Number(InputFile));
+            s.setInt32(s.getInt32(t-TAM_INT), Number(InputFile));
             read_ok = false;
           }
           else{
@@ -3163,7 +3233,7 @@ function interpreter(){
           break;
           case 2:
           if (read_ok) {
-            s[s[t]] = Number(InputFile);
+            s.setFloat64(s.getInt32(t - TAM_INT), Number(InputFile));
             read_ok = false;
           }
           else{
@@ -3173,7 +3243,7 @@ function interpreter(){
           break;
           case 4:
           if (read_ok) {
-            s[s[t]] = InputFile;
+            s.setUint8(s.getInt32(t - TAM_INT), InputFile.charCodeAt());
             read_ok = false;
           }
           else{
@@ -3183,8 +3253,21 @@ function interpreter(){
           break;
           case 7:
             if (read_ok) {
-              s[s[t]] = InputFile;
-              read_ok = false;
+              if (s.getInt32(s.getInt32(t-TAM_INT)) == 0){
+                var ref = alocaVetor();
+                s.setInt32(s.getInt32(t-TAM_INT), ref);
+                alocaString(InputFile, str_tab[ref]);
+                read_ok = false;
+              }
+              else {
+                if (typeof str_tab[s.getInt32(t - TAM_INT)] == "object"){
+                  alocaString(InputFile, str_tab[s.getInt32(s.getInt32(t - TAM_INT))]);
+                }
+                else{
+                  str_tab[s.getInt32(s.getInt32(t - TAM_INT))] = new lista();
+                  alocaString();
+                }
+              }
             }
             else{
               call_read = true;
@@ -3193,13 +3276,13 @@ function interpreter(){
           break;
         }
       //}
-      t--;
+      t -= TAM_INT;
       break;
 
       case 28:
-      h1 = s[t];
+      h1 = s.getInt32(t-TAM_INT);
       h2 = ir.y;
-      t--;
+      t -= TAM_INT;
       chrcnt = chrcnt + h1;
       var string = "";
       do {
@@ -3222,90 +3305,93 @@ function interpreter(){
         h1--;
         h2++;
       } while (h1 > 0);
-      window.setTimeout(atualizarConsole(string), 1000);
+      atualizarConsole(string);
       //call_read = true;
       //return;
       break;
 
       case 29:
       chrcnt = chrcnt + fld[ir.y];
-      /*switch (ir.y) {
+      switch (ir.y) {
         case 1:
         var str = "";
-        str += s[t].i;
-        window.setTimeout(atualizarConsole(str), 1000);
-        //call_read = true;
-        //return;
+          str += s.getInt32(t - TAM_INT);
+          atualizarConsole(str);
+          t -= TAM_INT;
         break;
         case 2:
-        var str = "                    ";
-        str += s[t].r;
-        atualizarConsole(str);
-        //call_read = true;
-        //return;
+        var str = "";
+          str += s.getFloat64(t - TAM_REAL);
+          atualizarConsole(str);
+          t -= TAM_REAL;
         break;
         case 3:
-        var str = "           ";
-        str += s[t].b;
-        atualizarConsole(str);
-        //call_read = true;
-        //return;
+          var str = "";
+          str += s.getInt8(t - TAM_BOOL);
+          atualizarConsole(str);
+          t -= TAM_BOOL;
         break;
         case 4:
-        atualizarConsole(String.fromCharCode(s[t].i));
-        //call_read = true;
-        //return;
+          atualizarConsole(String.fromCharCode(s.getUint8(t - TAM_CHAR)));
+          t -= TAM_CHAR;
         break;
-      }*/
+        case 7:
+          atualizarConsole(getString(str_tab[s.getInt32(t - TAM_INT)]));
+          t -= TAM_INT;
+        break;
+      }
       //debugger;
-      if (ir.y == 4)
+      /*if (ir.y == 4)
         s[t] = String.fromCharCode(s[t]);
       var str = "";
       str += s[t];
       window.setTimeout(atualizarConsole(str), 1000);
-      t = t - 1;
+      t = t - 1;*/
       break;
 
       case 30:
       chrcnt = chrcnt + s[t];
-      /*switch (ir.y) {
+      switch (ir.y) {
         case 1:
-          var str = "";
-          for (var p = 0; p < s[t].i; p++)
-          str += " ";
-          str += s[t-1].i;
-          window.setTimeout(atualizarConsole(str), 1000);
-          //call_read = true;
-          //return;
+          var str = "", len = s.getInt32(t - TAM_INT);
+          t -= TAM_INT;
+          for (var p = 0; p < len; p++)
+            str += " ";
+          str += s.getInt32(t-TAM_INT);
+          atualizarConsole(str);
+          t -= TAM_INT;
         break;
         case 2:
-          var str = "";
-          for (var p = 0; p < s[t].i; p++)
+          var str = "", len = s.getInt32(t - TAM_INT);
+          t -= TAM_INT;
+          for (var p = 0; p < len; p++)
           str += " ";
-          str += s[t-1].r;
+          str += s.getFloat64(t-TAM_REAL);
           atualizarConsole(str);
-          //call_read = true;
-          //return;
+          t -= TAM_REAL;
         break;
         case 3:
-          var str = "";
-          for (var p = 0; p < s[t].i; p++)
+          var str = "", len = s.getInt32(t - TAM_INT);
+          t -= TAM_INT;
+          for (var p = 0; p < len; p++)
           str += " ";
-          str += s[t-1].b;
+          str += s.getInt8(t - TAM_BOOL);
           atualizarConsole(str);
-          //call_read = true;
-          //return;
+          t -= TAM_BOOL;
         break;
         case 4:
-          var str = "";
-          for (var p = 0; p < s[t].i; p++)
+          var str = "", len = s.getInt32(t-TAM_INT);
+          t -= TAM_INT;
+          for (var p = 0; p < len; p++)
           str += " ";
-          str += s[t-1].c;
+          str += String.fromCharCode(s.getUint8(t - TAM_CHAR));
           atualizarConsole(str);
-          //call_read = true;
-          //return;
+          t -= TAM_CHAR;
         break;
-      }*/
+        case 7:
+
+        break;
+      }
       var str = "";
       for (var p = 0; p < s[t]; p++)
         str += " ";
@@ -3319,186 +3405,236 @@ function interpreter(){
       return;
       break;
 
-      case 32:
-      t = b - 1;
-      pc = s[b + 1];
-      b = s[b + 3];
-      removerTopoPilha();
-      break;
-
+      case 32:    //Saída de função/procedimento
       case 33:
-      t = b;
-      pc = s[b + 1];
-      b = s[b + 3];
+      if (ir.f == 32)   //Procedimento
+        t = b - TAM_INT;
+      else
+        t = b;        //Função
+      pc = s.getInt32(b + TAM_INT);
+      b = s.getInt32(b + 3*TAM_INT);
       removerTopoPilha();
       break;
 
-      case 34: s[t] = s[s[t]]; break;
-      case 35: s[t] = !s[t]; break;
-      case 36: s[t] = -s[t]; break;
+      case 34:
+      switch (ir.y) {
+        case TAM_INT:
+          s.setInt32(t-TAM_INT, s.getInt32(s.getInt32(t-TAM_INT)));
+        break;
+        case TAM_REAL:
+          s.setFloat64(t-TAM_INT, s.getFloat64(s.getInt32(t-TAM_INT)));
+          t += TAM_INT;     //Espaço a mais na conversão inteiro => real
+        break;
+        case TAM_BOOL:
+        case TAM_CHAR:
+          s.setUint8(t-TAM_INT, s.getUint8(s.getInt32(t-TAM_INT)));
+          t -= 3;     //Libera espaço da conversão inteiro => caractere
+        break;
+      }
+      break;
 
+      case 35: //não
+        s.setUint8(t-TAM_BOOL,!s.getUint8(t-TAM_BOOL));
+      break;
+      case 36: //menos
+        s.setInt32(t - TAM_INT, -s.getInt32(t-TAM_INT));
+      break;
       case 37:
-      chrcnt = chrcnt + s[t - 1];
-      var str = "";
-      for(var p = 0; p < s[t-1]; p++)
+      var str = "", len = s.getInt32(t - 2*TAM_INT);
+      for(var p = 0; p < len; p++)
         str += " ";
-      str += s[t-2];
+      str += s.getFloat64(t - TAM_REAL - 2 * TAM_INT);
       //str += s[t-1];
-      str += "."+s[t];
+      str += "."+s.getInt32(t-TAM_INT);
       atualizarConsole(str);
         //call_read = true;
         //return;
-      t = t - 3;
+      t -= TAM_INT + TAM_INT + TAM_REAL;
       break;
 
       case 38:
-      //s1 = new record(s[t].i, s[t].r, s[t].b, s[t].c);
+      /*Armazenar na pilha.
+      y = Número de variáveis a ser armazenado o valor.
+      x = Tipo da variável(tamanho)
+      */
       if (ir.y == 1){
-        s[s[t - 1]] = s[t];
-        t = t - 2;
+        switch (ir.x) {
+          case TAM_INT:
+          s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+          t -= 2*TAM_INT;
+          break;
+          case TAM_REAL:
+          s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+          t -= TAM_REAL+TAM_INT;
+          break;
+          case TAM_BOOL:    //BOOL ou CHAR
+          s.setUint8(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+          t -= TAM_INT+TAM_BOOL;
+          break;
+          default:
+          s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+          t -= 2*TAM_INT;
+        }
       }
       else {
+        var tx = t;
         for(var i = 1; i <= ir.y; i++){
-          s[s[t-1]] = s[t];
-          s[t-1] = s[t];
-          t--;
+          switch (ir.x) {
+            case TAM_INT:
+            s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+            s.setInt32(t - 2*TAM_INT, s.getInt32(t-TAM_INT));   //Movimenta o dado 4 bytes para baixo
+            t -= TAM_INT;
+            break;
+            case TAM_REAL:
+            s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+            s.setFloat64(t-TAM_INT-TAM_REAL, s.getFloat64(t-TAM_REAL));   //Movimenta o dado 4 bytes para baixo.
+            t -= TAM_INT;
+            break;
+            case TAM_BOOL:    //BOOL ou CHAR
+            s.setUint8(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+            s.setUint8(t-TAM_INT-TAM_BOOL, s.getUint8(t-TAM_BOOL));
+            t -= TAM_INT;
+            break;
+            default:
+            s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+            s.setInt32(t-2*TAM_INT, s.getInt32(t-TAM_INT));
+            t -= TAM_INT;
+          }
         }
-        t--;
+        t -= ir.x;
       }
       break;
 
-      case 39:
-      t--;
-      s[t] = s[t] == s[t + 1];
+      case 39:  //real igual
+      s.setUint8(t - TAM_BOOL - TAM_BOOL,(s.getUint8(t - TAM_BOOL) == s.getUint8(t - 2*TAM_BOOL)));
+      t -= TAM_BOOL;
       break;
 
-      case 40:
-      t--;
-      s[t] = s[t] != s[t + 1];
+      case 40://real dirente
+      s.setUint8(t - TAM_BOOL - TAM_BOOL,(s.getUint8(t - TAM_BOOL) != s.getUint8(t - 2*TAM_BOOL)));
+      t -= TAM_BOOL;
       break;
 
-      case 41:
-      t--;
-      s[t] = s[t] < s[t + 1];
+      case 41://real menor
+      s.setUint8(t - TAM_REAL - TAM_REAL, (s.getFloat64(t-2*TAM_REAL) < s.getFloat64(t - TAM_REAL)));
+      t -= 15; //Libera 15 bytes nessa operação
       break;
 
-      case 42:
-      t--;
-      s[t] = s[t] <= s[t + 1];
+      case 42:// real menor ou igual
+      s.setUint8(t - TAM_REAL - TAM_REAL, (s.getFloat64(t-2*TAM_REAL) <= s.getFloat64(t - TAM_REAL)));
+      t -= 15; //Libera 15 bytes nessa operação
       break;
 
-      case 43:
-      t--;
-      s[t] = s[t] > s[t + 1];
+      case 43://real maior
+      s.setUint8(t - TAM_REAL - TAM_REAL, (s.getFloat64(t-2*TAM_REAL) > s.getFloat64(t -TAM_REAL)));
+      t -= 15; //Libera 15 bytes nessa operação
       break;
 
-      case 44:
-      t--;
-      s[t] = s[t] >= s[t + 1];
+      case 44:// real maior ou igual
+      s.setUint8(t - TAM_REAL - TAM_REAL, (s.getFloat64(t-2*TAM_REAL) >= s.getFloat64(t -TAM_REAL)));
+      t -= 15; //Libera 15 bytes nessa operação
       break;
 
-      case 45:
-      //debugger;
-      t--;
-      s[t] = s[t] == s[t + 1];
+      case 45:  //inteiro igual
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) == s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 46:
-      t--;
-      s[t] = s[t] != s[t + 1];
+      case 46://inteiro diferente
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) != s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 47:
-      t--;
-      s[t] = s[t] < s[t + 1];
+      case 47://inteiro menor
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) < s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 48:
-      t--;
-      s[t] = s[t] <= s[t + 1];
+      case 48://inteiro menor ou igual
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) <= s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 49:
-      t--;
-      s[t] = s[t] > s[t + 1];
+      case 49://inteiro maior
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) > s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 50:
-      t--;
-      s[t] = s[t] >= s[t + 1];
+      case 50://inteiro maior ou igual
+      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) >= s.getInt32(t-TAM_INT)));
+      t -= 7;   //Libera 7 bytes
       break;
 
-      case 51:
-      t--;
-      s[t] = s[t] || s[t + 1];
+      case 51://ou lógico
+      s.setUint8(t-2*TAM_BOOL, (s.getUint8(t-2*TAM_BOOL) || s.getUint8(t-TAM_BOOL)));
+      t -= TAM_BOOL;
       break;
 
-      case 52:
-      t--;
-      s[t] = s[t] + s[t + 1];
+      case 52://Soma de inteiros
+      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) + s.getInt32(t-TAM_INT)));
+      t -= TAM_INT;
       break;
 
-      case 53:
-      t--;
-      s[t] = s[t] - s[t + 1];
+      case 53://Subtração de inteiros
+      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) - s.getInt32(t-TAM_INT)));
+      t -= TAM_INT;
       break;
 
-      case 54:
-      t--;
-      s[t] = s[t] + s[t + 1];
+      case 54://Soma de numeros reais
+      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) + s.getFloat64(t-TAM_REAL)));
+      t -= TAM_REAL;
       break;
 
-      case 55:
-      t--;
-      s[t] = s[t] - s[t + 1];
+      case 55://Subtração de numeros reais
+      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) - s.getFloat64(t-TAM_REAL)));
+      t -= TAM_REAL;
       break;
 
-      case 56:
-      t = t - 1;
-      s[t] = s[t] && s[t + 1];
+      case 56://e lógico
+      s.setUint8(t-2*TAM_BOOL, (s.getUint8(t-2*TAM_BOOL) && s.getUint8(t-TAM_BOOL)));
+      t -= TAM_BOOL;
       break;
 
-      case 57:
-      t--;
-      s[t] = s[t] * s[t + 1];
+      case 57://Multiplicação de inteiros
+      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) * s.getInt32(t-TAM_INT)));
+      t -= TAM_INT;
       break;
 
-      case 58:
-      t--;
-      if (s[t + 1] === 0){
+      case 58://Divisão de inteiros
+      if (s.getInt32(t-TAM_INT) == 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
         return;
       }
       else{
-        s[t] = s[t] / s[t + 1];
+        s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) / s.getInt32(t-TAM_INT)));
+        t -= TAM_INT;
       }
       break;
 
-      case 59:
-      t--;
-      if(s[t + 1] === 0){
+      case 59://módulo de inteiros
+      if(s.getInt32(t-TAM_INT) == 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
         return;
       }
       else{
-        s[t] = s[t] % s[t + 1];
+        s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) % s.getInt32(t-TAM_INT)));
+        t -= TAM_INT;
       }
       break;
 
-      case 60:
-      t--;
-      s[t] = s[t] * s[t + 1];
+      case 60://Multiplicação de reais
+      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) * s.getFloat64(t-TAM_REAL)));
+      t -= TAM_REAL;
       break;
 
-      case 61:
-      t--;
-      s[t] = s[t] / s[t + 1];
+      case 61://Divisão de reais
+      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) / s.getFloat64(t-TAM_REAL)));
+      t -= TAM_REAL;
       break;
 
       case 62:
-        //debugger;
         if (s[t] !== 0){
           if (s[t] <= s[t-1].length && s[t] >= (-s[t-1].length)){
             if (s[t] > 0)
@@ -3608,16 +3744,16 @@ function interpret(){
   }
   else{
     read_ok = false;
-    s = [];
-    s[1] = 0;
-    s[2] = 0;
-    s[3] = -1;
-    s[4] = btab[1].last;
+
+    s.setInt32(0,0);
+    s.setInt32(4, 0);
+    s.setInt32(8, -1);
+    s.setInt32(12, btab[1].last);
     b = 0;
     display[1] = 0;
     //debugger;
-    t = btab[2].vsize - 1;
-    pc = tab[s[4]].adr;
+    t = btab[2].vsize;
+    pc = tab[s.getInt32(12)].adr;
     ps = 'run';
     lncnt = 0;
     ocnt = 0;

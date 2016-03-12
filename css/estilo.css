@@ -53,3 +53,31 @@
 #modalFooter{
   margin-top: 0px !important; /*retirando css do boostrap */
 }
+
+.line-error {
+  background: #FBC2C4 !important;
+  color: #8a1f11 !important;
+}
+
+.line-normal {
+  background: white !important;
+  color: black;
+}
+
+
+
+.breakpoints {width: 15px;}
+.breakpoint { color: #822; }
+.CodeMirror {border: 1px solid #aaa;}
+
+.tooltip-inner {
+  max-width: none !important;
+  white-space: nowrap !important;
+  text-align: center;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  margin-bottom: 6px;
+  background-color: black;
+  font-size: 14px;
+}

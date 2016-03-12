@@ -1,4 +1,40 @@
 
+//funcao para adicionar linha de erro no editor
+function mostraErroNaLinha(linha, titulo){
+  editor.addLineClass(linha, 'background', 'line-error');
+  var info = editor.lineInfo(1);
+  editor.setGutterMarker(linha, "breakpoints", makeMarker(titulo));
+}
+
+//funcao que criar o marcador
+function makeMarker(titulo) {
+  var marker = document.createElement("div");
+  marker.style.color = "#822";
+  marker.innerHTML = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>";
+  if (titulo !== "") {
+      marker.title = titulo;
+  }else{
+      marker.title = "";
+  }
+  marker.setAttribute("data-toggle", "tooltip");
+  marker.setAttribute("data-placement", "right");
+  return marker;
+}
+//funcao para remover erros do editor
+function limparCodeBox(){
+  for(i = 0; i <= editor.lineCount(); i++){
+      editor.removeLineClass(i,'background', 'line-error');
+  }
+  editor.clearHistory();
+  editor.clearGutter("breakpoints");
+}
+
+//seta tooltip
+$(document).ready(function() {
+  $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});
+
+
 //ao clicar no botao abre janela para selecionar arquivo
 document.getElementById('novo').onclick = function() {
   document.getElementById('my_file').click();
@@ -237,7 +273,7 @@ function removerTodaPilhaVar(){
   $("#tab_var tr:gt(1)").remove();
   arrayObjetoTabela = [];
 }
-
+//funcao para salvar as variaveis editadas
 function salvar(){
   for (var i = 0; i < arrayObjetoTabela.length; i++) {
     var objeto = arrayObjetoTabela[i];

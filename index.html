@@ -62,92 +62,96 @@
           <span class="glyphicon glyphicon-play"></span>
         </button>
         <!--<button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="adicionarTabelaPilha('t');">
-          <span class="glyphicon glyphicon-play"></span> Add Row
-        </button>
-
-        <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="removerTopoPilha();">
-          <span class="glyphicon glyphicon-play"></span> remove Row
-        </button>-->
-        <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
-        <span class="glyphicon glyphicon-play"></span> Compilar
-      </button>-->
-      <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
-        <span class="glyphicon glyphicon-upload"></span>
+        <span class="glyphicon glyphicon-play"></span> Add Row
       </button>
 
-      <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
+      <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="removerTopoPilha();">
+      <span class="glyphicon glyphicon-play"></span> remove Row
+    </button>-->
+    <!--<button name="compilar" id="compilar"type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" onclick="return popitup('console.html')">
+    <span class="glyphicon glyphicon-play"></span> Compilar
+  </button>-->
+  <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
+    <span class="glyphicon glyphicon-upload"></span>
+  </button>
 
-      <button name="depurar" id="compilar"type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" onclick="download('arquivo.pse', 'application/octet-stream')">
-        <span class="glyphicon glyphicon-floppy-disk"></span>
-      </button>
+  <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
+
+  <button name="depurar" id="compilar"type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" onclick="download('arquivo.pse', 'application/octet-stream')">
+    <span class="glyphicon glyphicon-floppy-disk"></span>
+  </button>
 
 
-      <!-- <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="adicionarObjetoVar('1', '2')">
-        <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
-      </button> -->
+  <!-- <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="mostraErroNaLinha(Math.floor((Math.random() * 5) + 1),'sdasd')">
+    <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
+  </button>
 
-      <!-- Modal -->
-      <div class="modal fade" id="modalOutput" role="dialog">
-        <div class="modal-dialog">
+  <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="novoEditor()">
+    <span class="glyphicon glyphicon-floppy-disk">aa</span>
+  </button> -->
 
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Saída</h4>
-            </div>
-            <div id="modalBody" class="modal-body">
-              <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
-              <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
-            </div>
-            <div id="modalFooter" class="modal-footer">
-              <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
-              <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-            </div>
-          </div>
+  <!-- Modal -->
+  <div class="modal fade" id="modalOutput" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Saída</h4>
+        </div>
+        <div id="modalBody" class="modal-body">
+          <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
+          <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
+        </div>
+        <div id="modalFooter" class="modal-footer">
+          <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
+          <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
         </div>
       </div>
-      <!--  fim Modal -->
-
-
     </div>
+  </div>
+  <!--  fim Modal -->
 
-    <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" >
-      <div id="pilha" style="width:100%">
-        <table class="table table-bordered" id="tab_logic">
-          <thead>
-            <tr >
-              <th colspan="2">Pilha de execução</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- inserir linhas pilha execucao-->
-          </tbody>
-        </table>
-      </div>
 
-      <div id="vars">
-        <table id="tab_var" class="table table-bordered" style="margin-bottom:5px !important;">
-          <thead>
-            <tr >
-              <th colspan="2">Variáveis</th>
-            </tr>
-            <tr>
-              <th>Nome</th>
-              <th>Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-              <!-- inserir linhas pilha variaveis-->
-          </tbody>
-        </table>
-        <button type="button" class="btn btn-default" onclick="ativarTabelaVar()">Editar</button>
-        <button type="button" class="btn btn-default" onclick="salvar()">Salvar</button>
-      </div>
-    </div>
+</div>
 
-  </div><!-- fim do jumbotron -->
+<div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" >
+  <div id="pilha" style="width:100%">
+    <table class="table table-bordered" id="tab_logic">
+      <thead>
+        <tr >
+          <th colspan="2">Pilha de execução</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- inserir linhas pilha execucao-->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="vars">
+    <table id="tab_var" class="table table-bordered" style="margin-bottom:5px !important;">
+      <thead>
+        <tr >
+          <th colspan="2">Variáveis</th>
+        </tr>
+        <tr>
+          <th>Nome</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- inserir linhas pilha variaveis-->
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-default" onclick="ativarTabelaVar()">Editar</button>
+    <button type="button" class="btn btn-default" onclick="salvar()">Salvar</button>
+  </div>
+</div>
+
+</div><!-- fim do jumbotron -->
 </div>
 <div style="clear:both;"/>
 <br>
@@ -157,7 +161,7 @@
     <h3 class="panel-title">Debug</h3>
   </div>
   <div class="panel-body">
-  <textarea id="panel-error" disabled="true"></textarea>
+    <textarea id="panel-error" disabled="true"></textarea>
   </div>
 </div>
 <!--fim debug painel -->
@@ -165,7 +169,8 @@
 <script>
 var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
   lineNumbers: true,
-  mode: "text/x-pascal"
+  mode: "text/x-pascal",
+  gutters: ["CodeMirror-linenumbers", "breakpoints"]
 });
 </script>
 <script async>

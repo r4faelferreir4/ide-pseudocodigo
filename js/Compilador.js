@@ -1188,6 +1188,7 @@ function block(fsys, isfun, level){
     function procdeclaration(){
       try{
         var isfun, tx, len;
+        if(debug)
         debugger;
         isfun = sy == "functionsy";
         insymbol();
@@ -2434,10 +2435,6 @@ function block(fsys, isfun, level){
           statement(fsys);
           emit1(f+1, lc2);
           kode[lc1].y = lc;
-          if (sy == "endsy")
-            insymbol();
-          else
-            Error("forstatement", "Está faltando um end");
         }
         catch(err){
           return err;
@@ -2545,6 +2542,8 @@ function block(fsys, isfun, level){
         }
       }
       try{
+        if(debug)
+        debugger;
         if (statbegsys.concat(["ident"]).indexOf(sy) != -1)
         switch (sy) {
           case "ident":
@@ -2899,6 +2898,7 @@ function interpreter(){
     ir = kode[pc];
     pc++;
     ocnt++;
+    (debug)
     debugger;
     switch(ir.f){
       case 0:

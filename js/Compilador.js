@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//VARIÁVEIS CONSTANTES
+//VARIÁVEIS CONSTANTESemit1(32)
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -681,9 +681,9 @@ function block(fsys, isfun, level){
     //  var conrec = {tp: "", i: 2, r: 2.4};
 
 
-    var dx;   //Índice de alocação de dados
-    var prt;  //Índice T deste procedimento
-    var prb;  //Índice B deste procedimento
+    var dx;   //quatidade de bytes usado no procedimento ou função
+    var prt;  //ìndice em tab para o procedimento ou função
+    var prb;  //indice em btab para o procedimento ou função
     var x;
 
     function skip(fsys, n){
@@ -1047,7 +1047,7 @@ function block(fsys, isfun, level){
                   if (valpar)
                     sz = tab[x].adr;
                   else
-                    sz = 1;
+                    sz = TAM_INT;
                 }
             }
             test(["semicolon", "rparent"], ["ident", "comma"].concat(fsys), 14);
@@ -1187,7 +1187,8 @@ function block(fsys, isfun, level){
 
     function procdeclaration(){
       try{
-        var isfun;
+        var isfun, tx, len;
+        debugger;
         isfun = sy == "functionsy";
         insymbol();
         if (sy != "ident"){
@@ -1199,6 +1200,7 @@ function block(fsys, isfun, level){
         else
           enter(id, "prozedure");
         tab[t].normal = true;
+        tx = t;
         insymbol();
         block(["semicolon"].concat(fsys), isfun, level+1);
         /*if (sy == "semicolon")
@@ -1206,8 +1208,18 @@ function block(fsys, isfun, level){
         else
           Error(14);*/
         var bool = 0;
-        if(isfun) bool++;
-        emit(32 + bool);
+        len = TAM_INT;
+        if(isfun){
+          bool++;
+          switch (tab[tx].typ) {
+            case "reals": len = TAM_REAL; break;
+            case "chars":
+            case "bools": len = TAM_CHAR; break;
+            default:  len = TAM_INT ;
+
+          }
+        }
+        emit1(32 + bool, len);
       }
       catch(err){
         return err;
@@ -1369,7 +1381,7 @@ function block(fsys, isfun, level){
           }
           if (cp < lastp)
             Error(39);
-          emit1(19, btab[tab[i].ref].psize-1);
+          emit2(19, tab[i].typ, btab[tab[i].ref].psize);
           if (tab[i].lev < level)
             emit2(3, tab[i].lev, level);
         }
@@ -2587,7 +2599,7 @@ function block(fsys, isfun, level){
       }
     }//statement
   try{
-    dx = 5;
+    dx = 4*TAM_INT;
     prt = t;
     if (level > lmax)
     fatal(5);
@@ -2595,6 +2607,14 @@ function block(fsys, isfun, level){
     EnterBlock();
     display[level] = b;
     prb = b;
+    if (tab[prt].obj == "funktion")
+      switch (tab[prt-1].typ) {
+        case "reals": dx += TAM_REAL;  break;
+        case "bools":
+        case "chars": dx += TAM_CHAR;  break;
+        default:  dx += TAM_INT;
+
+      }
     tab[prt].typ = "notyp";
     tab[prt].ref = prb;
     if (sy == "lparent")
@@ -2876,12 +2896,10 @@ var read_ok = false;
 
 function interpreter(){
   do {
-    if(debug)
-    debugger;
     ir = kode[pc];
     pc++;
     ocnt++;
-    //debugger;
+    debugger;
     switch(ir.f){
       case 0:
       s.setInt32(t, (display[ir.x]+ir.y));
@@ -3087,21 +3105,37 @@ function interpreter(){
         return;
       }
       else{
-        t = t + TAM_INT * 5;
-        s.setInt32(t- TAM_INT * 2, h1-1);
+        if (tab[ir.y].obj == "prozedure")
+          t = t + TAM_INT * 4;
+        else
+          switch (tab[ir.y].typ) {
+            case "reals": t += 4 * TAM_INT + TAM_REAL;  break;
+            case "bools":
+            case "chars": t += 4 * TAM_INT + TAM_CHAR;
+            default:  t += 5 * TAM_INT;
+          }
+        s.setInt32(t- TAM_INT * 2, h1);
         s.setInt32(t - TAM_INT, ir.y);
       }
       break;
 
       case 19:
       h1 = t - ir.y; //{h1 points to base}
-      h2 = s.getInt32(h1 + 4*TAM_INT); //{h2 points to tab}
+      var hx = h1;    //Posição de inicio da pilha do procedimento ou função
+      switch (ir.x) {//espaço para o retorno da função
+        case "reals": h1 += TAM_REAL; break;
+        case "bools":
+        case "chars": h1 += TAM_CHAR; break;
+        case "notyp": h1 = h1; break; //Procedimento não tem retorno, não precisa alocar espaço
+        default:  h1 += TAM_INT;
+      }
+      h2 = s.getInt32(h1 + 3*TAM_INT); //{h2 points to tab}
       h3 = tab[h2].lev;
-      display[h3 + 1] = h1;
-      h4 = s.getInt32(h1 + 3*TAM_INT) + h1;
-      s.setInt32(h1 + 1*TAM_INT, pc);
-      s.setInt32(h1 + 2*TAM_INT, display[h3]);
-      s.setInt32(h1 + 3*TAM_INT, b);
+      display[h3 + 1] = hx;
+      h4 = s.getInt32(h1 + 2*TAM_INT) + h1;
+      s.setInt32(h1, pc);
+      s.setInt32(h1 + 1*TAM_INT, display[h3]);
+      s.setInt32(h1 + 2*TAM_INT, b);
 
       for (h3 = t+TAM_INT;  h3 < h4;  h3+=TAM_INT)
         s.setInt32(h3, 0);
@@ -3409,10 +3443,11 @@ function interpreter(){
       case 33:
       if (ir.f == 32)   //Procedimento
         t = b - TAM_INT;
-      else
+      else{
         t = b;        //Função
-      pc = s.getInt32(b + TAM_INT);
-      b = s.getInt32(b + 3*TAM_INT);
+      }
+      pc = s.getInt32(b);
+      b = s.getInt32(b + 2*TAM_INT);
       removerTopoPilha();
       break;
 

@@ -96,16 +96,18 @@ function changeOutput(){
   interpret();
 }
 
-function lista(next, c){
+function lista(next, c, destruct){
   this.next = next;
   this.c = c;
+  this.destruct = destruct;
 }
 
 
 
-function alocaString(str, head){//Aloca string reutilizando espaço já alocado
+function alocaString(str, head, destruct){//Aloca string reutilizando espaço já alocado
   if (str !== undefined && head !== undefined){
     head.c = str.charAt();   //Definindo o inicio da lista
+    head.destruct = destruct;
     var i = 1;
     var length = str.length;
     while(i < length){
@@ -113,6 +115,7 @@ function alocaString(str, head){//Aloca string reutilizando espaço já alocado
         head.next = new lista();
       head = head.next;
       head.c = str.charAt(i);
+      head.destruct = destruct;
       i++;
     }
     head.next = undefined;
@@ -142,14 +145,19 @@ function lenString(head){
 }
 
 function getString(head){
-  var str= "";
-  debugger;
+  var str= "", destruct, destroi;
+  if (head.destruct){
+    destroi = head;
+    destruct = true;
+  }
   if (typeof head == "object"){
     str += head.c;
     while (head.next !== undefined){
       head = head.next;
       str += head.c;
     }
+    if (destruct)
+      liberaString(destroi);
     return str;
   }
 }

@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//VARIÁVEIS CONSTANTESemit1(32)
+  //VARIÁVEIS realocaString(52)
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -1485,7 +1485,7 @@ function block(fsys, isfun, level){
                           emit(65);
                         }
                         else {
-                          Error("litmaiusculo", "\nErro, parâmetro incorreto");
+                          Error("strmax", "\nErro, parâmetro incorreto");
                         }
                       break;
                       case 18:
@@ -1494,7 +1494,7 @@ function block(fsys, isfun, level){
                           emit(66);
                         }
                         else {
-                          Error("litminusculo", "\nErro, parâmetro incorreto");
+                          Error("strmin", "\nErro, parâmetro incorreto");
                         }
                       break;
                       case 19:
@@ -1503,7 +1503,7 @@ function block(fsys, isfun, level){
                         emit(64);
                       }
                       else {
-                        Error("littamanho", "\nVariável informada de tipo incorreto.");
+                        Error("strtmo", "\nVariável informada de tipo incorreto.");
                       }
                       break;
                       case 20:
@@ -1516,11 +1516,11 @@ function block(fsys, isfun, level){
                             emit(67);
                           }
                           else {
-                            Error("litbusca", "\nParâmetro incorreto");
+                            Error("strbusca", "\nParâmetro incorreto");
                           }
                         }
                         else {
-                          Error("litbusca", "\nParâmetro incorreto");
+                          Error("strbusca", "\nParâmetro incorreto");
                         }
                       break;
                       case 21:
@@ -1539,23 +1539,23 @@ function block(fsys, isfun, level){
                                 emit(63);
                               }
                               else {
-                                Error("litinsere", "\nTerceiro argumento precisa ser do tipo literal.");
+                                Error("strinsere", "\nTerceiro argumento precisa ser do tipo literal.");
                               }
                             }
                             else {
-                              Error("litinsere", "Segundo argumento precisa ser do tipo inteiro. ");
+                              Error("strinsere", "Segundo argumento precisa ser do tipo inteiro. ");
                             }
                           }
                           else {
-                            Error("litinsere", "\nPrimeiro argumento precisa ser do tipo literal. ");
+                            Error("strinsere", "\nPrimeiro argumento precisa ser do tipo literal. ");
                           }
                         }
                         else {
-                          Error("litinsere", "\nEstá faltando o terceiro argumento ou uma vírgula. ");
+                          Error("strinsere", "\nEstá faltando o terceiro argumento ou uma vírgula. ");
                         }
                       }
                       else {
-                        Error("litinsere", "\nEstá faltando o segundo argumento ou uma vírgula.");
+                        Error("strinsere", "\nEstá faltando o segundo argumento ou uma vírgula.");
                       }
                       break;
                     }
@@ -1597,9 +1597,9 @@ function block(fsys, isfun, level){
                         x.typ = tab[i].typ;
                         x.ref = 0;
                         if (x.typ == "reals")
-                          emit1(25, tab[i].adr);
+                          emit2(24, tab[i].typ, tab[i].adr);
                         else
-                          emit1(24, tab[i].adr);
+                          emit2(24, tab[i].typ, tab[i].adr);
                       break;
                       case "variable":
                         x.typ = tab[i].typ;
@@ -1685,7 +1685,7 @@ function block(fsys, isfun, level){
                     if (sy == "realcon"){
                       x.typ = "reals";
                       EnterReal(rnum);
-                      emit1(25, c1);
+                      emit2(24, x.typ, c1);
                     }
                     else {
                       if (sy != "stringsy"){
@@ -1700,7 +1700,7 @@ function block(fsys, isfun, level){
                         inum = inum.join("");
                         x.typ = "strings";
                       }
-                      emit1(24, inum);
+                      emit2(24, x.typ, inum);
                     }
                     x.ref = 0;
                     insymbol();
@@ -1748,10 +1748,8 @@ function block(fsys, isfun, level){
                 factor (fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), y);
                 if (op == "times"){
                   x.typ = resulttype(x.typ, y.typ);
-                  switch (x.typ) {
-                    case "ints":  emit(57);break;
-                    case "reals": emit(60);break;
-                  }
+                  emit1(57, x.typ);
+
                 }
                 else
                 if(op == "rdiv"){
@@ -1764,7 +1762,7 @@ function block(fsys, isfun, level){
                     y.typ = "reals";
                   }
                   if (x.typ == "reals" && y.typ == "reals")
-                    emit(61);
+                    emit1(58, "reals");
                   else {
                     if (x.typ != "notyp" && y.typ != "notyp")
                     Error(33);
@@ -1786,7 +1784,7 @@ function block(fsys, isfun, level){
                 else {
                   if (x.typ == "ints" && y.typ == "ints")
                     if (op == "idiv")
-                      emit(58);
+                      emit1(58, "ints");
                     else
                       emit(59);
                   else {
@@ -1812,7 +1810,7 @@ function block(fsys, isfun, level){
               }
               else
                 if (op == "minus")
-                  emit(36);
+                  emit1(36, TAM_INT);
             }
             else
               term(fsys.concat(["plus", "minus", "orsy"]), x);
@@ -1840,17 +1838,22 @@ function block(fsys, isfun, level){
                 x.typ = resulttype(x.typ, y.typ);
                 switch (x.typ) {
                   case "strings":
+                  if(op == "plus")
+                    emit1(52, "strings");
+                  else
+                    Error();
+                  break;
                   case "ints":
                     if (op == "plus")
-                      emit(52);
+                        emit1(52, "ints");
                     else
-                      emit(53);
+                      emit1(53, "ints");
                   break;
                   case "reals":
                     if (op == "plus")
-                      emit(54);
+                        emit1(52, "reals");
                     else
-                      emit(55);
+                      emit1(53, "reals");
                   break;
                 }
               }
@@ -1868,7 +1871,7 @@ function block(fsys, isfun, level){
             simpleexpression(fsys, y);
             if (["notyp", "ints", "bools", "chars", "strings"].indexOf(x.typ) != -1 && x.typ == y.typ)
               switch (op) {
-                case "eql": emit(45);break;
+                case "eql": emit1(39, x.typ);break;
                 case "neq": emit(46);break;
                 case "lss": emit(47);break;
                 case "leq": emit(48);break;
@@ -1879,7 +1882,7 @@ function block(fsys, isfun, level){
               if (x.typ == "strings" || y.typ == "strings"){
                 if (x.typ == "chars" || y.typ == "chars"){
                   switch (op) {
-                    case "eql": emit(45);break;
+                    case "eql": emit1(39, x.typ);break;
                     //case "neq": emit(46);break;
                     case "lss": emit(47);break;
                     //case "leq": emit(48);break;
@@ -1899,7 +1902,7 @@ function block(fsys, isfun, level){
               }
               if (x.typ == "reals" && y.typ == "reals")
               switch (op) {
-                case "eql": emit(39);break;
+                case "eql": emit1(39, x.typ);break;
                 case "neq": emit(40);break;
                 case "lss": emit(41);break;
                 case "leq": emit(42);break;
@@ -1923,6 +1926,7 @@ function block(fsys, isfun, level){
           y = new item("", 1);
           x.typ = tab[i].typ;
           x.ref = tab[i].ref;
+          debugger;
           if (tab[i].normal)
             f = 0;
           else
@@ -2045,14 +2049,12 @@ function block(fsys, isfun, level){
                     emit(63);
                   }
                 }
-                if (op == "plus")
-                  emit(52);
-                if (op == "minus")
-                  emit(53);
-                if (op == "mult")
-                  emit(57);
-                if (op == "div")
-                  emit(58);
+                switch (op) {
+                    case "plus": emit1(52, x.typ); break;
+                  case "minus":emit1(53, x.typ); break;
+                  case "mult":  emit1(57, x.typ); break;
+                  case "div": emit1(58, x.typ); break;
+                }
                 var len = TAM_INT;
                 switch (x.typ) {
                   case "reals":
@@ -2100,13 +2102,18 @@ function block(fsys, isfun, level){
                 }
               }
               else {
-                emit1(8, 5);
                 emit2(38, TAM_INT, assign);
               }
             }
             else{
               if (x.typ == "reals" && y.typ == "ints"){
                 emit1(26,TAM_INT);
+                switch (op) {
+                  case "plus": emit1(52, x.typ); break;
+                  case "minus":emit1(53, x.typ); break;
+                  case "mult":emit1(57, x.typ); break;
+                  case "div": emit1(58, x.typ); break;
+                }
                 emit2(38, TAM_REAL, assign);
               }
               else
@@ -2127,17 +2134,16 @@ function block(fsys, isfun, level){
           insymbol();
           statement(["semicolon", "endsy"].concat(fsys));
           while (sy != "endsy"){
-            /*if (sy == "semicolon")
-            insymbol();
+            if (statbegsys.concat("ident").indexOf(sy) != -1)
+              statement(["semicolon", "endsy", "elsesy"].concat(fsys));
             else
-            Error(14);*/
-            statement(["semicolon", "endsy"].concat(fsys));
+              break;
           }
-          /*if (sy == "endsy")
+          if (sy == "endsy")
             insymbol();
           else
             if (sy != "elsesy")
-              Error(57);*/
+              Error(57);
         }
         catch(err){
           return err;
@@ -2179,20 +2185,6 @@ function block(fsys, isfun, level){
       }//ifstatement
 
       function casestatement(){
-        var x;
-        x = new item("", 1);
-        var i, j, k, lc1;
-        var casetab = new Array(csmax);
-        function CaseRecord(val, lc){
-          this.val = val;
-          this.lc = lc;
-        }
-        //inicializa array com objetos do tipo caserecord
-        for (var a = 0; i < csmax; i++){
-          casetab[a] = new CaseRecord(0,0);
-        }
-        var exittab = new Array(csmax);
-        //debugger;
         function caselabel(){
           try{
             var lab, k;
@@ -2207,7 +2199,10 @@ function block(fsys, isfun, level){
             else{
               i++;
               k = 0;
-              casetab[i].val = lab.i;
+              if (lab.tp == "reals")
+                casetab[i].val = lab.r;
+              else
+                casetab[i].val = lab.i;
               casetab[i].lc = lc;
               do
                 k++;
@@ -2244,24 +2239,38 @@ function block(fsys, isfun, level){
           }
         }//fim onecase
         try{
+          var x;
+          x = new item("", 1);
+          var i, j, k, lc1;
+          var casetab = new Array(csmax);
+          function CaseRecord(val, lc){
+            this.val = val;
+            this.lc = lc;
+          }
+          //inicializa array com objetos do tipo caserecord
+          for ( i = 0; i < csmax; i++){
+            casetab[i] = new CaseRecord();
+          }
+          var exittab = new Array(csmax);
           insymbol();
+          debugger;
           i = 0;
           j = 0;
           expression(fsys.concat(["ofsy", "comma", "colon"]), x);
-          if (["ints", "bools", "chars", "notyp"].indexOf(x.typ) == -1)
+          if (["ints", "reals", "bools", "chars", "notyp"].indexOf(x.typ) == -1)
             Error(23);
           lc1 = lc;
-          emit(12);
+          emit2(12, x.typ, 0);
           if (sy == "ofsy")
             insymbol();
           else
             Error(8);
           onecase();
           while (sy != "endsy") {
-            insymbol();
             onecase();
           }
           kode[lc1].y = lc;
+          debugger;
           for (k = 1; k <= i; k++) {
             emit1(13, casetab[k].val);
             emit1(13, casetab[k].lc);
@@ -2285,12 +2294,8 @@ function block(fsys, isfun, level){
           var lc1;
           lc1 = lc;
           insymbol();
-          statement(["semicolon", "untilsy"].concat(fsys));
-          while(["semicolon"].concat(statbegsys).indexOf(sy) != -1){
-            if (sy == "semicolon")
-              insymbol();
-            else
-              Error(14);
+          statement(["untilsy"].concat(fsys));
+          while(statbegsys.concat("ident").indexOf(sy) != -1){
             statement(["semicolon", "untilsy"].concat(fsys));
           }
           if (sy == "untilsy"){
@@ -2365,6 +2370,7 @@ function block(fsys, isfun, level){
           else
             skip(["untilsy"].concat(fsys), 51);
           f = 14;
+          var steptyp = TAM_INT;
           if (sy == "untilsy"){
             insymbol();
             var p;
@@ -2380,30 +2386,36 @@ function block(fsys, isfun, level){
                   if (sy == "intcon" || sy == "realcon"){
                     if (sy == "intcon"){
                       if (cvt == "ints")
-                        emit1(24, inum);
+                        emit2(24, cvt, inum);
                       else
                         Error("para", "Erro, tipo do passo incompatível com a variável inicial");
                     }
                     else{
-                      if (cvt == "reals")
-                        emit1(24, rnum);
+                      if (cvt == "reals"){
+                        EnterReal(rnum);
+                        emit2(24, cvt, c1);
+                        steptyp = TAM_REAL;
+                      }
                       else
                         Error("para", "Erro, tipo do passo incompatível com a variável inicial");
                     }
                   }
-                  emit(36);
+                  emit1(36, steptyp);
                 }
                 else {
                   if (sy == "intcon" || sy == "realcon"){
                     if (sy == "intcon"){
                       if (cvt == "ints")
-                        emit1(24, inum);
+                        emit2(24, cvt, inum);
                       else
                         Error("para", "Erro, tipo do passo incompatível com a variável inicial");
                     }
                     else{
-                      if (cvt == "reals")
-                        emit1(24, rnum);
+                      if (cvt == "reals"){
+                        EnterReal(rnum);
+                        emit2(24, cvt, c1);
+                        steptyp = TAM_REAL;
+                      }
                       else
                         Error("para", "Erro, tipo do passo incompatível com a variável inicial");
                     }
@@ -2416,7 +2428,7 @@ function block(fsys, isfun, level){
                 insymbol();
               }
               else {
-                emit1(24, 1);
+                emit2(24, cvt, 1);
               }
             }
           }
@@ -2426,14 +2438,14 @@ function block(fsys, isfun, level){
           lc1 = lc;
           if (kode[lc-1].f == 36)
             f = 16;
-          emit(f);
+          emit2(f, steptyp, 0);
           if (sy == "dosy")
             insymbol();
           else
               Error(54);
           lc2 = lc;
           statement(fsys);
-          emit1(f+1, lc2);
+          emit2(f+1, steptyp, lc2);
           kode[lc1].y = lc;
         }
         catch(err){
@@ -2447,7 +2459,6 @@ function block(fsys, isfun, level){
           var x, y;
           x = new item("", 1);
           y = new item("", 1);
-
           switch (n) {
             case 1:
             case 2:
@@ -2542,7 +2553,6 @@ function block(fsys, isfun, level){
         }
       }
       try{
-        if(debug)
         debugger;
         if (statbegsys.concat(["ident"]).indexOf(sy) != -1)
         switch (sy) {
@@ -2591,7 +2601,7 @@ function block(fsys, isfun, level){
           forstatement();
           break;
         }
-        test(fsys.concat(["ident"]), [""], 14);
+        test(fsys.concat(["ident", "realcon", "intcon", "charcon", "bools"]), [""], 14);
       }
       catch(err){
         return err;
@@ -2658,14 +2668,14 @@ function block(fsys, isfun, level){
     }while(statbegsys.indexOf(sy) == -1);
     tab[prt].adr = lc;
     insymbol();
-    statement(["semicolon", "endsy"].concat(fsys));
+    statement(["semicolon", "endsy", "elsesy"].concat(fsys));
     while (sy != "endsy"){
       /*if (sy == "semicolon")
       insymbol();
       else
       Error(14);*/
       if (statbegsys.concat(["ident"]).indexOf(sy) != -1 && ch != "?")
-        statement(["semicolon", "endsy"].concat(fsys));
+        statement(["semicolon", "endsy", "elsesy"].concat(fsys));
       else {
         insymbol();
         Error();
@@ -2831,12 +2841,12 @@ try{
   enter('ln', "funktion", "reals", 14);
   enter('sqrt', "funktion", "reals", 15);
   enter('arctan', "funktion", "reals", 16);
-  enter('litmaiusculo', "funktion", "strings", 17);
-  enter('litminusculo', "funktion", "strings", 18);
+  enter('strmax', "funktion", "strings", 17);
+  enter('strmin', "funktion", "strings", 18);
   enter('leia', "prozedure", "notyp", 1);
-  enter('littamanho', 'funktion', 'ints', 19);
-  enter('litbusca', "funktion", "ints", 20);
-  enter('litinsere', 'funktion', 'strings', 21);
+  enter('strtmo', 'funktion', 'ints', 19);
+  enter('strbusca', "funktion", "ints", 20);
+  enter('strinsere', 'funktion', 'strings', 21);
   enter('escreva', "prozedure", "notyp", 3);
   //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
@@ -3027,9 +3037,25 @@ function interpreter(){
         pc = ir.y;
       t -= TAM_BOOL;
       break;
-      case 12:    //switch
-      h1 = s.getInt32(t-TAM_INT);
-      t -= TAM_INT;   //Libera 4 bytes
+      case 12:     //switch
+      switch (ir.x) {
+        case "ints":
+         h1 = s.getInt32(t-TAM_INT);
+         t -= TAM_INT;   //Libera 4 bytes
+         break;
+        case "reals":
+          h1 = s.getFloat64(t-TAM_REAL);
+          t -= TAM_REAL;   //Libera 8 bytes
+        break;
+        case "bools":
+        case "chars":
+          h1 = s.getUint8(t-TAM_CHAR);
+          t -= TAM_INT;   //Libera 1 byte
+        break;
+        default:
+
+      }
+
       h2 = ir.y;
       h3 = 0;
       do {
@@ -3050,51 +3076,102 @@ function interpreter(){
           else
           h2 += 2;
         }
-      }while (h3 === 0);
+      }while (h3 == 0);
+
       break;
       case 14:
-      h1 = s.getInt32(t - TAM_INT*3);
-      if(h1 <= s.getInt32(t-TAM_INT*2)){
-        s.setInt32(s.getInt32(t - TAM_INT*4), h1);
+      if (ir.x == TAM_INT){
+        h1 = s.getInt32(t - TAM_INT*3);
+        if(h1 <= s.getInt32(t-TAM_INT*2)){
+          s.setInt32(s.getInt32(t - TAM_INT*4), h1);
+        }
+        else{
+          t -= TAM_INT*4;
+          pc = ir.y;
+        }
       }
-      else{
-        t -= TAM_INT*4;
-        pc = ir.y;
+      else {
+        h1 = s.getFloat64(t - TAM_REAL*3);
+        if(h1 <= s.getFloat64(t-TAM_REAL*2)){
+          s.setFloat64(s.getInt32(t - TAM_REAL*3-TAM_INT), h1);
+        }
+        else{
+          t -= TAM_REAL*3+TAM_INT;
+          pc = ir.y;
+        }
       }
       break;
 
       case 15:
-      h2 = s.getInt32(t - TAM_INT * 4);
-      h1 = s.getInt32(h2) + s.getInt32(t-TAM_INT);
-      if (h1 <= s.getInt32(t-TAM_INT * 2)){
-        s.setInt32(h2, h1);
-        pc = ir.y;
+      if(ir.x == TAM_INT){
+        h2 = s.getInt32(t - TAM_INT * 4);
+        h1 = s.getInt32(h2) + s.getInt32(t-TAM_INT);
+        if (h1 <= s.getInt32(t-TAM_INT * 2)){
+          s.setInt32(h2, h1);
+          pc = ir.y;
+        }
+        else{
+          t -= TAM_INT * 3;
+        }
       }
-      else{
-        t -= TAM_INT * 3;
+      else {
+        h2 = s.getInt32(t - TAM_REAL * 3 - TAM_INT);
+        h1 = s.getFloat64(h2) + s.getFloat64(t-TAM_REAL);
+        if (h1 <= s.getFloat64(t-TAM_REAL * 2)){
+          s.setFloat64(h2, h1);
+          pc = ir.y;
+        }
+        else{
+          t -= TAM_REAL * 3;
+        }
       }
       break;
 
       case 16:
-      h1 = s.getInt32(t- TAM_INT * 3);
-      if (h1 >= s.getInt32(t - TAM_INT * 2)){
-        s.setInt32(s.getInt32(t - TAM_INT * 4), h1);
+      if(ir.x == TAM_INT){
+        h1 = s.getInt32(t- TAM_INT * 3);
+        if (h1 >= s.getInt32(t - TAM_INT * 2)){
+          s.setInt32(s.getInt32(t - TAM_INT * 4), h1);
+        }
+        else{
+          pc = ir.y;
+          t -= TAM_INT * 4;
+        }
       }
-      else{
-        pc = ir.y;
-        t -= TAM_INT * 4;
+      else {
+        h1 = s.getFloat64(t- TAM_REAL * 3);
+        if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
+          s.setFloat64(s.getInt32(t - TAM_REAL * 3-TAM_INT), h1);
+        }
+        else{
+          pc = ir.y;
+          t -= TAM_REAL * 3 + TAM_INT;
+        }
       }
       break;
 
       case 17:
-      h2 = s.getInt32(t - TAM_INT * 4);
-      h1 = s.getInt32(h2) + s.getInt32(t - TAM_INT);
-      if (h1 >= s.getInt32(t - TAM_INT * 2)){
-        s.setInt32(h2, h1);
-        pc = ir.y;
+      if(ir.x == TAM_INT){
+        h2 = s.getInt32(t - TAM_INT * 3 - TAM_INT);
+        h1 = s.getInt32(h2) + s.getInt32(t - TAM_INT);
+        if (h1 >= s.getInt32(t - TAM_INT * 2)){
+          s.setInt32(h2, h1);
+          pc = ir.y;
+        }
+        else{
+          t -= TAM_INT * 3;
+        }
       }
-      else{
-        t -= TAM_INT * 3;
+      else {
+        h2 = s.getInt32(t - TAM_REAL * 3 - TAM_INT);
+        h1 = s.getFloat64(h2) + s.getFloat64(t - TAM_REAL);
+        if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
+          s.setFloat64(h2, h1);
+          pc = ir.y;
+        }
+        else{
+          t -= TAM_REAL * 3;
+        }
       }
       break;
 
@@ -3220,8 +3297,34 @@ function interpreter(){
         return;
       }
       else{
-        s.setInt32(t, ir.y);
-        t += TAM_INT;
+        switch (ir.x) {
+          case "reals":
+            s.setFloat64(t, rconst[ir.y]);
+            t += TAM_REAL;
+          break;
+          case "bools":
+          case "chars":
+            s.setUint8(t, ir.y);
+            t += TAM_CHAR;
+          break;
+          case "strings":
+          if (str_tab[0] == undefined){
+            str_tab[0] = new lista();
+            alocaString(ir.y, str_tab[0]);
+            s.setInt32(t, 0);
+          }
+          else {
+            str_tab[1] = new lista();
+            alocaString(ir.y, str_tab[1]);
+            s.setInt32(t, 1);
+          }
+          t += TAM_INT;
+          break;
+          default:
+            s.setInt32(t, ir.y);
+            t += TAM_INT;
+        }
+
       }
       break;
 
@@ -3230,15 +3333,12 @@ function interpreter(){
         ps = 'stkchk';
         return;
       }
-      else{
-        s.setFloat64(t, rconst[ir.y]);
-        t += TAM_REAL;
-      }
+
       break;
 
-      case 26:
+      case 26:  //Conversão inteiro para real
       if (ir.y == TAM_INT){
-        h1 = t-TAM_INT - ir.y;
+        h1 = t - ir.y;
         s.setFloat64(h1, s.getInt32(h1));
         t += TAM_INT;   //Conversão inteiro para real, aloca mais 4 bytes
       }
@@ -3294,12 +3394,14 @@ function interpreter(){
                 read_ok = false;
               }
               else {
-                if (typeof str_tab[s.getInt32(t - TAM_INT)] == "object"){
+                if (typeof str_tab[s.getInt32(s.getInt32(t-TAM_INT))] == "object"){
                   alocaString(InputFile, str_tab[s.getInt32(s.getInt32(t - TAM_INT))]);
+                  read_ok = false;
                 }
                 else{
                   str_tab[s.getInt32(s.getInt32(t - TAM_INT))] = new lista();
-                  alocaString();
+                  alocaString(InputFile, str_tab[s.getInt32(s.getInt32(t-TAM_INT))]);
+                  read_ok = false;
                 }
               }
             }
@@ -3471,7 +3573,10 @@ function interpreter(){
       case 35: //não
         s.setUint8(t-TAM_BOOL,!s.getUint8(t-TAM_BOOL));
       break;
-      case 36: //menos
+      case 36: //nega inteiro ou real
+      if (ir.y == TAM_REAL)
+        s.setFloat64(t - TAM_REAL, -s.getFloat64(t-TAM_REAL));
+      else
         s.setInt32(t - TAM_INT, -s.getInt32(t-TAM_INT));
       break;
       case 37:
@@ -3540,14 +3645,34 @@ function interpreter(){
       }
       break;
 
-      case 39:  //real igual
-      s.setUint8(t - TAM_BOOL - TAM_BOOL,(s.getUint8(t - TAM_BOOL) == s.getUint8(t - 2*TAM_BOOL)));
-      t -= TAM_BOOL;
+      case 39:  //expressão relacional igual(real, inteiro, string e caracter)
+      switch (ir.y) {
+        case "reals":
+         s.setUint8(t - 2*TAM_REAL,(s.getFloat64(t - TAM_REAL) == s.getFloat64(t - 2*TAM_REAL)));
+         t -= 15;
+        break;
+        case "bools":
+        case "chars":
+          s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - TAM_CHAR) == s.getUint8(t - 2*TAM_CHAR)));
+          t -= TAM_CHAR;
+        break;
+        case "strings":
+        var id1, id2, str2, str2, adr;
+        id1 = s.getInt32(t-TAM_INT);
+        id2 = s.getInt32(t-2*TAM_INT);
+        str1 = getString(str_tab[id1]);
+        str2 = getString(str_tab[id2]);
+        adr = s.getInt32(s.getInt32(t-3*TAM_INT));
+        if (id1)
+        break;
+        default:
+          s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) == s.getInt32(t-TAM_INT)));
+          t -= 7;   //Libera 7 bytes
+      }
       break;
-
-      case 40://real dirente
-      s.setUint8(t - TAM_BOOL - TAM_BOOL,(s.getUint8(t - TAM_BOOL) != s.getUint8(t - 2*TAM_BOOL)));
-      t -= TAM_BOOL;
+      case 40://real diferente
+      s.setUint8(t - 2*TAM_REAL,(s.getFloat64(t - TAM_REAL) != s.getFloat64(t - 2*TAM_REAL)));
+      t -= 15;
       break;
 
       case 41://real menor
@@ -3570,11 +3695,9 @@ function interpreter(){
       t -= 15; //Libera 15 bytes nessa operação
       break;
 
-      case 45:  //inteiro igual
-      s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) == s.getInt32(t-TAM_INT)));
-      t -= 7;   //Libera 7 bytes
-      break;
+      case 45:  //livre
 
+      break;
       case 46://inteiro diferente
       s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) != s.getInt32(t-TAM_INT)));
       t -= 7;   //Libera 7 bytes
@@ -3605,24 +3728,71 @@ function interpreter(){
       t -= TAM_BOOL;
       break;
 
-      case 52://Soma de inteiros
-      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) + s.getInt32(t-TAM_INT)));
-      t -= TAM_INT;
+      case 52://adição(inteiro,real) concatenação(string, caracter)
+      switch (ir.y) {
+        case "reals":
+          s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) + s.getFloat64(t-TAM_REAL)));
+          t -= TAM_REAL;
+        break;
+        case "ints":
+          s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) + s.getInt32(t-TAM_INT)));
+          t -= TAM_INT;
+        break;
+        case "strings":
+          var str1, str2, id1, id2, adr;
+          id1 = s.getInt32(t-2*TAM_INT);
+          id2 = s.getInt32(t-TAM_INT);
+          str1 = getString(str_tab[id1]);
+          str2 = getString(str_tab[id2]);
+          adr = s.getInt32(s.getInt32(t-3*TAM_INT));
+          if (id1 == adr){
+            alocaString(str1+str2, str_tab[adr]);
+            t -= TAM_INT;
+            if(id2 == 0 || id2 == 1)
+              str_tab[id2] = undefined  //Libera o espaço para strings temporárias
+          }
+          else if (id2 == adr){
+            alocaString(str1+str2, str_tab[adr]);
+            s.setInt32(t-2*TAM_INT, adr);
+            t -= TAM_INT;
+            if (id1 == 0 || id1 == 1)
+              str_tab[id1] = undefined;
+          }
+          else {
+            adr = alocaVetor();
+            alocaString(str1+str2, str_tab[adr]);
+            s.setInt32(t-2*TAM_INT, adr);
+            if (id1 == 0 || id1 == 1)
+              str_tab[id1] = undefined;
+            if(id2 == 0 || id2 == 1)
+              str_tab[id2] = undefined;
+            t -= TAM_INT;
+          }
+        break;
+      }
       break;
 
-      case 53://Subtração de inteiros
-      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) - s.getInt32(t-TAM_INT)));
-      t -= TAM_INT;
+      case 53://Subtração(inteiro,real)
+      switch (ir.y) {
+        case "reals":
+          s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) - s.getFloat64(t-TAM_REAL)));
+          t -= TAM_REAL;
+        break;
+        case "ints":
+          s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) - s.getInt32(t-TAM_INT)));
+          t -= TAM_INT;
+        break;
+        case "strings":
+        break;
+      }
       break;
 
-      case 54://Soma de numeros reais
-      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) + s.getFloat64(t-TAM_REAL)));
-      t -= TAM_REAL;
+      case 54://livre
+
       break;
 
-      case 55://Subtração de numeros reais
-      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) - s.getFloat64(t-TAM_REAL)));
-      t -= TAM_REAL;
+      case 55://livre
+
       break;
 
       case 56://e lógico
@@ -3630,20 +3800,41 @@ function interpreter(){
       t -= TAM_BOOL;
       break;
 
-      case 57://Multiplicação de inteiros
-      s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) * s.getInt32(t-TAM_INT)));
-      t -= TAM_INT;
+      case 57://Multiplicação(inteiro,real)
+      switch (ir.y) {
+        case "reals":
+        s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) * s.getFloat64(t-TAM_REAL)));
+        t -= TAM_REAL;
+        break;
+        case "ints":
+        s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) * s.getInt32(t-TAM_INT)));
+        t -= TAM_INT;
+        break;
+      }
       break;
 
-      case 58://Divisão de inteiros
-      if (s.getInt32(t-TAM_INT) == 0){
+      case 58://Divisão(inteiro,real)
+      var check;
+      if (ir.y == "ints")
+        check = s.getInt32(t-TAM_INT);
+      else if( ir.y == "reals")
+        check = s.getFloat64(t-TAM_REAL);
+      if (check == 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
         return;
       }
       else{
-        s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) / s.getInt32(t-TAM_INT)));
-        t -= TAM_INT;
+        switch (ir.y) {
+          case "ints":
+            s.setInt32(t-2*TAM_INT, (s.getInt32(t-2*TAM_INT) / s.getInt32(t-TAM_INT)));
+            t -= TAM_INT;
+          break;
+          case "reals":
+            s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) / s.getFloat64(t-TAM_REAL)));
+            t -= TAM_REAL;
+          break;
+        }
       }
       break;
 
@@ -3659,14 +3850,12 @@ function interpreter(){
       }
       break;
 
-      case 60://Multiplicação de reais
-      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) * s.getFloat64(t-TAM_REAL)));
-      t -= TAM_REAL;
+      case 60://livre
+
       break;
 
-      case 61://Divisão de reais
-      s.setFloat64(t-2*TAM_REAL, (s.getFloat64(t-2*TAM_REAL) / s.getFloat64(t-TAM_REAL)));
-      t -= TAM_REAL;
+      case 61://livre
+
       break;
 
       case 62:
@@ -3797,6 +3986,7 @@ function interpret(){
     fld[2] = 22;
     fld[3] = 10;
     fld[4] = 1;
+    str_tab = [];
     adicionarTabelaPilha(progname);
     interpreter();
   }

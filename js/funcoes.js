@@ -101,17 +101,30 @@ function lista(next, c){
   this.c = c;
 }
 
-function alocaString(str, head){
+
+
+function alocaString(str, head){//Aloca string reutilizando espaço já alocado
   if (str !== undefined && head !== undefined){
     head.c = str.charAt();   //Definindo o inicio da lista
     var i = 1;
     var length = str.length;
     while(i < length){
-      head.next = new lista();
+      if (head.next == undefined)
+        head.next = new lista();
       head = head.next;
       head.c = str.charAt(i);
       i++;
     }
+    head.next = undefined;
+  }
+}
+
+function liberaString(head){//Retira as referências para que o coletor de lixo limpe esses dados
+  var Ohead;
+  while(head.next != undefined){
+    Ohead = head.next;
+    head.next = undefined;
+    head = Ohead;
   }
 }
 
@@ -160,7 +173,7 @@ function getChar(head, pos){
 }
 
 function alocaVetor(){
-  var i = 0;
+  var i = 2;
   while(str_tab[i] !== undefined){
     i++;
   }

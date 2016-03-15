@@ -1,4 +1,39 @@
 
+//atalhos
+//para compilar
+shortcut.add("f9",function() {
+	alert("apertou f9");
+});
+//executar o programa
+shortcut.add("Ctrl+F9",function() {
+	alert("apertou ctrl+f9");
+});
+
+//rodar até o cursor
+shortcut.add("F4",function() {
+	alert("apertou f4");
+});
+
+//passo-a-passo entrando em rotinas (step into)
+shortcut.add("F7",function() {
+	alert("apertou f7");
+});
+
+//passo-a-passo saltando rotinas (step over)
+shortcut.add("F8",function() {
+	alert("apertou f8");
+});
+
+//interromper a depuração e a execução
+shortcut.add("Ctrl+F2",function() {
+	alert("apertou ctrl+f2");
+});
+
+//fim atalhos
+
+
+
+
 //funcao para adicionar linha de erro no editor
 function mostraErroNaLinha(linha, titulo){
   editor.addLineClass(linha, 'background', 'line-error');
@@ -12,9 +47,9 @@ function makeMarker(titulo) {
   marker.style.color = "#822";
   marker.innerHTML = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>";
   if (titulo !== "") {
-      marker.title = titulo;
+    marker.title = titulo;
   }else{
-      marker.title = "";
+    marker.title = "";
   }
   marker.setAttribute("data-toggle", "tooltip");
   marker.setAttribute("data-placement", "right");
@@ -23,7 +58,7 @@ function makeMarker(titulo) {
 //funcao para remover erros do editor
 function limparCodeBox(){
   for(i = 0; i <= editor.lineCount(); i++){
-      editor.removeLineClass(i,'background', 'line-error');
+    editor.removeLineClass(i,'background', 'line-error');
   }
   editor.clearHistory();
   editor.clearGutter("breakpoints");
@@ -112,7 +147,7 @@ function alocaString(str, head, destruct){//Aloca string reutilizando espaço j�
     var length = str.length;
     while(i < length){
       if (head.next == undefined)
-        head.next = new lista();
+      head.next = new lista();
       head = head.next;
       head.c = str.charAt(i);
       head.destruct = destruct;
@@ -157,7 +192,7 @@ function getString(head){
       str += head.c;
     }
     if (destruct)
-      liberaString(destroi);
+    liberaString(destroi);
     return str;
   }
 }

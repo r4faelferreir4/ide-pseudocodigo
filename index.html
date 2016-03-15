@@ -18,6 +18,7 @@
   <script src="codemirror/mode/pascal/pascal.js"></script>
 
   <!-- JS e CSS para pagina -->
+  <script src="js/shortcuts.js"></script>
   <script async src="js/funcoes.js"></script>
   <script async src="js/Compilador.js"></script>
   <link rel=stylesheet href="css/estilo.css"/>
@@ -83,36 +84,36 @@
 
 
   <!-- <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="mostraErroNaLinha(Math.floor((Math.random() * 5) + 1),'sdasd')">
-    <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
-  </button>
+  <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
+</button>
 
-  <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="novoEditor()">
-    <span class="glyphicon glyphicon-floppy-disk">aa</span>
-  </button> -->
+<button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="novoEditor()">
+<span class="glyphicon glyphicon-floppy-disk">aa</span>
+</button> -->
 
-  <!-- Modal -->
-  <div class="modal fade" id="modalOutput" role="dialog">
-    <div class="modal-dialog">
+<!-- Modal -->
+<div class="modal fade" id="modalOutput" role="dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Saída</h4>
-        </div>
-        <div id="modalBody" class="modal-body">
-          <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
-          <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
-        </div>
-        <div id="modalFooter" class="modal-footer">
-          <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
-          <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-        </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Saída</h4>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
+        <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
+      </div>
+      <div id="modalFooter" class="modal-footer">
+        <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
+        <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
       </div>
     </div>
   </div>
-  <!--  fim Modal -->
+</div>
+<!--  fim Modal -->
 
 
 </div>

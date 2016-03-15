@@ -172,7 +172,7 @@ function getChar(head, pos){
     }
     while(head !== undefined){
       if (i == pos)
-      return head.c;
+      return head.c.charCodeAt();
       else
       head = head.next;
       i++;
@@ -191,6 +191,7 @@ function alocaVetor(){
 
 function setChar(head, char, pos){
   var i = 1, len;
+  char = String.fromCharCode(char);
   if (typeof head == "object"){
     if (pos < 0){
       len = lenString(head);

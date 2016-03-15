@@ -1886,12 +1886,13 @@ function block(fsys, isfun, level){
               }
             else {
               if (x.typ == "strings" || y.typ == "strings"){
-                if (x.typ == "chars"){
-                  emit1(25, 2);
-                }
-                else if(y.typ == "chars"){
-                  emit1(25, 1);
-                }
+                if (x.typ == "strings")
+                  if (y.typ == "chars")
+                    emit1(25,1);
+                if (y.typ == "strings")
+                  if(x.typ == "chars")
+                    emit1(25,2);
+                x.typ = resulttype(x.typ,y.typ);
                 switch (op) {
                   case "eql": emit1(39, x.typ);break;
                   case "neq": emit1(40, x.typ);break;
@@ -1908,6 +1909,7 @@ function block(fsys, isfun, level){
                 if(y.typ == "reals")
                   if(x.typ == "ints")
                     emit1(26,TAM_REAL);
+                x.typ = resulttype(x.typ, y.typ);
                 switch (op) {
                   case "eql": emit1(39, x.typ);break;
                   case "neq": emit1(40, x.typ);break;
@@ -1927,7 +1929,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          var x, y, f,op="", assign=1;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
+          var x, y, f,op="", assign=1, fstring=false;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
           x = new item("", 1);
           y = new item("", 1);
           x.typ = tab[i].typ;
@@ -1941,6 +1943,7 @@ function block(fsys, isfun, level){
           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
             if (x.typ == "strings"){
               x.typ = "chars";
+              fstring = true;
             }
             selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
           }
@@ -2056,13 +2059,13 @@ function block(fsys, isfun, level){
                   }
                 }
                 switch (op) {
-                    case "plus": emit1(52, x.typ); break;
+                  case "plus": emit1(52, x.typ); break;
                   case "minus":emit1(53, x.typ); break;
-                  case "mult":  emit1(57, x.typ); break;
-                  case "div": emit1(58, x.typ); break;
+                  case "mult":emit1(57, x.typ); break;
+                  case "div":emit1(58, x.typ); break;
                 }
 
-                emit2(38, x.typ, assign);
+                emit2(38, tab[i].typ, assign);
               }
             }
             else
@@ -2074,7 +2077,7 @@ function block(fsys, isfun, level){
                 else
                   emit1(23, btab[x.ref].vsize);
           else{
-            if(x.typ == 'strings'){
+            if(x.typ == 'strings' || fstring){
               if (x.ref == 1){
                 if (y.typ != "chars"){
                   Error("assignment", "Tentando atribuir um valor não caracter a uma posição de string");
@@ -2093,7 +2096,10 @@ function block(fsys, isfun, level){
                     emit1(34, ltyp);
                   }
                   emit(63);
-                  emit2(38, x.typ, assign);
+                  if(!fstring)
+                    emit2(38, x.typ, assign);
+                  else
+                    emit2(38, "strings", assign);
                 }
               }
               else {
@@ -2110,6 +2116,10 @@ function block(fsys, isfun, level){
                   case "div": emit1(58, x.typ); break;
                 }
                 emit2(38, x.typ, assign);
+              }
+              else if(x.typ == "ints"){
+                if(y.typ == "reals")
+                  Error("assignment", "Erro ao atribuir");
               }
               else
                 if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
@@ -4002,76 +4012,57 @@ function interpreter(){
 
       break;
 
-      case 62:
-        if (s[t] !== 0){
-          if (s[t] <= s[t-1].length && s[t] >= (-s[t-1].length)){
-            if (s[t] > 0)
-              s[t]--;
-            s[t-1] = s[t-1].charCodeAt(Number(s[t]));
-            t--;
+      case 62: //Pega caracter da posição de uma string
+        var pos = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+        var adr = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+        var char;
+        if (pos != 0){
+          if (pos < 0){
+            if ((-pos) < lenString(str_tab[adr]))
+              char = getChar(str_tab[adr], pos);
           }
-          else {
-            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
-            ps = "fin";
+          else if(pos < lenString(str_tab[adr]))
+            char = getChar(str_tab[adr], pos);
+          else{
+            atualizarConsole("ERRO! Posição não permitida");
             return;
           }
+          s.setUint8(t, char);
+          t += TAM_CHAR;
         }
-        else {
-          atualizarConsole("\nNão é permitido acessar uma posição 0 na string");
-          ps = "fin";
+        else{
+          atualizarConsole("Posição 0 não existe");
           return;
         }
       break;
-      case 63:
-      if (typeof s[t-2] == "number"){
-        if (s[t-2] != 0){
-          if (s[t-2] <= s[t].length && s[t-2] >= (-s[t].length)){
-            if (s[t-2] > 0)
-              s[t-2]--;
-            if (s[t-2] != -1)
-              s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1])+s[t].slice(s[t-2]+1, s[t].length);
-            else
-              s[t-2] = s[t].slice(0, s[t-2])+String.fromCharCode(s[t-1]);
-            t -= 2;
-          }
-          else {
-            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
-            ps = "fin";
+      case 63: //Escreve um caracter em uma posição de uma string
+        var adr = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+        var char = s.getUint8(t-TAM_CHAR);
+        t -= TAM_CHAR;
+        var pos = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+        if (pos > 0 && pos < lenString(str_tab[adr]))
+          setChar(str_tab[adr], char, pos);
+        else if(pos < 0){
+          if ((-pos) < lenString(str_tab[adr]))
+            setChar(str_tab[adr], char, pos);
+          else{
+            atualizarConsole("ERRO! Posição não permitida");
             return;
           }
         }
         else {
-          atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
-          ps = "fin";
+          atualizarConsole("ERRO! Posição não permitida");
           return;
         }
-      }
-      else {
-        if (s[t-1] != 0){
-          if (s[t-1] <= s[t-2].length && s[t-1] >= (-s[t-2].length)){
-            if (s[t-1] > 0)
-              s[t-1]--;
-            if (s[t-1] == -1)
-            s[t-2] = s[t-2]+s[t];
-            else
-              s[t-2]= s[t-2].slice(0, s[t-1]+1)+s[t]+s[t-2].slice(s[t-1]+1, s[t-2].length);
-            t -= 2;
-          }
-          else {
-            atualizarConsole("\nNão é permitido acessar uma posição fora da string");
-            ps = "fin";
-            return;
-          }
-        }
-        else {
-          atualizarConsole("Posição 0 não existe em uma string, iniciar a partir da posição 1 ou -1");
-          ps = "fin";
-          return;
-        }
-      }
+        s.setInt32(t, adr);
+        t += TAM_INT;
       break;
-      case 64:
-        s[t] = s[t].length;
+      case 64://Retorna tamanho de uma string
+        s.setInt32(t-TAM_INT, lenString(str_tab[s.getInt32(t-TAM_INT)]));
       break;
       case 65:
         s[t] = s[t].toUpperCase();

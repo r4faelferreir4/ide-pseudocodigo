@@ -1,14 +1,14 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-  //VARIÁVEIS emit(43)
+  //VARIÁVEIS Error(56)
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
 var emax = 500;		//Exponente máximo para numeros reais
 var emin = -500;	//Exponente minimo para numeros reais
-var kmax = 15;		//Numero maximos de digitos significativos
+var kmax = 40;		//Numero maximos de digitos significativos
 var tmax = 100;		//Tamanho da tabela
 var bmax = 20;		//Tamanho da tabela de blocos
 var amax = 30;		//Tamanho da tabela de arranjos
@@ -173,50 +173,40 @@ function initArray(){
 function compiladorPascalS(){
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
-  console.log(InputFile[iln]);
-  //DEFINIÇÕES DE FUNÇÕES FALTANDO
-  function ErrorMsg(){
-    var k, Msg = [];
-    Msg[0] = "undef id  "; Msg[1] = "multi def ";
-    Msg[2] = "identificador"; Msg[3] = "programa  " ;
-    Msg[4] = ")         "; Msg[5] = ":         ";
-    Msg[6] = "sintaxe    "; Msg[7] = "ident, var";
-    Msg[8] = "de        "; Msg[9] = "(         ";
-    Msg[10] = "id, arranjo "; Msg[11] = "[         ";
-    Msg[12] = "]         "; Msg[13] = "..        ";
-    Msg[14] = ";         "; Msg[15] = "func. type";
-    Msg[16] = "=         "; Msg[17] = "booleano   ";
-    Msg[18] = "convar typ"; Msg[19] = "tipo      ";
-    Msg[20] = "prog.param"; Msg[21] = "muito grande   ";
-    Msg[22] = ".         "; Msg[23] = "typ (case)";
-    Msg[24] = "caracter "; Msg[25] = "const id  ";
-    Msg[26] = "index type"; Msg[27] = "indexbound";
-    Msg[28] = "no array  "; Msg[29] = "type id   ";
-    Msg[30] = "undef type"; Msg[31] = "no record ";
-    Msg[32] = "boole type"; Msg[33] = "arith type";
-    Msg[34] = "inteiro   "; Msg[35] = "tipos     ";
-    Msg[36] = "param type"; Msg[37] = "variab id ";
-    Msg[38] = "string    "; Msg[39] = "N. de partes";
-    Msg[40] = "tipo      "; Msg[41] = "tipo      ";
-    Msg[42] = "real type "; Msg[43] = "inteiro   ";
-    Msg[44] = "var, const"; Msg[45] = "var, proc ";
-    Msg[46] = "types (:=)"; Msg[47] = "typ (case)";
-    Msg[48] = "tipo      "; Msg[49] = "store ovfl";
-    Msg[50] = "constante  "; Msg[51] = ":=        ";
-    Msg[52] = "entao      "; Msg[53] = "ate     ";
-    Msg[54] = "faça        "; Msg[55] = "para baixo ";
-    Msg[56] = "inicia     "; Msg[57] = "fim       ";
-    Msg[58] = "fator    ";
-    k = 0;
-    console.log("\n");
-    console.log(" palavras chave");
-    while (errs.length !== 0){        //Verificação se o vetor está vázio.
-      while (!(k < ermax && k > 0))  //Verificação de k está entre os valores de erro cadastrados
-      k++;
-      console.log(k + "   " + Msg[k]);  //Exibindo erro no console
-      errs.splice(0, 1);  //Localiza o erro que foi exibido e elimina-o da lista de erros
-    }
 
+  function ErrorMsg(code){
+    var k, Msg = [];
+    Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações multiplas não são permitidas.";
+    Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
+    Msg[4] = "Está faltando o delimitador \')\'."; Msg[5] = "Está faltando o caractere \':\'.";
+    Msg[6] = "O ponto e vírgula não é necessário ao final da instrução."; Msg[7] = "";
+    Msg[8] = "Está faltando a palavra reservada \'de\'."; Msg[9] = "Está faltando o delimitador \'(\'.";
+    Msg[10] = ""; Msg[11] = "está faltando o delimitador \'[\'.";
+    Msg[12] = "está faltando o delimitador \']\'."; Msg[13] = "Está faltando os caracteres \'..\' para especificar o intervalo de um arranjo.";
+    Msg[14] = "está faltando o caractere \';\'."; Msg[15] = "Tipo de retorno de função não suportado.";
+    Msg[16] = "está faltando o caractere \'=\'."; Msg[17] = "A expressão precisa retornar como resultado um valor lógico.";
+    Msg[18] = "tipo de dado da variável não suportado pela instrução \'para\'."; Msg[19] = "o tipo do inicio, fim e passo da instrução \'para\' precisam ser iguais ao tipo da variavel inicial.";
+    Msg[20] = ""; Msg[21] = "número muito grande.";
+    Msg[22] = ""; Msg[23] = "tipo de dado não suportado pela instrução \'caso\'.";
+    Msg[24] = "caractere não reconhecido."; Msg[25] = "o identificador precisa ser uma constante.";
+    Msg[26] = "este índice não é permitido para este arranjo."; Msg[27] = "os limites inferior e superior deste arranjo estão irregulares.";
+    Msg[28] = "você só pode acessar posições específicas com \'[]\' em arranjos e strings."; Msg[29] = "identificador de tipo não reconhecido.";
+    Msg[30] = "tipo indefinido."; Msg[31] = "a variável que você está tentando acessar um atributo não é do tipo \'registro\'. ";
+    Msg[32] = "operadores lógicos como \'e\', \'ou\' e \'nao\' só podem ser usados com variáveis ou expressões que resultam em um dado do tipo lógico."; Msg[33] = "tipo de dado não permitido para expressões aritméticas.";
+    Msg[34] = "a variável nessa expressão precisa ser do tipo \'inteiro\'."; Msg[35] = "tipo de dado não permitido para expressões relacionais.";
+    Msg[36] = "tipo do parametro incorreto."; Msg[37] = "o identificador precisa ser uma variável.";
+    Msg[38] = "a literal do tipo string não pode ser vazia."; Msg[39] = "você está passando parametros não declarados nessa chamada.";
+    Msg[40] = "tipo de dado não suportado pela instrução \'leia\'."; Msg[41] = "tipo de dado não suportado pela instrução \'escreva\'.";
+    Msg[42] = ""; Msg[43] = "";
+    Msg[44] = "você não pode introduzir um procedimento em uma expressão"; Msg[45] = "o identificador não é uma variável.";
+    Msg[46] = "tipo incompatível para atribuição à essa variável."; Msg[47] = "o tipo do rótulo na instrução \'caso\' é incompatível com a variável analisada.";
+    Msg[48] = "tipo de parametro incompatível para a função."; Msg[49] = "pilha de execução muito pequena.";
+    Msg[50] = "constante  "; Msg[51] = "";
+    Msg[52] = "entao      "; Msg[53] = "está faltando a palavra reservada \'ate\'.";
+    Msg[54] = "está faltando a palavra reservada \'faca\'."; Msg[55] = "";
+    Msg[56] = ""; Msg[57] = "está faltando o delimitador de final de bloco de instruções \'fim\'.";
+    Msg[58] = "";
+    return Msg[code];
   }
 
   //FUNÇÃO DE BUSCA DE CARACTERES
@@ -250,9 +240,10 @@ function compiladorPascalS(){
     }
   }
   //Função Error
-  function Error(struct, str){
+  function Error(code, struct, str){
     try{
       debugger;
+      var strError = ErrorMsg(code);
       if (isOk){
         isOk = false;
         str = "";
@@ -263,6 +254,7 @@ function compiladorPascalS(){
             str += "\n"+"<variável>"+":=".bold()+"<expressão>";
           break;
         }
+        str += '\n'+strError;
         MsgErro = str;
       }
     }
@@ -463,6 +455,14 @@ function compiladorPascalS(){
               NextCh();
               if (ch != "\'")
               break;
+            }
+            if(ch == "\\"){
+              var bar = ch;
+              NextCh();
+              if(ch != "\'"){
+                stab[sx+k] = bar;
+                k++;
+              }
             }
             if ((sx + k) == smax)
             fatal(7);
@@ -1513,7 +1513,10 @@ function block(fsys, isfun, level){
                           expression(fsys.concat(["rparent"]), y);
                           if (y.typ == "strings" || y.typ == "chars"){
                             ts = ["ints", "strings", "chars"];
-                            emit(67);
+                            if (y.typ == "chars")
+                              emit1(67, 0);
+                            else
+                              emit1(67, 1);
                           }
                           else {
                             Error("strbusca", "\nParâmetro incorreto");
@@ -2141,8 +2144,14 @@ function block(fsys, isfun, level){
           while (sy != "endsy"){
             if (statbegsys.concat("ident").indexOf(sy) != -1)
               statement(["semicolon", "endsy", "elsesy"].concat(fsys));
-            else
-              break;
+            else{
+              if (sy == "semicolon"){
+                Error(6);
+                insymbol();
+              }
+              else
+                break;
+            }
           }
           if (sy == "endsy")
             insymbol();
@@ -2302,6 +2311,10 @@ function block(fsys, isfun, level){
           statement(["untilsy"].concat(fsys));
           while(statbegsys.concat("ident").indexOf(sy) != -1){
             statement(["semicolon", "untilsy"].concat(fsys));
+            if(sy == "semicolon"){
+              Error(6);
+              insymbol();
+            }
           }
           if (sy == "untilsy"){
             insymbol();
@@ -2606,6 +2619,10 @@ function block(fsys, isfun, level){
           forstatement();
           break;
         }
+        if (sy == "semicolon"){
+          Error(6);
+          insymbol();
+        }
         test(fsys.concat(["ident", "realcon", "intcon", "charcon", "bools"]), [""], 14);
       }
       catch(err){
@@ -2669,6 +2686,10 @@ function block(fsys, isfun, level){
       btab[prb].vsize = dx;
       while(["proceduresy", "functionsy"].indexOf(sy) != -1)
         procdeclaration();
+      if(sy == "semicolon"){
+        Error(6);
+        insymbol();
+      }
       test(["beginsy"], blockbegsys.concat(statbegsys), 56);
     }while(statbegsys.indexOf(sy) == -1);
     tab[prt].adr = lc;
@@ -2682,10 +2703,16 @@ function block(fsys, isfun, level){
       if (statbegsys.concat(["ident"]).indexOf(sy) != -1 && ch != "?")
         statement(["semicolon", "endsy", "elsesy"].concat(fsys));
       else {
-        insymbol();
-        Error();
-        if (ch == "?")
-          break;
+        if (sy == "semicolon"){
+          Error(6);
+          insymbol();
+        }
+        else{
+          insymbol();
+          Error();
+          if (ch == "?")
+            break;
+        }
       }
 
     }
@@ -2785,8 +2812,7 @@ try{
   iflag = true;
   oflag = true;
   if (sy != "programsy"){
-    console.log("Aplicação finalizada");
-    return;
+    Error(3);
   }
   else {
     insymbol();
@@ -4064,33 +4090,44 @@ function interpreter(){
       case 64://Retorna tamanho de uma string
         s.setInt32(t-TAM_INT, lenString(str_tab[s.getInt32(t-TAM_INT)]));
       break;
-      case 65:
-        s[t] = s[t].toUpperCase();
+      case 65:     //Pega endereço de referencia no topo da pilha e converte string para maiúsculo
+        var adr = s.getInt32(t-TAM_INT);
+        var str = getString(str_tab[adr]);
+        str = str.toUpperCase();
+        alocaString(str, str_tab[adr], false);
       break;
-      case 66:
-        s[t] = s[t].toLowerCase();
+      case 66:     //Pega endereço de referência no topo da pilha e converte string para minúsculo
+        var adr = s.getInt32(t-TAM_INT);
+        var str = getString(str_tab[adr]);
+        str = str.toLowerCase();
+        alocaString(str, str_tab[adr], false);
       break;
       case 67:    //busca um caracter ou string no topo da pilha em uma string em t-1
-        if (typeof s[t] == "number")
-          s[t] = String.fromCharCode(s[t]);
-        s[t-1] = s[t-1].indexOf(s[t]);
-        if (s[t-1] == -1)
-          s[t-1] = 0;
-        else
-          s[t-1]++;
-        t--;
+        if(ir.y == 1){
+          var adr1 = s.getInt32(t-TAM_INT);
+          t -= TAM_INT;
+          var str1 = getString(str_tab[adr1]);
+          if (str_tab[adr1].destruct)
+            str_tab[adr1] = undefined;
+        }
+        else{
+          var str1 = String.fromCharCode(s.getUint8(t-TAM_CHAR));
+          t -= TAM_CHAR;
+        }
+        var adr2 = s.getInt32(t-TAM_INT);
+        var str2 = getString(str_tab[adr2]);
+        if (str_tab[adr2].destruct)
+          str_tab[adr2] = undefined;
+        var result = str2.localeCompare(str1);
+        s.setInt32(t-TAM_INT, result);
       break;
       case 68:    //Avaliação curta do operador 'ou'
-        if (s[t])
+        if (s.getUint8(t-TAM_BOOL))
           pc = ir.y;
       break;
       case 69:    //Avaliação curta do operador 'e'
-        if (!s[t])
+        if (!s.getUint8(t-TAM_BOOL))
           pc = ir.y;
-      break;
-      case 70:    //Sendo t o topo da pilha, copia o valor t-ir.y para o novo topo da pilha
-        t++;
-        s[t] = s[t-ir.y];
       break;
 
       }//primeiro switch

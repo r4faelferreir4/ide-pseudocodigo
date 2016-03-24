@@ -240,21 +240,21 @@ function compiladorPascalS(){
     }
   }
   //Função Error
-  function Error(code, struct, str){
+  function Error(code){
     try{
       debugger;
       var strError = ErrorMsg(code);
       if (isOk){
         isOk = false;
         str = "";
-        str += "Um erro foi encontrado";
-        switch(struct){
-          case "assignment":
-            str += "\nEspera-se uma instrução desta forma:";
-            str += "\n"+"<variável>"+":=".bold()+"<expressão>";
+        str += "Um erro foi encontrado: "+strError;
+        switch(code){
+          case 1:
+            str += "\nIsso pode acontecer se você declarou uma variável mais de uma vez";
+            str += "\nTambém pode acontecer na estrutura \'caso\' para ";
           break;
         }
-        str += '\n'+strError;
+
         MsgErro = str;
       }
     }
@@ -2912,7 +2912,8 @@ try{
     return err;
   }
   finally{
-    alert("Compilação finalizada");
+    if (isOk)
+      MsgErro = "Compilação finalizada com sucesso.";
     //interpret();
   }
 

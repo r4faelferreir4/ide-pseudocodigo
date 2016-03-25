@@ -83,12 +83,12 @@
   </button>
 
 
-  <!-- <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="mostraErroNaLinha(Math.floor((Math.random() * 5) + 1),'sdasd')">
-  <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
-</button>
+  <!-- <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="adicionarErro('eee')">
+    <span class="glyphicon glyphicon-floppy-disk">hkjh</span>
+  </button>
 
-<button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="novoEditor()">
-<span class="glyphicon glyphicon-floppy-disk">aa</span>
+  <button name="depurar" id="compilar"type="button" class="btn btn-default" onclick="limpaDebug()">
+  <span class="glyphicon glyphicon-floppy-disk">aa</span>
 </button> -->
 
 <!-- Modal -->
@@ -157,13 +157,23 @@
 <div style="clear:both;"/>
 <br>
 <!--Debug painel -->
-<div class="panel panel-danger">
+<div class="panel panel-danger" style="max-height: 200px; overflow:auto;">
   <div class="panel-heading">
     <h3 class="panel-title">Debug</h3>
   </div>
-  <div class="panel-body">
-    <textarea id="panel-error" disabled="true"></textarea>
-  </div>
+
+  <table class="table table-bordered" id="panel-error">
+    <thead>
+      <tr >
+        <th colspan="2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- inserir linhas pilha execucao-->
+    </tbody>
+  </table>
+  <!-- <textarea id="panel-error" disabled="true"></textarea> -->
+</div>
 </div>
 <!--fim debug painel -->
 </div>

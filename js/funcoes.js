@@ -265,6 +265,21 @@ function renderInput(bool) {
   }
 }
 
+
+//debug
+function adicionarErro(erro) {
+  var table = document.getElementById("panel-error");
+  var row = table.insertRow(1);
+  var cell1 = row.insertCell(0);
+  cell1.innerHTML = erro;
+}
+
+function limpaDebug(){
+  $("#panel-error tr:gt(0)").remove();
+}
+
+//fim funcoes debug
+
 //funcoes para pilha
 function adicionarTabelaPilha(funcao) {
   /*$('#tab_logic').append('<tr><td>'+ funcao + '</td></tr>');*/

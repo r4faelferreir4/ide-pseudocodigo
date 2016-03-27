@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-  //VARIÁVEIS Error(15)
+  //VARIÁVEIS Error(19)
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -327,8 +327,27 @@ function compiladorPascalS(){
             str += Errorstr.slice(0, Errorstr.length-2);
           break;
           case 15:
+            limparCodeBox();
+            line -= 2;
+            mostraErroNaLinha(line, strError);
+            str = "Um erro foi encontrado na linha "+line+": "+strError;
             str += "\nOs tipos suportados para retorno de função são: ";
             str += "inteiro, real, logico, caracter, string.";
+          break;
+          case 18:
+            limparCodeBox();
+            str = "Um erro foi encontrado na linha "+line+": "+"O tipo de dado da variável \'"+errorName+"\' não é suportado pela instrução \'para\'.";
+            mostraErroNaLinha(line-1, str);
+            str += "\nA instrução \'para\' suporta os seguintes tipos de dado: inteiro, real, caracter e logico";
+          break;
+          case 19:
+          var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":"";
+            str += "\nA variável utilizada nessa estrutura é do tipo "+tp+".";
+            if (tp == "real"){
+              str += "\nCaso você esteja utilizando valores literais inteiros, pode convertê-los para real adicionando o caracter \'e\' ou \'.0\' ao final do valor. Por exemplo: \n";
+              str += "para i de 0e ate 5e passo 2e faca\n";
+              str += "para i de 0.0 ate 5.0 passo 2.0 faca";
+            }
           break;
         }
 
@@ -2452,14 +2471,14 @@ function block(fsys, isfun, level){
           if (sy == "ident"){
             i = loc(id);
             insymbol();
-            if (i === 0)
+            if (i == 0)
               cvt = "ints";
             else
             if (tab[i].obj == "variable"){
               cvt = tab[i].typ;
               emit2(0, tab[i].lev, tab[i].adr);
               if (["notyp", "ints", "bools", "chars", "reals"].indexOf(cvt) == -1)
-                Error(18);
+                Error(18, tab[i].name);
             }
             else {
               Error(37);
@@ -2472,7 +2491,7 @@ function block(fsys, isfun, level){
             insymbol();
             expression(["untilsy", "downtosy", "dosy"].concat(fsys), x);
             if (x.typ != cvt)
-            Error(19);
+            Error(19, cvt);
           }
           else
             skip(["untilsy", "ofsy"].concat(fsys), 8);
@@ -2484,7 +2503,7 @@ function block(fsys, isfun, level){
             p = new item("", 1);
             expression(fsys.concat(["stepsy", "dosy"]), p);
             if (p.typ != cvt)
-              Error(19);
+              Error(19, cvt);
             else{
               if (sy == "stepsy"){
                 insymbol();
@@ -2495,7 +2514,7 @@ function block(fsys, isfun, level){
                       if (cvt == "ints")
                         emit2(24, cvt, inum);
                       else
-                        Error(19);
+                        Error(19, cvt);
                     }
                     else{
                       if (cvt == "reals"){
@@ -2504,7 +2523,7 @@ function block(fsys, isfun, level){
                         steptyp = TAM_REAL;
                       }
                       else
-                        Error(19);
+                        Error(19, cvt);
                     }
                   }
                   emit1(36, steptyp);
@@ -2515,7 +2534,7 @@ function block(fsys, isfun, level){
                       if (cvt == "ints")
                         emit2(24, cvt, inum);
                       else
-                        Error(19);
+                        Error(19, cvt);
                     }
                     else{
                       if (cvt == "reals"){
@@ -2524,13 +2543,13 @@ function block(fsys, isfun, level){
                         steptyp = TAM_REAL;
                       }
                       else
-                        Error(19);
+                        Error(19,cvt);
                     }
                   }
 
                 }
                 if (p.typ != cvt) {
-                  Error(19);
+                  Error(19, cvt);
                 }
                 insymbol();
               }

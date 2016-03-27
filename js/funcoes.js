@@ -121,7 +121,8 @@ function atualizarConsole(string){
 }
 
 function mostraErro(){
-  document.getElementById("panel-error").value = MsgErro;
+	limpaDebug();
+  adicionarErro(MsgErro);
 }
 
 function changeOutput(){

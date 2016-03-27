@@ -14,10 +14,10 @@ CodeMirror.defineMode("pascal", function() {
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
-  var keywords = words("programa fim var const procedimento funcao inicio inteiro real logico literal enumerado ponteiro " +
-                       "enquanto fimenquanto escreva e ou xou nao repete leia " +
+  var keywords = words("caso programa fim var const procedimento funcao inicio inteiro real logico string enumerado ponteiro " +
+                       "enquanto fimenquanto escreva e ou xou nao repita leia " +
                        "para fimpara se entao fimse retorne de ate passo senao faca " +
-					   "caracter string arranjo registro fimprocedimento fimfuncao fimregistro verdadeiro falso ");
+					   "caracter string arranjo registro verdadeiro falso ");
 
 
 

@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-  //VARIÁVEIS Error(19)
+  //VARIÁVEIS Error(36)
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
@@ -20,7 +20,7 @@ var smax = 600;		//Tamanho da tabela de strings
 var ermax = 59;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
-var nmax = 32767;	//281474976710655 2**48-1
+var nmax = 2147643648;	//281474976710655 2**48-1
 var lineleng = 300;	//Tamanho da linha de saída
 var linelimit = 500;
 var stacksize = (1024*1024)*5;   //5 megabytes de espaço
@@ -98,6 +98,8 @@ var key = [];   //Tipo alfa não especificado, lembrar de tratar isso depois
 var ksy = [];   //Tipo symbol não especificado, lembrar de tratar isso depois
 var sps = [];      //Simbolos especiais, tipo symbol não especificado
 var csps = [];    //Caracteres de simbolos especiais
+var xsps = [];  //Símbolos especiais com índice numerico
+var nsps = []    //Nome dos símbolos especiais
 var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
@@ -182,32 +184,33 @@ function compiladorPascalS(){
     Msg[6] = "Erro de sintaxe."; Msg[7] = "O ponto e vírgula não é necessário ao final da instrução.";
     Msg[8] = "Está faltando a palavra reservada \'de\'."; Msg[9] = "Está faltando o delimitador \'(\'.";
     Msg[10] = ""; Msg[11] = "está faltando o delimitador \'[\'.";
-    Msg[12] = "está faltando o delimitador \']\'."; Msg[13] = "Está faltando os caracteres \'..\' para especificar o intervalo do arranjo.";
-    Msg[14] = "está faltando o ponto e vírgula."; Msg[15] = "Tipo de retorno de função não suportado.";
-    Msg[16] = "está faltando o caractere \'=\'."; Msg[17] = "A expressão precisa retornar como resultado um valor lógico.";
-    Msg[18] = "tipo de dado da variável não suportado pela instrução \'para\'."; Msg[19] = "o tipo dos valores de inicio, fim e passo da instrução \'para\' precisam ser iguais ao tipo da variavel inicial.";
-    Msg[20] = ""; Msg[21] = "número muito grande.";
-    Msg[22] = ""; Msg[23] = "tipo de dado não suportado pela instrução \'caso\'.";
-    Msg[24] = "caractere não reconhecido."; Msg[25] = "o identificador precisa ser uma constante.";
-    Msg[26] = "este índice não é permitido para este arranjo."; Msg[27] = "os limites inferior e superior deste arranjo estão irregulares.";
-    Msg[28] = "você só pode acessar posições específicas com \'[]\' em arranjos e strings."; Msg[29] = "identificador de tipo não reconhecido.";
-    Msg[30] = "tipo indefinido."; Msg[31] = "a variável que você está tentando acessar um atributo não é do tipo \'registro\'. ";
-    Msg[32] = "operadores lógicos como \'e\', \'ou\' e \'nao\' só podem ser usados com variáveis ou expressões que resultam em um dado do tipo lógico."; Msg[33] = "tipo de dado não permitido para expressões aritméticas.";
-    Msg[34] = "a variável nessa expressão precisa ser do tipo \'inteiro\'."; Msg[35] = "tipo de dado não permitido para expressões relacionais.";
-    Msg[36] = "tipo do parametro incorreto."; Msg[37] = "o identificador precisa ser uma variável.";
-    Msg[38] = "a literal do tipo string não pode ser vazia."; Msg[39] = "você está passando parametros não declarados nessa chamada.";
-    Msg[40] = "tipo de dado não suportado pela instrução \'leia\'."; Msg[41] = "tipo de dado não suportado pela instrução \'escreva\'.";
+    Msg[12] = "Está faltando o delimitador \']\'."; Msg[13] = "Está faltando os caracteres \'..\' para especificar o intervalo do arranjo.";
+    Msg[14] = "Está faltando o ponto e vírgula."; Msg[15] = "Tipo de retorno de função não suportado.";
+    Msg[16] = "Está faltando o caractere \'=\'."; Msg[17] = "A expressão precisa retornar como resultado um valor lógico.";
+    Msg[18] = "Tipo de dado da variável não suportado pela instrução \'para\'."; Msg[19] = "O tipo dos valores de inicio, fim e passo da instrução \'para\' precisam ser iguais ao tipo da variavel inicial.";
+    Msg[20] = ""; Msg[21] = "Número muito grande.";
+    Msg[22] = ""; Msg[23] = "Tipo de dado não suportado pela instrução \'caso\'.";
+    Msg[24] = "Caracter não reconhecido."; Msg[25] = "o identificador \'"+id+"\' precisa ser uma constante.";
+    Msg[26] = "Este tipo de índice não é permitido para este arranjo."; Msg[27] = "Os limites inferior e superior deste arranjo estão irregulares.";
+    Msg[28] = "A variável \'"+id+"\' não é do tipo arranjo nem string, você não pode utilizar colchetes."; Msg[29] = "O identificador "+id+" não é um tipo de dado.";
+    Msg[30] = "Tipo indefinido."; Msg[31] = "A variável \'"+id+"\' que você está tentando acessar um atributo não é do tipo \'registro\'. ";
+    Msg[32] = "Operadores lógicos como \'e\', \'ou\' e \'nao\' só podem ser usados com variáveis ou expressões que resultam em um dado do tipo lógico."; Msg[33] = "tipo de dado não permitido para expressões aritméticas.";
+    Msg[34] = "A variável nessa expressão precisa ser do tipo \'inteiro\'."; Msg[35] = "tipo de dado não permitido para expressões relacionais.";
+    Msg[36] = "Tipo do parametro incorreto."; Msg[37] = "o identificador precisa ser uma variável.";
+    Msg[38] = "A literal do tipo string não pode ser vazia."; Msg[39] = "você está passando parametros não declarados nessa chamada.";
+    Msg[40] = "Tipo de dado não suportado pela instrução \'leia\'."; Msg[41] = "tipo de dado não suportado pela instrução \'escreva\'.";
     Msg[42] = ""; Msg[43] = "";
-    Msg[44] = "você não pode introduzir um procedimento em uma expressão"; Msg[45] = "o identificador não é uma variável.";
-    Msg[46] = "tipo incompatível para atribuição."; Msg[47] = "o tipo do rótulo na instrução \'caso\' é incompatível com a variável analisada.";
-    Msg[48] = "tipo de parametro incompatível para a função."; Msg[49] = "pilha de execução muito pequena.";
-    Msg[50] = "constante  "; Msg[51] = "Está faltando o operador de atribuição \':=\'";
-    Msg[52] = "entao      "; Msg[53] = "está faltando a palavra reservada \'ate\'.";
-    Msg[54] = "está faltando a palavra reservada \'faca\'."; Msg[55] = "";
-    Msg[56] = ""; Msg[57] = "está faltando o delimitador de final de bloco de instruções \'fim\'.";
+    Msg[44] = "Você não pode introduzir um procedimento em uma expressão"; Msg[45] = "o identificador não é uma variável.";
+    Msg[46] = "Tipo incompatível para atribuição."; Msg[47] = "o tipo do rótulo na instrução \'caso\' é incompatível com a variável analisada.";
+    Msg[48] = "Tipo de parametro incompatível para a função."; Msg[49] = "Pilha de execução muito pequena.";
+    Msg[50] = "Constante  "; Msg[51] = "Está faltando o operador de atribuição \':=\'";
+    Msg[52] = "Entao      "; Msg[53] = "Está faltando a palavra reservada \'ate\'.";
+    Msg[54] = "Está faltando a palavra reservada \'faca\'."; Msg[55] = "";
+    Msg[56] = ""; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
     Msg[58] = ""; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
+    Msg[62] = "Está faltando o ";
     return Msg[code];
   }
 
@@ -248,10 +251,12 @@ function compiladorPascalS(){
       if (isOk){
         var strError = ErrorMsg(code);
         var line;
+        line = iln;
         if (cc == 1)
-          line = iln - 2;
-        else
-          line = iln - 1;
+          line--;
+        do {
+          line--;
+        } while (InputFile[line].length == 0);
         mostraErroNaLinha(line, strError);
         isOk = false;
         str = "";
@@ -271,6 +276,7 @@ function compiladorPascalS(){
                 str += "\nVeja um exemplo: "+"programa".bold()+" test()";
               break;
               case "leia":
+                str = "Um erro foi encontrado na linha "+line+": "+strError;
                 str += "\nVocê precisa informar uma variável como parametro para o procedimento \'leia\'";
               break;
               case "functionsy":
@@ -281,7 +287,7 @@ function compiladorPascalS(){
                 str += "\nA função/procedimento que você está chamando possui parametros por refência. Você precisa informar uma variável como parametro.";
               break;
               case "colon":
-                str += "\nEspera-se a declaraçao de uma variável após a vírgula. Para resolver o problema você pode:\n(a) Apagar a vírgula.\n(b) Declarar uma nova variável.";
+                str += "\nEspera-se a identificação de uma variável após a vírgula. Para resolver o problema você pode:\n(a) Apagar a vírgula.\n(b) Informar uma nova variável.";
               break;
               case "period":
                 str += "\nVocê precisa informar um atributo do registro informado após o ponto. Para este registro existem os atributos:\n";
@@ -306,33 +312,41 @@ function compiladorPascalS(){
                 str += "\nA palavra reservada \'"+key[ky]+"\' não é esperada nesta posição.";
               }
               else {
-                if (sps.indexOf(sy) != -1){
-                  var ky = sps.indexOf(sy);
+                if (xsps.indexOf(sy) != -1){
+                  var ky = xsps.indexOf(sy);
                   str += "\nO operador \'"+csps[ky]+"\' não é esperado nesta posição.";
                 }
               }
             }
-            str += "\nAs seguintes palavras são permitidas nesta posição: ";
-            var Errorstr = "";
-            errorName.forEach(function each(value, index, obj){
-              if (ksy.indexOf(value) != -1){
-                Errorstr += key[ksy.indexOf(value)]+", ";
-              }
-              else{
-                if (sps.indexOf(value) != -1){
-                  Errostr += csps[sps.indexOf(value)]+", ";
+            if (errorName.length != 0){
+              str += "\nAs seguintes palavras são permitidas nesta posição: ";
+              var Errorstr = "";
+              if (errorName.indexOf("ident") != -1)
+                Errorstr += "variáveis, ";
+              errorName.forEach(function each(value, index, obj){
+                if (ksy.indexOf(value) != -1){
+                  Errorstr += key[ksy.indexOf(value)]+", ";
                 }
-              }
-            });
-            str += Errorstr.slice(0, Errorstr.length-2);
+                else{
+                  if (xsps.indexOf(value) != -1){
+                    Errorstr += nsps[xsps.indexOf(value)]+", ";
+                  }
+                }
+              });
+              str += Errorstr.slice(0, Errorstr.length-2);
+            }
           break;
           case 15:
             limparCodeBox();
-            line -= 2;
-            mostraErroNaLinha(line, strError);
+            line -= 1;
+            mostraErroNaLinha(line-1, strError);
             str = "Um erro foi encontrado na linha "+line+": "+strError;
             str += "\nOs tipos suportados para retorno de função são: ";
             str += "inteiro, real, logico, caracter, string.";
+          break;
+          case 17:
+          var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":(errorName =="notyp")?"sem tipo":"";
+            str += "\nA expressão avaliada está retornando o tipo "+tp+".";
           break;
           case 18:
             limparCodeBox();
@@ -341,14 +355,29 @@ function compiladorPascalS(){
             str += "\nA instrução \'para\' suporta os seguintes tipos de dado: inteiro, real, caracter e logico";
           break;
           case 19:
-          var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":"";
+          var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
             str += "\nA variável utilizada nessa estrutura é do tipo "+tp+".";
             if (tp == "real"){
               str += "\nCaso você esteja utilizando valores literais inteiros, pode convertê-los para real adicionando o caracter \'e\' ou \'.0\' ao final do valor. Por exemplo: \n";
-              str += "para i de 0e ate 5e passo 2e faca\n";
-              str += "para i de 0.0 ate 5.0 passo 2.0 faca";
+              str += "para r de 0e ate 5e passo 2e faca\n";
+              str += "para r de 0.0 ate 5.0 passo 2.0 faca";
             }
           break;
+          case 23:
+            str += "\nOs tipos de dados suportados são: inteiro, real, logico e caracter.";
+          break;
+          case 26:
+          var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
+            str += "\nO tipo permitido para o índice deste arranjo é "+tp+".";
+          break;
+          case 36:
+            var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
+            var tpref  = (ref == "ints")?"inteiro":(ref == "reals")?"real":(ref == "bools")?"logico":(ref == "chars")?"caracter":(ref == "strings")?"string":(ref == "records")?"registro":"";
+            str += "\nEspera-se um parâmetro do tipo \'"+tpref+"\' mas você está passando um parâmetro do tipo \'"+tp+"\'";
+          break
+          case 62:
+            str += errorName+"º parâmetro.";
+          break
         }
 
         MsgErro = str;
@@ -643,9 +672,9 @@ function enter(x0, x1, x2, x3){
 function EnterArray(tp, l, h){
   try{
     if (l > h)
-      Error(27);
+      Error(27, l, h);
     if (Math.abs(l) > xmax || Math.abs(h) > xmax){
-      Error(27);
+      Error(27, l, h);
       l = 0;
       h = 0;
     }
@@ -784,8 +813,11 @@ function block(fsys, isfun, level){
 
     function skip(fsys, n, sx3){
       try{
-        if (n == 6)
+        if (n == 6){
+          var i = fsys.indexOf("constsy");
+          sx3 = sx3.concat(fsys.slice(0, i));
           Error(n, sx3);
+        }
         else
           Error(n);
         while(fsys.indexOf(sy) == -1)
@@ -959,7 +991,7 @@ function block(fsys, isfun, level){
           high = new conrec("", 0, 0);
           constant(["colon", "rbrack", "rparent", "ofsy"].concat(fsys), low);
           if (low.tp == "reals"){
-            Error(27);
+            Error(26, low.i, 0);
             low.tp = "ints";
             low.i = 0;
           }
@@ -1335,9 +1367,9 @@ function block(fsys, isfun, level){
           x = new item("", 1);
           do{
             if (sy == "period"){
-              insymbol();
               if (v.typ != "records")
                 Error(31);
+              insymbol();
               if (sy != "ident")
                 Error(2, "period", loc(id));
               else {
@@ -1369,9 +1401,9 @@ function block(fsys, isfun, level){
               if (sy != "lbrack")
                 Error(11);
               do{
-                insymbol();
-                if (v.typ != "arrays" || v.typ != "strings")
+                if (v.typ != "arrays" && v.typ != "strings")
                   Error(28);
+                insymbol();
                 if (v.typ != "arrays"){
                   if (v.typ == "strings" || v.typ == "chars"){
                     if (v.typ == "strings" && !assign)
@@ -1391,7 +1423,7 @@ function block(fsys, isfun, level){
                   expression(fsys.concat(["comma", "rbrack"]), x);
                   a = v.ref;
                   if (atab[a].inxtyp != x.typ)
-                    Error(26);
+                    Error(26, atab[a].inxtyp);
                   else
                     if (atab[a].elsize == 1)
                       emit1(20, a);
@@ -1435,7 +1467,7 @@ function block(fsys, isfun, level){
                   expression(fsys.concat(["comma", "colon", "rparent"]), x);
                   if (x.typ == tab[cp].typ){
                     if (x.ref != tab[cp].ref)
-                      Error(36);
+                      Error(36, "records", "records");
                     else
                       if (x.typ == "arrays")
                         emit1(22, atab[x.ref].size);
@@ -1451,7 +1483,7 @@ function block(fsys, isfun, level){
                       emit1(26,TAM_INT);
                     else
                       if (x.typ != "notyp")
-                        Error(36);
+                        Error(36, x.typ, tab[cp].typ);
                 }
                 else {
                   if (sy != "ident")
@@ -1471,7 +1503,7 @@ function block(fsys, isfun, level){
                       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                         selector(fsys.concat(["comma", "colon", "rparent"]), x, false);
                       if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
-                        Error(36);
+                        Error(36, x.typ, tab[cp].typ);
                     }
                   }
                 }
@@ -1588,7 +1620,7 @@ function block(fsys, isfun, level){
                           emit(65);
                         }
                         else {
-                          Error(36);
+                          Error(36, x.typ, "strings");
                         }
                       break;
                       case 18:
@@ -1597,7 +1629,7 @@ function block(fsys, isfun, level){
                           emit(66);
                         }
                         else {
-                          Error(36);
+                          Error(36, x.typ, "strings");
                         }
                       break;
                       case 19:
@@ -1606,7 +1638,7 @@ function block(fsys, isfun, level){
                         emit(64);
                       }
                       else {
-                        Error(36);
+                        Error(36, x.typ, "strings");
                       }
                       break;
                       case 20:
@@ -1622,11 +1654,11 @@ function block(fsys, isfun, level){
                               emit1(67, 1);
                           }
                           else {
-                            Error(36);
+                            Error(36, y.typ, "strings");
                           }
                         }
                         else {
-                          Error(36);
+                          Error(36, x.typ, "strings");
                         }
                       break;
                       case 21:
@@ -1645,23 +1677,23 @@ function block(fsys, isfun, level){
                                 emit(63);
                               }
                               else {
-                                Error(36);
+                                Error(36, z.typ, "strings");
                               }
                             }
                             else {
-                              Error(36);
+                              Error(36, y.typ, "ints");
                             }
                           }
                           else {
-                            Error(36);
+                            Error(36, x.typ, "strings");
                           }
                         }
                         else {
-                          Error(36);
+                          Error(62, 3);
                         }
                       }
                       else {
-                        Error(36);
+                        Error(62,2);
                       }
                       break;
                     }
@@ -2274,7 +2306,7 @@ function block(fsys, isfun, level){
           insymbol();
           expression(fsys.concat(["thensy", "dosy"]), x);
           if (["bools", "notyp"].indexOf(x.typ) == -1)
-            Error(17);
+            Error(17, x.typ);
           lc1 = lc;
           emit(11);
           if (sy == "thensy")
@@ -2428,7 +2460,7 @@ function block(fsys, isfun, level){
             insymbol();
             expression(fsys, x);
             if (["bools", "notyp"].indexOf(x.typ) == -1)
-              Error(17);
+              Error(17, x.typ);
             emit1(11, lc1);
           }
           else
@@ -2447,7 +2479,7 @@ function block(fsys, isfun, level){
           lc1 = lc;
           expression(fsys.concat(["dosy"]), x);
           if (["bools", "notyp"].indexOf(x.typ) == -1)
-            Error(17);
+            Error(17, x.typ);
           lc2 = lc;
           emit(11);
           if (sy == "dosy")
@@ -2620,7 +2652,7 @@ function block(fsys, isfun, level){
                     Error(40);
                   }
                 }
-                test(["comma", "rparent"], ["comma", "rparent"], fsys, 6);
+                test(["comma", "rparent", "ident"], ["comma", "rparent"], fsys, 6);
               }while(sy == "comma");
               if (sy == "rparent")
               insymbol();
@@ -2732,7 +2764,7 @@ function block(fsys, isfun, level){
           Error(7);
           insymbol();
         }
-        test(["ident", "realcon", "intcon", "charcon", "bools"], fsys.concat(["ident", "realcon", "intcon", "stringsy", "charcon", "bools"]), [""], 14);
+        test(["ident", "realcon", "intcon", "charcon", "bools"], fsys.concat(["ident", "realcon", "intcon", "stringsy", "charcon", "bools"]), [""], 6);
       }
       catch(err){
         return err;
@@ -2891,6 +2923,20 @@ try{
   sps['['] = 'lbrack'; sps[']'] = 'rbrack';
   sps['#'] = 'neq'; sps['&'] = 'andsy';
   sps[';'] = 'semicolon';
+  xsps[0] = 'plus'; xsps[1] = 'minus';
+  xsps[2] = 'times'; xsps[3] = 'rdiv';
+  xsps[4] = 'lparent'; xsps[5] = 'rparent';
+  xsps[6] = 'eql'; xsps[7] = 'comma';
+  xsps[8] = 'lbrack'; xsps[9] = 'rbrack';
+  xsps[10] = 'neq'; xsps[11] = 'andsy';
+  xsps[12] = 'semicolon';
+  nsps[0] = 'adição'; nsps[1] = 'subtração';
+  nsps[2] = 'multiplicação'; nsps[3] = 'divisão';
+  nsps[4] = 'parentese esquerdo'; nsps[5] = 'parentese direito';
+  nsps[6] = 'igual'; nsps[7] = 'vírgula';
+  nsps[8] = 'colchete esquerdo'; nsps[9] = 'colchete direito';
+  nsps[10] = 'diferente'; nsps[11] = 'e lógico';
+  nsps[12] = 'ponto e vírgula';
   csps[0] = "+";  csps[1] = "-" ; csps[2] = "*";
   csps[3] = "/";  csps[4] = "(";  csps[5] = ")";
   csps[6] = "=";  csps[7] = ","; csps[8] = "[";

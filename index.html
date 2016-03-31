@@ -18,9 +18,10 @@
   <script src="codemirror/mode/pascal/pascal.js"></script>
 
   <!-- JS e CSS para pagina -->
-  <script src="js/shortcuts.js"></script>
+  <script async src="js/shortcuts.js"></script>
   <script async src="js/funcoes.js"></script>
   <script async src="js/Compilador.js"></script>
+  <script async src="js/Interpretador.js"></script>
   <link rel=stylesheet href="css/estilo.css"/>
 
 </head>
@@ -108,7 +109,7 @@
       <div id="modalFooter" class="modal-footer">
         <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
         <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Esconder</button>
       </div>
     </div>
   </div>
@@ -205,9 +206,6 @@ function getCode(){
       mostraErro();
     }
   }
-
-
-
   //alert(text);
 }
 </script>

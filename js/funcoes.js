@@ -1,17 +1,53 @@
 
 //atalhos
 //para compilar
-shortcut.add("f9",function() {
-	alert("apertou f9");
+function compiler(){
+	InputFile = editor.getValue();
+	isOk = true;
+	isDone = false;
+	compiladorPascalS();
+	document.getElementById("output").value = "";
+	mostraErro();
+}
+shortcut.add("F9",function() {
+	debugger;
+	compiler();
 });
 //executar o programa
+function reexecute(){
+	if (isOk && isDone){
+		limpaConsole();
+		mostrarModalOutput();
+		call_read = false;
+		interpret();
+	}
+	else {
+		if (isOk){
+			MsgErro = "Você precisa compilar o programa antes de executá-lo.";
+			mostraErro();
+			esconderModalOutput();
+		}
+		else {
+			MsgErro = "O programa não foi compilado corretamente.";
+			mostraErro();
+			esconderModalOutput();
+		}
+
+	}
+}
 shortcut.add("Ctrl+F9",function() {
-	alert("apertou ctrl+f9");
+	reexecute();
+});
+//Compilar e executar
+
+shortcut.add("F10",function() {
+	getCode();
 });
 
 //rodar até o cursor
 shortcut.add("F4",function() {
-	alert("apertou f4");
+	read_ok = true;
+	interpret();
 });
 
 //passo-a-passo entrando em rotinas (step into)
@@ -75,10 +111,10 @@ document.getElementById('novo').onclick = function() {
   document.getElementById('my_file').click();
 };
 
-
+//Script para entrada de dados pelo teclado
 function runScript(e) {
   if (e.keyCode == 13) {
-    if (call_read){
+    if (call_read && !debug){
       var input = pegaValorInput();
       //input.pop();
       atualizarConsole(input);
@@ -89,16 +125,14 @@ function runScript(e) {
     }
   }
 }
-function reexecute(){
-  limpaConsole();
-  call_read = false;
-  interpret();
-}
+
+//Função para pegar o valor informado pelo usuário
 function pegaValorInput() {
   return document.getElementById("scriptBox").value;
 
 }
 
+//Limpar input após teclar enter
 function limpaInput() {
   document.getElementById("scriptBox").value = "";
 }
@@ -110,16 +144,19 @@ atualizarConsole();
 //document.getElementById("output").value = output_console.join("\n");
 }*/
 
+//Limpa o console de saída quando um novo programa é iniciado
 function limpaConsole() {
   document.getElementById("output").value = "";
 }
 
+//Imprime informações no console de saída
 function atualizarConsole(string){
   string = document.getElementById("output").value + string;
   document.getElementById("output").value = string;
   scrollOutput();
 }
 
+//Imprime erros no console debug abaixo do editor
 function mostraErro(){
 	limpaDebug();
   adicionarErro(MsgErro);
@@ -132,13 +169,12 @@ function changeOutput(){
   interpret();
 }
 
+//Armazenamento e operações com string
 function lista(next, c, destruct){
   this.next = next;
   this.c = c;
   this.destruct = destruct;
 }
-
-
 
 function alocaString(str, head, destruct){//Aloca string reutilizando espaço já alocado
   if (str !== undefined && head !== undefined){
@@ -303,6 +339,37 @@ function removerTodaPilhaFuncoes(){
 //funcoes para pilha de variaveis
 //array de objetos
 var arrayObjetoTabela = [];
+
+//Carregar variáveis no depurador
+function carregaVariaveis(start){
+	ativarTabelaVar();
+	debugger;
+	var value;
+	do {
+		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
+			switch (tab[start].typ) {
+				case "reals":
+				value = s.getFloat64(display[tab[start].lev]+tab[start].adr);
+				break;
+				case "chars":
+				case "bools":
+				value = s.getUint8(display[tab[start].lev]+tab[start].adr);
+				break;
+				case "strings":
+					if (str_tab[s.getInt32(display[tab[start].lev]+tab[start].adr)] != undefined)
+						value = getString(str_tab[s.getInt32(display[tab[start].lev]+tab[start].adr)]);
+					else
+						value = "";
+				break;
+				default:
+				value = s.getInt32(display[tab[start].lev]+tab[start].adr);
+			}
+			adicionarObjetoVar(tab[start].name, value);
+			start++;
+		}
+	} while(tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
+}
+
 //objeto auxiliar
 function objetoTabela(posNome,posValor){
   this.posNome = posNome;
@@ -312,11 +379,9 @@ function objetoTabela(posNome,posValor){
 }
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
 function adicionarObjetoVar(posNome,posValor){
-  if (tab[posNome] !== undefined && s[posValor] !== undefined) {
     objeto = new objetoTabela(posNome,posValor);
     adicionarTabelaVar(objeto);
     arrayObjetoTabela.push(objeto);
-  }
 }
 
 function adicionarTabelaVar(objeto) {
@@ -324,8 +389,8 @@ function adicionarTabelaVar(objeto) {
   var row = table.insertRow(2);
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
-  cell1.innerHTML = tab[objeto.posNome];
-  cell2.innerHTML = "<input type='text' value='"+ s[objeto.posValor] +"'name='"+objeto.idinput+"' id='"+ objeto.idinput +"'>";
+  cell1.innerHTML = objeto.posNome;
+  cell2.innerHTML = "<input type='text' value='"+ objeto.posValor +"'name='"+objeto.idinput+"' id='"+ objeto.idinput +"'>";
   desativarTabelaVar();
 }
 function desativarTabelaVar(){

@@ -1,5 +1,5 @@
 {$APPTYPE CONSOLE}
-emit1(10)resulttype
+Error(1)
 program Pascals; {1.6.75}
 {        N. Wirth,  E.T.H.
           Clausiusstr.55   CH-8006 Zurich    }

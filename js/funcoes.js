@@ -13,6 +13,7 @@ shortcut.add("F9",function() {
 	debugger;
 	compiler();
 });
+
 //executar o programa
 function reexecute(){
 	if (isOk && isDone){
@@ -35,20 +36,19 @@ function reexecute(){
 
 	}
 }
-shortcut.add("Ctrl+F9",function() {
-	reexecute();
-});
-//Compilar e executar
+shortcut.add("Ctrl+F9",function(){reexecute();});
 
-shortcut.add("F10",function() {
-	getCode();
-});
+//Compilar e executar
+shortcut.add("F10",function() {getCode();});
 
 //rodar até o cursor
-shortcut.add("F4",function() {
-	read_ok = true;
-	interpret();
-});
+function runToCursor(){
+	stopln = editor.getCursor().line;
+	debug_op = true;
+	if (pc != 0)
+		call_read = true;
+}
+shortcut.add("F4",function(){runToCursor();});
 
 //passo-a-passo entrando em rotinas (step into)
 shortcut.add("F7",function() {
@@ -342,7 +342,6 @@ var arrayObjetoTabela = [];
 
 //Carregar variáveis no depurador
 function carregaVariaveis(start){
-	ativarTabelaVar();
 	debugger;
 	var value;
 	do {
@@ -364,33 +363,36 @@ function carregaVariaveis(start){
 				default:
 				value = s.getInt32(display[tab[start].lev]+tab[start].adr);
 			}
-			adicionarObjetoVar(tab[start].name, value);
+			adicionarObjetoVar(tab[start].name, value, start);
 			start++;
 		}
-	} while(tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
+	} while(tab[start].obj != undefined && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
 }
 
 //objeto auxiliar
-function objetoTabela(posNome,posValor){
-  this.posNome = posNome;
-  this.posValor = posValor;
+function objetoTabela(Nome,Valor, index){
+  this.Nome = Nome;
+  this.Valor = Valor;
   this.novoValor = "";
-  this.idinput = "inpt_"+posValor;
+  this.idtab = index;
 }
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
-function adicionarObjetoVar(posNome,posValor){
-    objeto = new objetoTabela(posNome,posValor);
+function adicionarObjetoVar(posNome,posValor, start){
+    objeto = new objetoTabela(posNome,posValor, start);
     adicionarTabelaVar(objeto);
     arrayObjetoTabela.push(objeto);
 }
 
+function atualizaVariavel(index){
+
+}
 function adicionarTabelaVar(objeto) {
   var table = document.getElementById("tab_var");
   var row = table.insertRow(2);
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
-  cell1.innerHTML = objeto.posNome;
-  cell2.innerHTML = "<input type='text' value='"+ objeto.posValor +"'name='"+objeto.idinput+"' id='"+ objeto.idinput +"'>";
+  cell1.innerHTML = objeto.Nome;
+  cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
   desativarTabelaVar();
 }
 function desativarTabelaVar(){

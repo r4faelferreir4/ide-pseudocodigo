@@ -4,22 +4,31 @@ var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
 var ps = "";
 var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
 "lngchk", "redchk"];
-var t; //index do top da pilha
-var b; //index base
+var t; //índice do top da pilha temporária
+var b; //índice base pilha temporária
 var h1, h2, h3, h4;
-var fld = new Array(4);//tamano padrão dos campos
+var fld = new Array(4);//tamanho padrão dos campos
 var lmax = 10;		//Nível máximo
 var display = new Array(lmax);
 var stack = new ArrayBuffer(stacksize);
 var s = new DataView(stack);//new Array(stacksize);
-var call_read = false;
-var read_ok = false;
+var call_read = false;  //flag para leitura de informação do teclado
+var read_ok = false;    //flag se já leu uma informação do teclado
+var debug_op = false;  //flag para modo debug
+var stopln;   //Linha de parada para o depurador
 
 function interpreter(){
   do {
     ir = kode[pc];
     pc++;
     ocnt++;
+    if (debug_op){
+      if (stopln == ir.line){
+        read_ok = false;
+        call_read = true;
+        return;
+      }
+    }
     switch(ir.f){
       case 0:
       s.setInt32(t, (display[ir.x]+ir.y));
@@ -715,6 +724,7 @@ function interpreter(){
       /*Armazenar na pilha.
       y = Número de variáveis a ser armazenado o valor.
       x = Tipo da variável(tamanho)
+      z = Posição na tabela de símbolos das variáveis atualizadas
       */
       if (ir.y == 1){
         switch (ir.x) {
@@ -745,6 +755,7 @@ function interpreter(){
           s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
           t -= 2*TAM_INT;
         }
+        atualizaVariavel(ir.z);
       }
       else {
         var tx = t;
@@ -770,6 +781,7 @@ function interpreter(){
             s.setInt32(t-2*TAM_INT, s.getInt32(t-TAM_INT));
             t -= TAM_INT;
           }
+          atualizaVariavel(ir.z[i-1]);
         }
         t -= ir.x;
       }

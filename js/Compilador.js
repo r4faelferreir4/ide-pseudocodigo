@@ -1,14 +1,14 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-  //VARIÁVEIS Error(36)
+  //VARIÁVEIS emit2(27, 38)lineCount
 var debug = false;//Parar em debugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
 var emax = 500;		//Exponente máximo para numeros reais
 var emin = -500;	//Exponente minimo para numeros reais
-var kmax = 40;		//Numero maximos de digitos significativos
+var kmax = 40;		//Numero máximo de digitos significativos
 var tmax = 100;		//Tamanho da tabela
 var bmax = 20;		//Tamanho da tabela de blocos
 var amax = 30;		//Tamanho da tabela de arranjos
@@ -52,11 +52,12 @@ function item(typ, ref){
   this.typ = typ;
   this.ref = ref;
 }
-function order(f, x, y, z){
+function order(f, x, y, z, line){
   this.f = f;
   this.x = x;
   this.y = y;
   this.z = z;
+  this.line = line;
 }
 function conrec(tp, i, r){
   this.tp = tp;
@@ -151,7 +152,7 @@ function initArray(){
   var j = 0;
   console.log("iniciando tab");
   do{
-    tab[j] =  {name: "", link: 1, obj: [""], typ: [""], xtyp: [""], ref: 1, normal: true, lev: 1, adr: 44};
+    tab[j] =  new Ttab();
     j++;
   }while(j < tmax);
   j = 0;
@@ -169,7 +170,7 @@ function initArray(){
   j = 0;
   console.log("btab iniciada");
   do{
-    kode[j] = new order(0, 0, 0, 0);
+    kode[j] = new order();
     j++;
   }while( j < cmax);
   j = 0;
@@ -490,7 +491,7 @@ function compiladorPascalS(){
       if (i != -1){
         sy = ksy[i];
         if (sy == "debugsy"){
-          emit(70);
+          emit(linecount, 70);
           insymbol();
           return;
         }
@@ -739,11 +740,12 @@ function EnterReal(x){
   }
 }
 
-function emit(fct){
+function emit(line, fct){
   try{
     if (lc == cmax)
       fatal(6);
     kode[lc].f = fct;
+    kode[lc].line = line;
     lc++;
   }
   catch(err){
@@ -751,12 +753,13 @@ function emit(fct){
   }
 }//emit
 
-function emit1(fct, b){
+function emit1(line, fct, b){
   try{
     if (lc == cmax)
       fatal(6);
     kode[lc].f = fct;
     kode[lc].y = b;
+    kode[lc].line = line;
     lc++;
   }
   catch(err){
@@ -764,7 +767,7 @@ function emit1(fct, b){
   }
 }//emit1
 
-function emit2(fct, a, b, c){
+function emit2(line, fct, a, b, c){
   try{
     if (lc == cmax)
       fatal(6);
@@ -772,6 +775,7 @@ function emit2(fct, a, b, c){
     kode[lc].x = a;
     kode[lc].y = b;
     kode[lc].z = c;
+    kode[lc].line = line;
     lc++;
   }
   catch(err){
@@ -781,7 +785,7 @@ function emit2(fct, a, b, c){
 
 function printtables(){
   var i;
-  var o = new order(0, 0, 0);
+  var o = new order();
   console.log("");
   console.log("identificadores    link obj typ ref nrm lev adr");
   for (i = btab[1].last+1; i < t; i++){
@@ -1366,7 +1370,7 @@ function block(fsys, isfun, level){
 
           }
         }
-        emit1(32 + bool, len);
+        emit1(linecount, 32 + bool, len);
       }
       catch(err){
         return err;
@@ -1401,7 +1405,7 @@ function block(fsys, isfun, level){
                   v.ref = tab[j].ref;
                   a = tab[j].adr;
                   if (a !== 0)
-                    emit1(9, a);
+                    emit1(linecount, 9, a);
                 }
                 insymbol();
                 if (sy == "lbrack" && v.typ == "strings"){
@@ -1422,7 +1426,7 @@ function block(fsys, isfun, level){
                 if (v.typ != "arrays"){
                   if (v.typ == "strings" || v.typ == "chars"){
                     if (v.typ == "strings" && !assign)
-                      emit1(34, TAM_INT);
+                      emit1(linecount, 34, TAM_INT);
                     expression(fsys.concat(["comma", "rbrack"]), x);
                     if(x.typ != "ints")
                       Error(59);
@@ -1441,9 +1445,9 @@ function block(fsys, isfun, level){
                     Error(26, atab[a].inxtyp);
                   else
                     if (atab[a].elsize == 1)
-                      emit1(20, a);
+                      emit1(linecount, 20, a);
                     else
-                      emit1(21, a);
+                      emit1(linecount, 21, a);
                   v.typ = atab[a].eltyp;
                   v.ref = atab[a].elref;
                 }
@@ -1468,7 +1472,7 @@ function block(fsys, isfun, level){
         var x, lastp, cp, k;
         try{
           x = new item("", 1);
-          emit1(18, i);
+          emit1(linecount, 18, i);
           lastp = btab[tab[i].ref].lastpar;
           cp = i;
           if (sy == "lparent"){
@@ -1485,17 +1489,17 @@ function block(fsys, isfun, level){
                       Error(36, "records", "records");
                     else
                       if (x.typ == "arrays")
-                        emit1(22, atab[x.ref].size);
+                        emit1(linecount, 22, atab[x.ref].size);
                       else
                         if (x.typ == "arrays")
-                          emit1(22, atab[x.ref].size);
+                          emit1(linecount, 22, atab[x.ref].size);
                         else
                           if (x.typ == "records")
-                            emit1(22, btab[x.ref].vsize);
+                            emit1(linecount, 22, btab[x.ref].vsize);
                   }
                   else
                     if (x.typ == "ints" && tab[cp].typ == "reals")
-                      emit1(26,TAM_INT);
+                      emit1(linecount, 26,TAM_INT);
                     else
                       if (x.typ != "notyp")
                         Error(36, x.typ, tab[cp].typ);
@@ -1512,9 +1516,9 @@ function block(fsys, isfun, level){
                       x.typ = tab[k].typ;
                       x.ref = tab[k].ref;
                       if (tab[k].normal)
-                        emit2(0, tab[k].lev, tab[k].adr);
+                        emit2(linecount, 0, tab[k].lev, tab[k].adr);
                       else
-                        emit2(1, tab[k].lev, tab[k].adr, tab[k].typ);
+                        emit2(linecount, 1, tab[k].lev, tab[k].adr, tab[k].typ);
                       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                         selector(fsys.concat(["comma", "colon", "rparent"]), x, false);
                       if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
@@ -1532,9 +1536,9 @@ function block(fsys, isfun, level){
           }
           if (cp < lastp)
             Error(39);
-          emit2(19, tab[i].typ, btab[tab[i].ref].psize);
+          emit2(linecount, 19, tab[i].typ, btab[tab[i].ref].psize);
           if (tab[i].lev < level)
-            emit2(3, tab[i].lev, level);
+            emit2(linecount, 3, tab[i].lev, level);
         }
         catch(err){
           return err;
@@ -1561,12 +1565,12 @@ function block(fsys, isfun, level){
                 result =  "ints";
               else {
                 result = "reals";
-                emit1(26, TAM_REAL);
+                emit1(linecount, 26, TAM_REAL);
               }
             else {
               result =  "reals";
               if (b == "ints")
-                emit1(26, TAM_INT);
+                emit1(linecount, 26, TAM_INT);
             }
             return result;
         }
@@ -1627,12 +1631,12 @@ function block(fsys, isfun, level){
                       case 16:
                         ts = ["ints", "reals"];
                         if (x.typ == "ints")
-                          emit1(26,TAM_INT);
+                          emit1(linecount, 26,TAM_INT);
                       break;
                       case 17:
                         ts = ["strings"];
                         if (x.typ == "strings"){
-                          emit(65);
+                          emit(linecount, 65);
                         }
                         else {
                           Error(36, x.typ, "strings");
@@ -1641,7 +1645,7 @@ function block(fsys, isfun, level){
                       case 18:
                         ts = ["strings"];
                         if (x.typ == "strings"){
-                          emit(66);
+                          emit(linecount, 66);
                         }
                         else {
                           Error(36, x.typ, "strings");
@@ -1650,7 +1654,7 @@ function block(fsys, isfun, level){
                       case 19:
                       ts = ["ints", "strings"];
                       if (x.typ == "strings"){
-                        emit(64);
+                        emit(linecount, 64);
                       }
                       else {
                         Error(36, x.typ, "strings");
@@ -1664,9 +1668,9 @@ function block(fsys, isfun, level){
                           if (y.typ == "strings" || y.typ == "chars"){
                             ts = ["ints", "strings", "chars"];
                             if (y.typ == "chars")
-                              emit1(67, 0);
+                              emit1(linecount, 67, 0);
                             else
-                              emit1(67, 1);
+                              emit1(linecount, 67, 1);
                           }
                           else {
                             Error(36, y.typ, "strings");
@@ -1689,7 +1693,7 @@ function block(fsys, isfun, level){
                             if (y.typ == "ints"){
                               if (z.typ == "strings"){
                                 ts = ["strings", "chars", "ints"];
-                                emit(63);
+                                emit(linecount, 63);
                               }
                               else {
                                 Error(36, z.typ, "strings");
@@ -1713,7 +1717,7 @@ function block(fsys, isfun, level){
                       break;
                     }
                     if (ts.indexOf(x.typ) != -1)
-                    emit1(8, n);
+                    emit1(linecount, 8, n);
                     else
                     if (x.typ != "notyp")
                     Error(48);
@@ -1750,9 +1754,9 @@ function block(fsys, isfun, level){
                         x.typ = tab[i].typ;
                         x.ref = 0;
                         if (x.typ == "reals")
-                          emit2(24, tab[i].typ, tab[i].adr);
+                          emit2(linecount, 24, tab[i].typ, tab[i].adr);
                         else
-                          emit2(24, tab[i].typ, tab[i].adr);
+                          emit2(linecount, 24, tab[i].typ, tab[i].adr);
                       break;
                       case "variable":
                         x.typ = tab[i].typ;
@@ -1765,7 +1769,7 @@ function block(fsys, isfun, level){
                               f = 0;
                             else
                               f = 1;
-                            emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
+                            emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                             selector(fsys, x, false);
                             if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings"){
                               var ltyp;
@@ -1775,16 +1779,16 @@ function block(fsys, isfun, level){
                                 case "bools":ltyp = TAM_BOOL;break;
                                 case "chars":ltyp = TAM_CHAR;break;
                               }
-                              emit1(34, ltyp);
+                              emit1(linecount, 34, ltyp);
                             }
                             if (x.typ == "strings" && x.ref == 1){
                               x.ref = 0;
                               x.typ = "chars";
-                              emit(62);
+                              emit(linecount, 62);
                             }
                             else{
                               if (x.typ == "strings" && x.ref == 0)
-                                emit1(34, TAM_INT);
+                                emit1(linecount, 34, TAM_INT);
                             }
                           }
                           else {
@@ -1800,7 +1804,7 @@ function block(fsys, isfun, level){
                                 f = 1;
                             if (ireference && f > 0)
                               f--;    //O programador quer acessar o valor do ponteiro e não da variável apontada
-                            emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
+                            emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                           }
                         }
                         else {
@@ -1809,7 +1813,7 @@ function block(fsys, isfun, level){
                             f = 0;
                           else
                             f = 1;
-                          emit2(f, tab[i].lev, tab[i].adr. tab[i].typ);
+                          emit2(linecount, f, tab[i].lev, tab[i].adr. tab[i].typ);
                           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                             if (x.typ == "strings"){
                               x.typ = "chars";
@@ -1838,7 +1842,7 @@ function block(fsys, isfun, level){
                     if (sy == "realcon"){
                       x.typ = "reals";
                       EnterReal(rnum);
-                      emit2(24, x.typ, c1);
+                      emit2(linecount, 24, x.typ, c1);
                     }
                     else {
                       if (sy != "stringsy"){
@@ -1853,7 +1857,7 @@ function block(fsys, isfun, level){
                         inum = inum.join("");
                         x.typ = "strings";
                       }
-                      emit2(24, x.typ, inum);
+                      emit2(linecount, 24, x.typ, inum);
                     }
                     x.ref = 0;
                     insymbol();
@@ -1876,7 +1880,7 @@ function block(fsys, isfun, level){
                     insymbol();
                     factor(fsys, x);
                     if (x.typ == "bools")
-                    emit(35);
+                    emit(linecount, 35);
                     else
                     if (x.typ != "notyp")
                     Error(32);
@@ -1895,27 +1899,27 @@ function block(fsys, isfun, level){
                 var lcx;
                 if (op == "andsy"){
                   lcx = lc;
-                  emit(69);
+                  emit(linecount, 69);
                 }
                 insymbol();
                 factor (fsys.concat(["times", "rdiv", "idiv", "imod", "andsy"]), y);
                 if (op == "times"){
                   x.typ = resulttype(x.typ, y.typ);
-                  emit1(57, x.typ);
+                  emit1(linecount, 57, x.typ);
 
                 }
                 else
                 if(op == "rdiv"){
                   if (x.typ == "ints"){
-                    emit1(26,TAM_REAL);
+                    emit1(linecount, 26,TAM_REAL);
                     x.typ = "reals";
                   }
                   if(y.typ == "ints"){
-                    emit1(26,TAM_INT);
+                    emit1(linecount, 26,TAM_INT);
                     y.typ = "reals";
                   }
                   if (x.typ == "reals" && y.typ == "reals")
-                    emit1(58, "reals");
+                    emit1(linecount, 58, "reals");
                   else {
                     if (x.typ != "notyp" && y.typ != "notyp")
                     Error(33);
@@ -1925,7 +1929,7 @@ function block(fsys, isfun, level){
                 else
                 if (op == "andsy"){
                   if (x.typ == "bools" && y.typ == "bools"){
-                    emit(56);
+                    emit(linecount, 56);
                     kode[lcx].y = lc;
                   }
                   else {
@@ -1937,9 +1941,9 @@ function block(fsys, isfun, level){
                 else {
                   if (x.typ == "ints" && y.typ == "ints")
                     if (op == "idiv")
-                      emit1(58, "ints");
+                      emit1(linecount, 58, "ints");
                     else
-                      emit(59);
+                      emit(linecount, 59);
                   else {
                     if (x.typ != "notyp" && y.typ != "notyp")
                       Error(34);
@@ -1963,7 +1967,7 @@ function block(fsys, isfun, level){
               }
               else
                 if (op == "minus")
-                  emit1(36, TAM_INT);
+                  emit1(linecount, 36, TAM_INT);
             }
             else
               term(fsys.concat(["plus", "minus", "orsy"]), x);
@@ -1972,13 +1976,13 @@ function block(fsys, isfun, level){
               var lcx;
               if (op == "orsy"){
                 lcx = lc;
-                emit(68);
+                emit(linecount, 68);
               }
               insymbol();
               term(fsys.concat(["plus", "minus", "orsy"]), y);
               if (op == "orsy"){
                 if (x.typ == "bools" && y.typ == "bools"){
-                  emit(51);
+                  emit(linecount, 51);
                   kode[lcx].y = lc;
                 }
                 else {
@@ -1990,29 +1994,29 @@ function block(fsys, isfun, level){
               else {
                 if (x.typ == "strings")
                   if(y.typ == "chars")
-                    emit1(25, 1);
+                    emit1(linecount, 25, 1);
                 if(y.typ == "strings")
                   if (x.typ == "chars")
-                    emit1(25, 2);
+                    emit1(linecount, 25, 2);
                 x.typ = resulttype(x.typ, y.typ);
                 switch (x.typ) {
                   case "strings":
                   if(op == "plus")
-                    emit1(52, "strings");
+                    emit1(linecount, 52, "strings");
                   else
                     Error(60);
                   break;
                   case "ints":
                     if (op == "plus")
-                        emit1(52, "ints");
+                        emit1(linecount, 52, "ints");
                     else
-                      emit1(53, "ints");
+                      emit1(linecount, 53, "ints");
                   break;
                   case "reals":
                     if (op == "plus")
-                        emit1(52, "reals");
+                        emit1(linecount, 52, "reals");
                     else
-                      emit1(53, "reals");
+                      emit1(linecount, 53, "reals");
                   break;
                 }
               }
@@ -2030,46 +2034,46 @@ function block(fsys, isfun, level){
             simpleexpression(fsys, y);
             if (["notyp", "ints", "bools", "chars", "strings", "reals"].indexOf(x.typ) != -1 && x.typ == y.typ)
               switch (op) {
-                case "eql": emit1(39, x.typ);break;
-                case "neq": emit1(40, x.typ);break;
-                case "lss": emit1(41, x.typ);break;
-                case "leq": emit1(42, x.typ);break;
-                case "gtr": emit1(43, x.typ);break;
-                case "geq": emit1(44, x.typ);break;
+                case "eql": emit1(linecount, 39, x.typ);break;
+                case "neq": emit1(linecount, 40, x.typ);break;
+                case "lss": emit1(linecount, 41, x.typ);break;
+                case "leq": emit1(linecount, 42, x.typ);break;
+                case "gtr": emit1(linecount, 43, x.typ);break;
+                case "geq": emit1(linecount, 44, x.typ);break;
               }
             else {
               if (x.typ == "strings" || y.typ == "strings"){
                 if (x.typ == "strings")
                   if (y.typ == "chars")
-                    emit1(25,1);
+                    emit1(linecount, 25,1);
                 if (y.typ == "strings")
                   if(x.typ == "chars")
-                    emit1(25,2);
+                    emit1(linecount, 25,2);
                 x.typ = resulttype(x.typ,y.typ);
                 switch (op) {
-                  case "eql": emit1(39, x.typ);break;
-                  case "neq": emit1(40, x.typ);break;
-                  case "lss": emit1(41, x.typ);break;
-                  case "leq": emit1(42, x.typ);break;
-                  case "gtr": emit1(43, x.typ);break;
-                  case "geq": emit1(43, x.typ);break;
+                  case "eql": emit1(linecount, 39, x.typ);break;
+                  case "neq": emit1(linecount, 40, x.typ);break;
+                  case "lss": emit1(linecount, 41, x.typ);break;
+                  case "leq": emit1(linecount, 42, x.typ);break;
+                  case "gtr": emit1(linecount, 43, x.typ);break;
+                  case "geq": emit1(linecount, 43, x.typ);break;
                 }
               }
               else{
                 if (x.typ == "reals")
                   if(y.typ == "ints")
-                    emit1(26,TAM_INT);
+                    emit1(linecount, 26,TAM_INT);
                 if(y.typ == "reals")
                   if(x.typ == "ints")
-                    emit1(26,TAM_REAL);
+                    emit1(linecount, 26,TAM_REAL);
                 x.typ = resulttype(x.typ, y.typ);
                 switch (op) {
-                  case "eql": emit1(39, x.typ);break;
-                  case "neq": emit1(40, x.typ);break;
-                  case "lss": emit1(41, x.typ);break;
-                  case "leq": emit1(42, x.typ);break;
-                  case "gtr": emit1(43, x.typ);break;
-                  case "geq": emit1(44, x.typ);break;
+                  case "eql": emit1(linecount, 39, x.typ);break;
+                  case "neq": emit1(linecount, 40, x.typ);break;
+                  case "lss": emit1(linecount, 41, x.typ);break;
+                  case "leq": emit1(linecount, 42, x.typ);break;
+                  case "gtr": emit1(linecount, 43, x.typ);break;
+                  case "geq": emit1(linecount, 44, x.typ);break;
                 }
               }
             }
@@ -2082,7 +2086,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          var x, y, f,op="", assign=1, fstring=false;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
+          var xx=0, x, y, f,op="", assign=1, fstring=false;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
           x = new item("", 1);
           y = new item("", 1);
           x.typ = tab[i].typ;
@@ -2092,7 +2096,7 @@ function block(fsys, isfun, level){
             f = 0;
           else
             f = 1;
-          emit2(f, lv, ad, "ints");
+          emit2(linecount, f, lv, ad, "ints");
           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
             if (x.typ == "strings"){
               x.typ = "chars";
@@ -2104,9 +2108,14 @@ function block(fsys, isfun, level){
             insymbol();
           else {
             if (sy == "comma"){
+              var p = i;
+              i = [];
+              i[0] = p;
               while(sy == "comma"){
                 insymbol();
-                var p = loc(id);
+                p = loc(id);
+                i[xx] = p;
+                xx++;
                 if (p == 0)
                   Error(0);
                 if (tab[p].typ == tab[i].typ){
@@ -2114,7 +2123,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                  emit2(f, tab[p].lev, tab[p].adr, tab[p].typ);
+                  emit2(linecount, f, tab[p].lev, tab[p].adr, tab[p].typ);
                   assign++;
                 }
                 else {
@@ -2140,7 +2149,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
+                emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
               }
               switch (sy) {
                 case "plus":
@@ -2207,18 +2216,18 @@ function block(fsys, isfun, level){
                         f = 0;
                       else
                         f = 1;
-                    emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
-                    emit(63);
+                    emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
+                    emit(linecount, 63);
                   }
                 }
                 switch (op) {
-                  case "plus": emit1(52, x.typ); break;
-                  case "minus":emit1(53, x.typ); break;
-                  case "mult":emit1(57, x.typ); break;
-                  case "div":emit1(58, x.typ); break;
+                  case "plus": emit1(linecount, 52, x.typ); break;
+                  case "minus":emit1(linecount, 53, x.typ); break;
+                  case "mult":emit1(linecount, 57, x.typ); break;
+                  case "div":emit1(linecount, 58, x.typ); break;
                 }
 
-                emit2(38, tab[i].typ, assign);
+                emit2(linecount, 38, tab[i].typ, assign, i);
               }
             }
             else
@@ -2226,9 +2235,9 @@ function block(fsys, isfun, level){
                 Error(46);
               else
                 if (x.typ == "arrays")
-                  emit1(23, atab[x.ref].size);
+                  emit1(linecount, 23, atab[x.ref].size);
                 else
-                  emit1(23, btab[x.ref].vsize);
+                  emit1(linecount, 23, btab[x.ref].vsize);
           else{
             if(x.typ == 'strings' || fstring){
               if (x.ref == 1){
@@ -2237,7 +2246,7 @@ function block(fsys, isfun, level){
                 }
                 else {
                   if (tab[i].typ != "arrays")
-                    emit2(1, tab[i].lev, tab[i].adr, tab[i].typ);
+                    emit2(linecount, 1, tab[i].lev, tab[i].adr, tab[i].typ);
                   else {
                     var ltyp;
                     switch (y.typ) {
@@ -2246,29 +2255,29 @@ function block(fsys, isfun, level){
                       case "bools":ltyp = TAM_BOOL;break;
                       case "chars":ltyp = TAM_CHAR;break;
                     }
-                    emit1(34, ltyp);
+                    emit1(linecount, 34, ltyp);
                   }
-                  emit(63);
+                  emit(linecount, 63);
                   if(!fstring)
-                    emit2(38, x.typ, assign);
+                    emit2(linecount, 38, x.typ, assign, i);
                   else
-                    emit2(38, "strings", assign);
+                    emit2(linecount, 38, "strings", assign, i);
                 }
               }
               else {
-                emit2(38, x.typ, assign);
+                emit2(linecount, 38, x.typ, assign, i);
               }
             }
             else{
               if (x.typ == "reals" && y.typ == "ints"){
-                emit1(26,TAM_INT);
+                emit1(linecount, 26,TAM_INT);
                 switch (op) {
-                  case "plus": emit1(52, x.typ); break;
-                  case "minus":emit1(53, x.typ); break;
-                  case "mult":emit1(57, x.typ); break;
-                  case "div": emit1(58, x.typ); break;
+                  case "plus": emit1(linecount, 52, x.typ); break;
+                  case "minus":emit1(linecount, 53, x.typ); break;
+                  case "mult":emit1(linecount, 57, x.typ); break;
+                  case "div": emit1(linecount, 58, x.typ); break;
                 }
-                emit2(38, x.typ, assign);
+                emit2(linecount, 38, x.typ, assign, i);
               }
               else if(x.typ == "ints"){
                 if(y.typ == "reals")
@@ -2276,7 +2285,7 @@ function block(fsys, isfun, level){
               }
               else
                 if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
-                  emit2(38, x.typ, assign);
+                  emit2(linecount, 38, x.typ, assign, i);
                 else
                   Error(46);
             }
@@ -2323,7 +2332,7 @@ function block(fsys, isfun, level){
           if (["bools", "notyp"].indexOf(x.typ) == -1)
             Error(17, x.typ);
           lc1 = lc;
-          emit(11);
+          emit(linecount, 11);
           if (sy == "thensy")
             insymbol();
           else {
@@ -2335,7 +2344,7 @@ function block(fsys, isfun, level){
           if (sy == "elsesy"){
             insymbol();
             lc2 = lc;
-            emit(10);
+            emit(linecount, 10);
             kode[lc1].y = lc;
             statement(fsys);
             kode[lc2].y = lc;
@@ -2400,7 +2409,7 @@ function block(fsys, isfun, level){
               statement(["semicolon", "endsy"].concat(fsys));
               j++;
               exittab[j] = lc;
-              emit(10);
+              emit(linecount, 10);
             }
           }
           catch(err){
@@ -2429,7 +2438,7 @@ function block(fsys, isfun, level){
           if (["ints", "reals", "bools", "chars", "notyp"].indexOf(x.typ) == -1)
             Error(23);
           lc1 = lc;
-          emit2(12, x.typ, 0);
+          emit2(linecount, 12, x.typ, 0);
           if (sy == "ofsy")
             insymbol();
           else
@@ -2441,10 +2450,10 @@ function block(fsys, isfun, level){
           kode[lc1].y = lc;
           debugger;
           for (k = 1; k <= i; k++) {
-            emit1(13, casetab[k].val);
-            emit1(13, casetab[k].lc);
+            emit1(linecount, 13, casetab[k].val);
+            emit1(linecount, 13, casetab[k].lc);
           }
-          emit1(10, 0);
+          emit1(linecount, 10, 0);
           for (k = 1; k <= j; k++)
             kode[exittab[k]].y = lc;
           if (sy == "endsy")
@@ -2476,7 +2485,7 @@ function block(fsys, isfun, level){
             expression(fsys, x);
             if (["bools", "notyp"].indexOf(x.typ) == -1)
               Error(17, x.typ);
-            emit1(11, lc1);
+            emit1(linecount, 11, lc1);
           }
           else
             Error(53);
@@ -2496,13 +2505,13 @@ function block(fsys, isfun, level){
           if (["bools", "notyp"].indexOf(x.typ) == -1)
             Error(17, x.typ);
           lc2 = lc;
-          emit(11);
+          emit(linecount, 11);
           if (sy == "dosy")
             insymbol();
           else
             Error(54);
           statement(fsys);
-          emit1(10, lc1);
+          emit1(linecount, 10, lc1);
           kode[lc2].y = lc;
         }
         catch(err){
@@ -2523,7 +2532,7 @@ function block(fsys, isfun, level){
             else
             if (tab[i].obj == "variable"){
               cvt = tab[i].typ;
-              emit2(0, tab[i].lev, tab[i].adr);
+              emit2(linecount, 0, tab[i].lev, tab[i].adr);
               if (["notyp", "ints", "bools", "chars", "reals"].indexOf(cvt) == -1)
                 Error(18, tab[i].name);
             }
@@ -2559,34 +2568,34 @@ function block(fsys, isfun, level){
                   if (sy == "intcon" || sy == "realcon"){
                     if (sy == "intcon"){
                       if (cvt == "ints")
-                        emit2(24, cvt, inum);
+                        emit2(linecount, 24, cvt, inum);
                       else
                         Error(19, cvt);
                     }
                     else{
                       if (cvt == "reals"){
                         EnterReal(rnum);
-                        emit2(24, cvt, c1);
+                        emit2(linecount, 24, cvt, c1);
                         steptyp = TAM_REAL;
                       }
                       else
                         Error(19, cvt);
                     }
                   }
-                  emit1(36, steptyp);
+                  emit1(linecount, 36, steptyp);
                 }
                 else {
                   if (sy == "intcon" || sy == "realcon"){
                     if (sy == "intcon"){
                       if (cvt == "ints")
-                        emit2(24, cvt, inum);
+                        emit2(linecount, 24, cvt, inum);
                       else
                         Error(19, cvt);
                     }
                     else{
                       if (cvt == "reals"){
                         EnterReal(rnum);
-                        emit2(24, cvt, c1);
+                        emit2(linecount, 24, cvt, c1);
                         steptyp = TAM_REAL;
                       }
                       else
@@ -2601,7 +2610,7 @@ function block(fsys, isfun, level){
                 insymbol();
               }
               else {
-                emit2(24, cvt, 1);
+                emit2(linecount, 24, cvt, 1);
               }
             }
           }
@@ -2611,14 +2620,14 @@ function block(fsys, isfun, level){
           lc1 = lc;
           if (kode[lc-1].f == 36)
             f = 16;
-          emit2(f, steptyp, 0);
+          emit2(linecount, f, steptyp, 0);
           if (sy == "dosy")
             insymbol();
           else
               Error(54);
           lc2 = lc;
           statement(fsys);
-          emit2(f+1, steptyp, lc2);
+          emit2(linecount, f+1, steptyp, lc2);
           kode[lc1].y = lc;
         }
         catch(err){
@@ -2657,12 +2666,12 @@ function block(fsys, isfun, level){
                     f = 0;
                     else
                     f = 1;
-                    emit2(f, tab[i].lev, tab[i].adr, tab[i].typ);
+                    emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                     selector(fsys.concat(["comma", "rparent"]), x, false);
                     }
                     if (["ints", "reals", "chars", "notyp", "strings"].indexOf(x.typ) != -1)
-                    emit1(27, types1.indexOf(x.typ));
+                    emit1(linecount, 27, types1.indexOf(x.typ));
                     else
                     Error(40);
                   }
@@ -2675,7 +2684,7 @@ function block(fsys, isfun, level){
               Error(4);
             }
             if (n == 2)
-            emit(62);
+            emit(linecount, 62);
             break;
             case 3:
             case 4:
@@ -2683,8 +2692,8 @@ function block(fsys, isfun, level){
               do{
                 insymbol();
                 if (sy == "stringsy"){
-                  emit1(24, sleng);
-                  emit1(28, inum);
+                  emit1(linecount, 24, sleng);
+                  emit1(linecount, 28, inum);
                   insymbol();
                 }
                 else {
@@ -2703,13 +2712,13 @@ function block(fsys, isfun, level){
                       expression(fsys.concat(["comma", "rparent"]), y);
                       if (y.typ != "ints")
                       Error(43);
-                      emit(37);
+                      emit(linecount, 37);
                     }
                     else
-                      emit1(30, types1.indexOf(x.typ));
+                      emit1(linecount, 30, types1.indexOf(x.typ));
                   }
                   else
-                    emit1(29, types1.indexOf(x.typ));
+                    emit1(linecount, 29, types1.indexOf(x.typ));
                 }
               }while(sy == "comma");
               if (sy == "rparent")
@@ -2718,7 +2727,7 @@ function block(fsys, isfun, level){
               Error(4);
             }
             if (n == 4)
-            emit(63);
+            emit(linecount, 63);
             break;
           }
         }
@@ -3060,7 +3069,7 @@ try{
   isDone = true;
   /*if (sy != "period")
     Error(22);*/
-  emit(31);
+  emit(linecount, 31);
   if (btab[2].vsize > stacksize)
     Error(49);
   if (progname == "test0")

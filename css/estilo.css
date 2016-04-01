@@ -64,6 +64,11 @@
   color: black;
 }
 
+.line-depurador {
+  background: #00FFFF !important;
+  color: #8a1f11 !important;
+}
+
 
 
 .breakpoints {width: 15px;}

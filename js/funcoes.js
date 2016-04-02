@@ -1,4 +1,23 @@
-
+function depurar(){
+	if (isOk && isDone){
+		debug_op = true;
+		call_read = false;
+		read_ok = false;
+		stopln = kode[tab[btab[1].last].adr].line;
+		limpaLinhaDepurador();
+		mostraLinhaDepurador(stopln);
+		interpret();
+	}
+	else {
+		if (isOk){
+			MsgErro = "Você precisa compilar primeiro.";
+		}
+		else {
+			MsgErro = "A compilação não foi realizada com sucesso.";
+		}
+		mostraErro();
+	}
+}
 //atalhos
 //para compilar
 function compiler(){
@@ -16,14 +35,20 @@ shortcut.add("F9",function() {
 
 //executar o programa
 function reexecute(){
-	if (isOk && isDone){
+	if (isOk && isDone && !debug_op){
 		limpaConsole();
 		mostrarModalOutput();
 		call_read = false;
 		interpret();
 	}
 	else {
-		if (isOk){
+		if (debug){
+			read_ok = true;
+			call_read = true;
+			debug = false;
+			interpret();
+		}
+		else if (isOk){
 			MsgErro = "Você precisa compilar o programa antes de executá-lo.";
 			mostraErro();
 			esconderModalOutput();
@@ -51,14 +76,44 @@ function runToCursor(){
 shortcut.add("F4",function(){runToCursor();});
 
 //passo-a-passo entrando em rotinas (step into)
-shortcut.add("F7",function() {
-	alert("apertou f7");
-});
+function inRoutine(){
+	debugger;
+	limpaLinhaDepurador();
+	if (kode[pc].f == 18){
+		stopln = kode[tab[kode[pc].y].adr].line;
+		mostraLinhaDepurador(stopln);
+		debug = true;
+		interpret();
+	}
+	else {
+		stopln = kode[pc].line;
+		if (kode[pc].f == 70)
+			read_ok = true;
+		debug = true;
+		mostraLinhaDepurador(stopln);
+		interpret();
+	}
+	interpret();
+}
+shortcut.add("F7",function() {inRoutine();});
+
+//passo-a-passo saindo de rotina(step out)
+function outRoutine(){
+
+}
+shortcut.add("Ctrl+F8",function() {outRoutine();});
 
 //passo-a-passo saltando rotinas (step over)
-shortcut.add("F8",function() {
-	alert("apertou f8");
-});
+function byRoutine(){
+	limpaLinhaDepurador();
+	stopln = kode[pc].line;
+	if (kode[pc].f == 70)
+		read_ok = true;
+	debug = true;
+	mostraLinhaDepurador(stopln);
+	interpret();
+}
+shortcut.add("F8",function() {byRoutine();});
 
 //interromper a depuração e a execução
 shortcut.add("Ctrl+F2",function() {
@@ -126,7 +181,7 @@ document.getElementById('novo').onclick = function() {
 //Script para entrada de dados pelo teclado
 function runScript(e) {
 	if (e.keyCode == 13) {
-		if (call_read && !debug){
+		if (call_read && !debug_op){
 			var input = pegaValorInput();
 			//input.pop();
 			atualizarConsole(input);
@@ -377,16 +432,11 @@ function carregaVariaveis(start){
 			adicionarObjetoVar(tab[start].name, value, start);
 			start++;
 		}
-<<<<<<< HEAD
 	} while(tab[start].obj != undefined && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
-=======
-	} while(tab[start].obj !== "prozedure" && tab[start].obj !== "funktion" && tab[start].name !== "");
->>>>>>> origin/master
 }
 
 var teste11 = 1;
 //objeto auxiliar
-<<<<<<< HEAD
 function objetoTabela(Nome,Valor, index){
   this.Nome = Nome;
   this.Valor = Valor;
@@ -398,28 +448,13 @@ function adicionarObjetoVar(posNome,posValor, start){
     objeto = new objetoTabela(posNome,posValor, start);
     adicionarTabelaVar(objeto);
     arrayObjetoTabela.push(objeto);
-=======
-function objetoTabela(posNome,posValor){
-	posValor = teste11;
-	teste11++;
-	this.posNome = posNome;
-	this.posValor = s[posValor];
-	this.novoValor = "";
-	this.idinput = "inpt_"+posValor;
-}
-//cria objeto tabela e verifica se existe os valores para adicionar na tabela
-function adicionarObjetoVar(posNome,posValor){
-	objeto = new objetoTabela(posNome,posValor);
-	adicionarTabelaVar(objeto);
-	arrayObjetoTabela.push(objeto);
->>>>>>> origin/master
+
 }
 
 function atualizaVariavel(index){
 
 }
 function adicionarTabelaVar(objeto) {
-<<<<<<< HEAD
   var table = document.getElementById("tab_var");
   var row = table.insertRow(2);
   var cell1 = row.insertCell(0);
@@ -427,15 +462,6 @@ function adicionarTabelaVar(objeto) {
   cell1.innerHTML = objeto.Nome;
   cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
   desativarTabelaVar();
-=======
-	var table = document.getElementById("tab_var");
-	var row = table.insertRow(2);
-	var cell1 = row.insertCell(0);
-	var cell2 = row.insertCell(1);
-	cell1.innerHTML = objeto.posNome;
-	cell2.innerHTML = "<input type='text' value='"+ objeto.posValor +"'name='"+objeto.idinput+"' id='"+ objeto.idinput +"'>";
-	desativarTabelaVar();
->>>>>>> origin/master
 }
 function desativarTabelaVar(){
 	$("#tab_var").find("input").attr("disabled", "disabled");

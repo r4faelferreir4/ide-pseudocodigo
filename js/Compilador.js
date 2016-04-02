@@ -1,8 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-  //VARIÁVEIS emit2(27, 38)lineCount
-var debug = false;//Parar em debugger
+//VARIÁVEIS COMPILADORemit
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
@@ -20,6 +19,7 @@ var ermax = 100;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
 var nmax = 2147643648;	//281474976710655 2**48-1
+var lmax = 10;		//Nível máximo
 var lineleng = 300;	//Tamanho da linha de saída
 var linelimit = 500;
 var stacksize = (1024*1024)*5;   //5 megabytes de espaço
@@ -28,6 +28,25 @@ var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
 var str_tab = [];
+
+//VARIÁVEIS INTERPRETADOR
+var ir; //buffer de instrução
+var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
+var ps = "";
+var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
+"lngchk", "redchk"];
+var t; //índice do top da pilha temporária
+var b; //índice base pilha temporária
+var h1, h2, h3, h4;
+var fld = new Array(4);//tamanho padrão dos campos
+var display = new Array(lmax);
+var stack = new ArrayBuffer(stacksize);
+var s = new DataView(stack);//new Array(stacksize);
+var call_read = false;  //flag para leitura de informação do teclado
+var read_ok = false;    //flag se já leu uma informação do teclado
+var debug_op = false;  //flag para modo debug
+var stopln;   //Linha de parada para o depurador
+var debug = false;//Parar em debugger
 
 //TIPOS DEFINIDOS
 
@@ -87,6 +106,7 @@ var lc;           //Contador do programa
 var ll;           //Tamanho da linha atual
 var ilnx;       //Posição da linha no ultimo caracter lido
 var ccx;      //Posição da coluna no ultimo caracter lido
+var changed = false;    //flag para mudança de linha de símbolo
 var linecount;    //Linha do ultimo símbolo lido
 var charcount;     //coluna do ultimo símbolo lido
 var errs = [];    //Lista de erros
@@ -412,7 +432,14 @@ function compiladorPascalS(){
 
   function insymbol(){      //Lê o próximo simbolo
     var i, j, k, e;
-    linecount = ilnx;
+    if(linecount < ilnx){
+      if(changed){
+        linecount = ilnx;
+        changed = false;
+      }
+      else
+        changed = true;
+    }
     charcount = ccx;
     function readscale(){
       var s, sign;
@@ -428,7 +455,7 @@ function compiladorPascalS(){
             sign = -1;
           }
         }
-        while (ch >= 0 && ch <= 9 && ch != " "){
+        while (ch >= 0 && ch <= 9 && ch != " " && ch != "\t"){
           s = 10 * s + Number(ch);
           NextCh();
         }
@@ -2973,6 +3000,10 @@ try{
   lc = 0;
   ll = 0;
   cc = 0;
+  ilnx = 0;
+  ccx = 0;
+  linecount = 0;
+  charcount = 0;
   ch = " ";
   iln = 0;
   errpos = 0;

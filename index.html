@@ -56,7 +56,7 @@
         </form>
         <!--<input id="compilar" name="compilar" type="button" value="Compilar" onclick="return popitup('console.html')"/>-->
         <!--<input id="compilar" class="btn btn-default btn-lg" name="compilar" type="button" value="Compilar" onclick="getCode();"/>-->
-        <button name="depurar" id="depurar"type="button" class="btn btn-default" title="Depurar" onclick="">
+        <button name="depurar" id="depurar"type="button" class="btn btn-default" title="Depurar" onclick="depurar();">
           <span class="glyphicon glyphicon-sort"></span>
         </button>
 
@@ -195,6 +195,7 @@ function getCode(){
   if (isOk && isDone){
     mostraErro();
     mostrarModalOutput();
+    debug_op = false;
     setTimeout(function(){
       call_read = false;
       interpret();

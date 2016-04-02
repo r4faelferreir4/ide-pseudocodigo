@@ -1,29 +1,12 @@
-//VARIÁVEIS INTERPRETADOR
-var ir; //buffer de instrução
-var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
-var ps = "";
-var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
-"lngchk", "redchk"];
-var t; //índice do top da pilha temporária
-var b; //índice base pilha temporária
-var h1, h2, h3, h4;
-var fld = new Array(4);//tamanho padrão dos campos
-var lmax = 10;		//Nível máximo
-var display = new Array(lmax);
-var stack = new ArrayBuffer(stacksize);
-var s = new DataView(stack);//new Array(stacksize);
-var call_read = false;  //flag para leitura de informação do teclado
-var read_ok = false;    //flag se já leu uma informação do teclado
-var debug_op = false;  //flag para modo debug
-var stopln;   //Linha de parada para o depurador
 
 function interpreter(){
   do {
     ir = kode[pc];
     pc++;
     ocnt++;
+    debugger;
     if (debug_op){
-      if (stopln == ir.line){
+      if (ir.line > stopln && ir.f != 18){
         read_ok = false;
         call_read = true;
         return;
@@ -677,6 +660,10 @@ function interpreter(){
         t = b;        //Função
       }
       pc = s.getInt32(b);
+      if(debug_op){
+        limpaLinhaDepurador();
+        mostraLinhaDepurador(kode[pc].line);
+      }
       b = s.getInt32(b + 2*TAM_INT);
       removerTopoPilha();
       break;
@@ -1222,14 +1209,16 @@ function interpreter(){
           pc = ir.y;
       break;
       case 70:
-        if (read_ok){
-          read_ok = false;
-          debug = false;
-        }
-        else {
-          call_read = true;
-          debug = true;
-          return;
+        if(debug_op){
+          if (read_ok){
+            read_ok = false;
+          }
+          else {
+            call_read = true;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(ir.line);
+            return;
+          }
         }
       break;
 

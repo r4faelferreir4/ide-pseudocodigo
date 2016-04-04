@@ -6,10 +6,16 @@ function interpreter(){
     ocnt++;
     debugger;
     if (debug_op){
-      if (ir.line > stopln && ir.f != 18){
-        read_ok = false;
-        call_read = true;
-        return;
+      if (ir.line > stopln){
+        if(!read_ok){
+          read_ok = false;
+          call_read = true;
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(kode[pc].line);
+          return;
+        }
+        else
+          read_ok = false;
       }
     }
     switch(ir.f){
@@ -312,6 +318,13 @@ function interpreter(){
       s.setInt32(h1, pc);
       s.setInt32(h1 + 1*TAM_INT, display[h3]);
       s.setInt32(h1 + 2*TAM_INT, b);
+      if(read_ok){
+        read_ok = false;
+        stopln = kode[tab[h2].adr].line;
+        limpaLinhaDepurador();
+        mostraLinhaDepurador(stopln);
+      }
+      out.push(kode[pc].line);
 
       for (h3 = t+TAM_INT;  h3 < h4;  h3+=TAM_INT)
         s.setInt32(h3, 0);
@@ -666,6 +679,7 @@ function interpreter(){
       }
       b = s.getInt32(b + 2*TAM_INT);
       removerTopoPilha();
+      out.pop();
       break;
 
       case 34:

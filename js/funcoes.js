@@ -3,7 +3,7 @@ function depurar(){
 		debug_op = true;
 		call_read = false;
 		read_ok = false;
-		stopln = kode[tab[btab[1].last].adr].line;
+		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
 		mostraLinhaDepurador(stopln);
 		interpret();
@@ -78,20 +78,17 @@ shortcut.add("F4",function(){runToCursor();});
 //passo-a-passo entrando em rotinas (step into)
 function inRoutine(){
 	debugger;
-	limpaLinhaDepurador();
 	if (kode[pc].f == 18){
-		stopln = kode[tab[kode[pc].y].adr].line;
+		stopln = kode[pc].line;
 		mostraLinhaDepurador(stopln);
+		read_ok = true;
 		debug = true;
-		interpret();
 	}
 	else {
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
 			read_ok = true;
 		debug = true;
-		mostraLinhaDepurador(stopln);
-		interpret();
 	}
 	interpret();
 }
@@ -181,7 +178,7 @@ document.getElementById('novo').onclick = function() {
 //Script para entrada de dados pelo teclado
 function runScript(e) {
 	if (e.keyCode == 13) {
-		if (call_read && !debug_op){
+		if (call_read && !debug){
 			var input = pegaValorInput();
 			//input.pop();
 			atualizarConsole(input);

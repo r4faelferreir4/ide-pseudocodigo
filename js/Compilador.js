@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//VARIÁVEIS COMPILADORemit
+//VARIÁVEIS COMPILADORcall
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
@@ -27,7 +27,8 @@ var TAM_REAL = 8;   //Tamanho em bytes do tipo real
 var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
-var str_tab = [];
+var str_tab = [];   //Vetor de listas para armazenar strings
+var CmdLn = [];     //Vetor contendo as linhas não em branco do código.
 
 //VARIÁVEIS INTERPRETADOR
 var ir; //buffer de instrução
@@ -47,6 +48,7 @@ var read_ok = false;    //flag se já leu uma informação do teclado
 var debug_op = false;  //flag para modo debug
 var stopln;   //Linha de parada para o depurador
 var debug = false;//Parar em debugger
+var out = [];     //Vetor de posições para saída de funções
 
 //TIPOS DEFINIDOS
 
@@ -253,6 +255,8 @@ function compiladorPascalS(){
           ll = 0;
           cc = 0;
           line = InputFile[iln];
+          if(line.length != 0)
+            CmdLn.push(iln);
           iln++;
           ll = line.length;
         }
@@ -434,7 +438,7 @@ function compiladorPascalS(){
     var i, j, k, e;
     if(linecount < ilnx){
       if(changed){
-        linecount = ilnx;
+        linecount = CmdLn.shift();
         changed = false;
       }
       else
@@ -500,7 +504,7 @@ function compiladorPascalS(){
       }
     }
     try{
-      while(ch == " " || ch == "\t")  //Pula espaços em branco
+      while(ch == " " || ch == "\t" || ch == "\n")  //Pula espaços em branco
         NextCh();
       ch = ch.toLowerCase(); //Torna palavras chave case insensitive
       if(ch >= "a" && ch <= "z"){
@@ -527,7 +531,7 @@ function compiladorPascalS(){
         sy = "ident";
     }
     else {
-      if (ch >= "0" && ch <= "9" && ch != " "){
+      if (ch >= "0" && ch <= "9" && ch != " " && ch != "\t"){
         k = 0;
         inum = 0;
         sy = "intcon";
@@ -535,7 +539,7 @@ function compiladorPascalS(){
           inum = inum * 10 + Number(ch);
           k++;
           NextCh();
-        }while(ch >= 0 && ch <= 9 && ch != " ");
+        }while(ch >= 0 && ch <= 9 && ch != " " && ch != "\t");
         if(k > kmax || inum > nmax){
           Error(21);
           inum = 0;
@@ -1498,6 +1502,7 @@ function block(fsys, isfun, level){
       function call(fsys, i){
         var x, lastp, cp, k;
         try{
+          debugger;
           x = new item("", 1);
           emit1(linecount, 18, i);
           lastp = btab[tab[i].ref].lastpar;

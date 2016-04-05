@@ -71,7 +71,7 @@ function runToCursor(){
 	stopln = editor.getCursor().line;
 	debug_op = true;
 	if (pc != 0)
-		call_read = true;
+	call_read = true;
 }
 shortcut.add("F4",function(){runToCursor();});
 
@@ -87,7 +87,7 @@ function inRoutine(){
 	else {
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
-			read_ok = true;
+		read_ok = true;
 		debug = true;
 	}
 	interpret();
@@ -105,7 +105,7 @@ function byRoutine(){
 	limpaLinhaDepurador();
 	stopln = kode[pc].line;
 	if (kode[pc].f == 70)
-		read_ok = true;
+	read_ok = true;
 	debug = true;
 	mostraLinhaDepurador(stopln);
 	interpret();
@@ -435,16 +435,16 @@ function carregaVariaveis(start){
 var teste11 = 1;
 //objeto auxiliar
 function objetoTabela(Nome,Valor, index){
-  this.Nome = Nome;
-  this.Valor = Valor;
-  this.novoValor = "";
-  this.idtab = index;
+	this.Nome = Nome;
+	this.Valor = Valor;
+	this.novoValor = "";
+	this.idtab = index;
 }
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
 function adicionarObjetoVar(posNome,posValor, start){
-    objeto = new objetoTabela(posNome,posValor, start);
-    adicionarTabelaVar(objeto);
-    arrayObjetoTabela.push(objeto);
+	objeto = new objetoTabela(posNome,posValor, start);
+	adicionarTabelaVar(objeto);
+	arrayObjetoTabela.push(objeto);
 
 }
 
@@ -452,13 +452,13 @@ function atualizaVariavel(index){
 
 }
 function adicionarTabelaVar(objeto) {
-  var table = document.getElementById("tab_var");
-  var row = table.insertRow(2);
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  cell1.innerHTML = objeto.Nome;
-  cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
-  desativarTabelaVar();
+	var table = document.getElementById("tab_var");
+	var row = table.insertRow(2);
+	var cell1 = row.insertCell(0);
+	var cell2 = row.insertCell(1);
+	cell1.innerHTML = objeto.Nome;
+	cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
+	desativarTabelaVar();
 }
 function desativarTabelaVar(){
 	$("#tab_var").find("input").attr("disabled", "disabled");
@@ -498,7 +498,7 @@ function atualizarTodasVar(){
 		var objeto = arrayObjetoTabela[i];
 		var input = document.getElementById(objeto.idinput);
 		if (input !== null) {
-				input.value = s[objeto.posValor];
+			input.value = s[objeto.posValor];
 		}
 	}
 }
@@ -974,5 +974,37 @@ function download(name, type) {
 	}
 	else {
 		alert("Você precisa compilar o código antes!");
+	}
+}
+
+function mostraItensDepuracao(bool) {
+	if (bool) {
+		document.getElementById("continuar").style.visibility = "visible";
+		document.getElementById("exe_cursor").style.visibility = "visible";
+		document.getElementById("prox_funcao").style.visibility = "visible";
+		document.getElementById("exe_entrando").style.visibility = "visible";
+		document.getElementById("exe_saindo").style.visibility = "visible";
+		document.getElementById("nao_parar").style.visibility = "visible";
+		document.getElementById("lb_nao_parar").style.visibility = "visible";
+		document.getElementById("coluna_direita").style.visibility = "visible";
+		document.getElementById("codeDiv").style.width = "76.5%";
+
+		document.getElementById("coluna_direita").style.width = "295pxpx;";
+		document.getElementById("coluna_direita").style.height = "400px";
+
+	} else {
+		document.getElementById("continuar").style.visibility = "hidden";
+		document.getElementById("exe_cursor").style.visibility = "hidden";
+		document.getElementById("prox_funcao").style.visibility = "hidden";
+		document.getElementById("exe_entrando").style.visibility = "hidden";
+		document.getElementById("exe_saindo").style.visibility = "hidden";
+		document.getElementById("nao_parar").style.visibility = "hidden";
+		document.getElementById("lb_nao_parar").style.visibility = "hidden";
+		document.getElementById("coluna_direita").style.visibility = "hidden";
+		document.getElementById("codeDiv").style.width = "98%";
+		
+		document.getElementById("coluna_direita").style.width = "1px;";
+		document.getElementById("coluna_direita").style.height = "1px";
+
 	}
 }

@@ -8,11 +8,23 @@ function interpreter(){
     if (debug_op){
       if (ir.line > stopln){
         if(!read_ok){
-          read_ok = false;
-          call_read = true;
-          limpaLinhaDepurador();
-          mostraLinhaDepurador(kode[pc].line);
-          return;
+          if(!CursorRun){
+            read_ok = false;
+            call_read = true;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(ir.line);
+            return;
+          }
+          else {
+            if(stopln == pc-1){
+              read_ok = false;
+              call_read = true;
+              runToCursor = false;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(ir.line);
+              return;
+            }
+          }
         }
         else
           read_ok = false;
@@ -323,6 +335,7 @@ function interpreter(){
         stopln = kode[tab[h2].adr].line;
         limpaLinhaDepurador();
         mostraLinhaDepurador(stopln);
+        stopln--;
       }
       out.push(kode[pc].line);
 
@@ -469,10 +482,8 @@ function interpreter(){
       break;
 
       case 27:    //INSTRUÇÃO DE LEITURA
-      /*if (InputFile){
-        ps = 'redchk';
-      }
-      else{*/
+        if (debug_op)
+          mostrarModalOutput();
         switch (ir.y) {
           case 1:
           if (read_ok) {
@@ -1269,6 +1280,7 @@ function interpret(){
     carregaVariaveis(btab[1].last+1);
     removerTodaPilhaFuncoes();
     adicionarTabelaPilha(progname);
+    limpaConsole();
     interpreter();
   }
   if (call_read){
@@ -1326,4 +1338,7 @@ function interpret(){
     }
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();
+    debug_op = false;
+    debug = false;
+    limpaLinhaDepurador();
 }//interpret

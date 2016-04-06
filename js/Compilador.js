@@ -49,6 +49,7 @@ var debug_op = false;  //flag para modo debug
 var stopln;   //Linha de parada para o depurador
 var debug = false;//Parar em debugger
 var out = [];     //Vetor de posições para saída de funções
+var CursorRun = false;  //Flag para o comando runToCursor;
 
 //TIPOS DEFINIDOS
 
@@ -255,14 +256,12 @@ function compiladorPascalS(){
           ll = 0;
           cc = 0;
           line = InputFile[iln];
-          if(line.length != 0)
-            CmdLn.push(iln);
+          ilnx = iln;
           iln++;
           ll = line.length;
         }
       }
       if (cc < ll){
-        ilnx = iln-1;
         ccx = cc;
         ch = line[cc];
         cc++;
@@ -283,11 +282,8 @@ function compiladorPascalS(){
         var strError = ErrorMsg(code);
         var line;
         line = linecount;
-        /*if (cc == 1)
-          line--;
-        do {
-          line--;
-        } while (InputFile[line].length == 0);*/
+        if(changed)
+          line++;
         mostraErroNaLinha(line, strError);
         isOk = false;
         str = "";
@@ -438,7 +434,7 @@ function compiladorPascalS(){
     var i, j, k, e;
     if(linecount < ilnx){
       if(changed){
-        linecount = CmdLn.shift();
+        linecount = ilnx;
         changed = false;
       }
       else
@@ -2118,7 +2114,7 @@ function block(fsys, isfun, level){
       }//expression
       function assignment(lv, ad){
         try{
-          var xx=0, x, y, f,op="", assign=1, fstring=false;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
+          var xx=0, ln, x, y, f,op="", assign=1, fstring=false;    //assign para atribuições multiplas, quantas atribuições a instrução 38 fará
           x = new item("", 1);
           y = new item("", 1);
           x.typ = tab[i].typ;
@@ -2128,7 +2124,8 @@ function block(fsys, isfun, level){
             f = 0;
           else
             f = 1;
-          emit2(linecount, f, lv, ad, "ints");
+          ln = linecount;
+          emit2(ln, f, lv, ad, "ints");
           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
             if (x.typ == "strings"){
               x.typ = "chars";
@@ -2155,7 +2152,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                  emit2(linecount, f, tab[p].lev, tab[p].adr, tab[p].typ);
+                  emit2(ln, f, tab[p].lev, tab[p].adr, tab[p].typ);
                   assign++;
                 }
                 else {
@@ -2181,7 +2178,7 @@ function block(fsys, isfun, level){
                     f = 0;
                   else
                     f = 1;
-                emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
+                emit2(ln, f, tab[i].lev, tab[i].adr, tab[i].typ);
               }
               switch (sy) {
                 case "plus":
@@ -2248,18 +2245,18 @@ function block(fsys, isfun, level){
                         f = 0;
                       else
                         f = 1;
-                    emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
-                    emit(linecount, 63);
+                    emit2(ln, f, tab[i].lev, tab[i].adr, tab[i].typ);
+                    emit(ln, 63);
                   }
                 }
                 switch (op) {
-                  case "plus": emit1(linecount, 52, x.typ); break;
-                  case "minus":emit1(linecount, 53, x.typ); break;
-                  case "mult":emit1(linecount, 57, x.typ); break;
-                  case "div":emit1(linecount, 58, x.typ); break;
+                  case "plus": emit1(ln, 52, x.typ); break;
+                  case "minus":emit1(ln, 53, x.typ); break;
+                  case "mult":emit1(ln, 57, x.typ); break;
+                  case "div":emit1(ln, 58, x.typ); break;
                 }
 
-                emit2(linecount, 38, tab[i].typ, assign, i);
+                emit2(ln, 38, tab[i].typ, assign, i);
               }
             }
             else
@@ -2267,9 +2264,9 @@ function block(fsys, isfun, level){
                 Error(46);
               else
                 if (x.typ == "arrays")
-                  emit1(linecount, 23, atab[x.ref].size);
+                  emit1(ln, 23, atab[x.ref].size);
                 else
-                  emit1(linecount, 23, btab[x.ref].vsize);
+                  emit1(ln, 23, btab[x.ref].vsize);
           else{
             if(x.typ == 'strings' || fstring){
               if (x.ref == 1){
@@ -2278,7 +2275,7 @@ function block(fsys, isfun, level){
                 }
                 else {
                   if (tab[i].typ != "arrays")
-                    emit2(linecount, 1, tab[i].lev, tab[i].adr, tab[i].typ);
+                    emit2(ln, 1, tab[i].lev, tab[i].adr, tab[i].typ);
                   else {
                     var ltyp;
                     switch (y.typ) {
@@ -2287,29 +2284,29 @@ function block(fsys, isfun, level){
                       case "bools":ltyp = TAM_BOOL;break;
                       case "chars":ltyp = TAM_CHAR;break;
                     }
-                    emit1(linecount, 34, ltyp);
+                    emit1(ln, 34, ltyp);
                   }
-                  emit(linecount, 63);
+                  emit(ln, 63);
                   if(!fstring)
-                    emit2(linecount, 38, x.typ, assign, i);
+                    emit2(ln, 38, x.typ, assign, i);
                   else
-                    emit2(linecount, 38, "strings", assign, i);
+                    emit2(ln, 38, "strings", assign, i);
                 }
               }
               else {
-                emit2(linecount, 38, x.typ, assign, i);
+                emit2(ln, 38, x.typ, assign, i);
               }
             }
             else{
               if (x.typ == "reals" && y.typ == "ints"){
-                emit1(linecount, 26,TAM_INT);
+                emit1(ln, 26,TAM_INT);
                 switch (op) {
-                  case "plus": emit1(linecount, 52, x.typ); break;
-                  case "minus":emit1(linecount, 53, x.typ); break;
-                  case "mult":emit1(linecount, 57, x.typ); break;
-                  case "div": emit1(linecount, 58, x.typ); break;
+                  case "plus": emit1(ln, 52, x.typ); break;
+                  case "minus":emit1(ln, 53, x.typ); break;
+                  case "mult":emit1(ln, 57, x.typ); break;
+                  case "div": emit1(ln, 58, x.typ); break;
                 }
-                emit2(linecount, 38, x.typ, assign, i);
+                emit2(ln, 38, x.typ, assign, i);
               }
               else if(x.typ == "ints"){
                 if(y.typ == "reals")
@@ -2317,7 +2314,7 @@ function block(fsys, isfun, level){
               }
               else
                 if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
-                  emit2(linecount, 38, x.typ, assign, i);
+                  emit2(ln, 38, x.typ, assign, i);
                 else
                   Error(46);
             }
@@ -3007,6 +3004,7 @@ try{
   cc = 0;
   ilnx = 0;
   ccx = 0;
+  CmdLn = [];
   linecount = 0;
   charcount = 0;
   ch = " ";

@@ -1,11 +1,12 @@
 function depurar(){
+	debugger;
 	if (isOk && isDone){
 		debug_op = true;
 		call_read = false;
 		read_ok = false;
 		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
-		mostraLinhaDepurador(stopln);
+		mostraLinhaDepurador(stopln+1);
 		interpret();
 	}
 	else {
@@ -29,7 +30,6 @@ function compiler(){
 	mostraErro();
 }
 shortcut.add("F9",function() {
-	debugger;
 	compiler();
 });
 
@@ -42,7 +42,7 @@ function reexecute(){
 		interpret();
 	}
 	else {
-		if (debug){
+		if (debug_op){
 			read_ok = true;
 			call_read = true;
 			debug = false;
@@ -68,47 +68,73 @@ shortcut.add("F10",function() {getCode();});
 
 //rodar até o cursor
 function runToCursor(){
-	stopln = editor.getCursor().line;
-	debug_op = true;
-	if (pc != 0)
-		call_read = true;
+	debugger;
+	if(debug_op){
+		stopln = editor.getCursor().line-1;
+		if(stopln < kode[tab[btab[1].last].adr].line){
+			var pcx = 0;
+			do {
+				pcx++;
+			} while (kode[pcx].line <= stopln);
+			stopln = pcx;
+			CursorRun = true;
+		}
+		debug_op = true;
+		if (pc != 0)
+			call_read = true;
+		interpret();
+	}
 }
 shortcut.add("F4",function(){runToCursor();});
 
 //passo-a-passo entrando em rotinas (step into)
 function inRoutine(){
-	debugger;
-	if (kode[pc].f == 18){
-		stopln = kode[pc].line;
-		mostraLinhaDepurador(stopln);
-		read_ok = true;
-		debug = true;
+	if(debug_op){
+		if (kode[pc].f == 18){
+			stopln = kode[pc].line;
+			mostraLinhaDepurador(stopln);
+			read_ok = true;
+		}
+		else {
+			stopln = kode[pc].line;
+			if (kode[pc].f == 70)
+				read_ok = true;
+		}
+		interpret();
 	}
 	else {
-		stopln = kode[pc].line;
-		if (kode[pc].f == 70)
-			read_ok = true;
-		debug = true;
+		MsgErro = "Você não inicializou no modo depurador.";
+		mostraErro();
 	}
-	interpret();
 }
 shortcut.add("F7",function() {inRoutine();});
 
 //passo-a-passo saindo de rotina(step out)
 function outRoutine(){
-
+	if(debug_op){
+		stopln = out.pop();
+		limpaLinhaDepurador();
+		mostraLinhaDepurador(stopln);
+		read_ok = true;
+		interpret();
+	}
 }
 shortcut.add("Ctrl+F8",function() {outRoutine();});
 
 //passo-a-passo saltando rotinas (step over)
 function byRoutine(){
-	limpaLinhaDepurador();
-	stopln = kode[pc].line;
-	if (kode[pc].f == 70)
-		read_ok = true;
-	debug = true;
-	mostraLinhaDepurador(stopln);
-	interpret();
+	if(debug_op){
+		limpaLinhaDepurador();
+		stopln = kode[pc].line;
+		if (kode[pc].f == 70)
+			read_ok = true;
+		mostraLinhaDepurador(stopln);
+		interpret();
+	}
+	else {
+		MsgErro = "Você não inicializou no modo depurador.";
+		mostraErro();
+	}
 }
 shortcut.add("F8",function() {byRoutine();});
 
@@ -178,9 +204,8 @@ document.getElementById('novo').onclick = function() {
 //Script para entrada de dados pelo teclado
 function runScript(e) {
 	if (e.keyCode == 13) {
-		if (call_read && !debug){
+		if (call_read && kode[pc].f == 27){
 			var input = pegaValorInput();
-			//input.pop();
 			atualizarConsole(input);
 			InputFile = input;
 			limpaInput();

@@ -69,11 +69,11 @@
 
         <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
 
-        <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" onclick="download('arquivo.pse', 'application/octet-stream')">
+        <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden"onclick="download('arquivo.pse', 'application/octet-stream')">
           <span class="glyphicon glyphicon-floppy-disk"></span>
         </button>
 
-        <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput()">
+        <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput();">
           <span class="glyphicon glyphicon-list-alt"></span>
         </button>
 
@@ -85,15 +85,15 @@
           <span class="glyphicon glyphicon-arrow-down"></span>
         </button>
 
-        <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função">
+        <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função" onclick ="byRoutine();">
           <span class="glyphicon glyphicon-share-alt"></span>
         </button>
 
-        <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções">
+        <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções" onclick="inRoutine();">
           <span class="glyphicon glyphicon-resize-small"></span>
         </button>
 
-        <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções">
+        <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções" onclick="outRoutine();">
           <span class="glyphicon glyphicon-resize-full"></span>
         </button>
 

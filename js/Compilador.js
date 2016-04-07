@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//VARIÁVEIS COMPILADORcall
+//VARIÁVEIS COMPILADOR
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
@@ -19,16 +19,14 @@ var ermax = 100;		//Nº máximo de erros
 var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
 var nmax = 2147643648;	//281474976710655 2**48-1
-var lmax = 10;		//Nível máximo
-var lineleng = 300;	//Tamanho da linha de saída
-var linelimit = 500;
+var lmax = 10;		//Nível máximo de chamadas de rotinas
 var stacksize = (1024*1024)*5;   //5 megabytes de espaço
 var TAM_REAL = 8;   //Tamanho em bytes do tipo real
 var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
 var str_tab = [];   //Vetor de listas para armazenar strings
-var CmdLn = [];     //Vetor contendo as linhas não em branco do código.
+var finalInst;      //Armazena o índice da última instrução do programa.
 
 //VARIÁVEIS INTERPRETADOR
 var ir; //buffer de instrução
@@ -235,7 +233,7 @@ function compiladorPascalS(){
     Msg[52] = "Entao      "; Msg[53] = "Está faltando a palavra reservada \'ate\'.";
     Msg[54] = "Está faltando a palavra reservada \'faca\'."; Msg[55] = "";
     Msg[56] = ""; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
-    Msg[58] = ""; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
+    Msg[58] = "É esperado a declaração de variáveis na declaração do procediment/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
     Msg[62] = "Está faltando o ";
@@ -518,7 +516,15 @@ function compiladorPascalS(){
       if (i != -1){
         sy = ksy[i];
         if (sy == "debugsy"){
-          emit(linecount, 70);
+          if(changed){
+            var line = ilnx;
+            do {
+              line--;
+            } while (InputFile[line].length == 0);
+            emit(line, 70);
+          }
+          else
+            emit(linecount, 70);
           insymbol();
           return;
         }
@@ -1194,7 +1200,7 @@ function block(fsys, isfun, level){
         tp = "notyp";
         rf = 0;
         sz = 0;
-        test(["ident", "refsy"], ["ident", "refsy"], fsys.concat(["rparent"]), 7);
+        test(["ident", "refsy"], ["ident", "refsy"], fsys.concat(["rparent"]), 58);
         while (sy == "ident" || sy == "refsy"){
           if (sy != "refsy")
             valpar = true;
@@ -1397,7 +1403,7 @@ function block(fsys, isfun, level){
 
           }
         }
-        emit1(linecount, 32 + bool, len);
+        emit1(linecount-1, 32 + bool, len);
       }
       catch(err){
         return err;
@@ -1496,11 +1502,17 @@ function block(fsys, isfun, level){
       }//Selector
 
       function call(fsys, i){
-        var x, lastp, cp, k;
+        var x, lastp, cp, k, line;
         try{
           debugger;
           x = new item("", 1);
-          emit1(linecount, 18, i);
+          if(changed)
+            line = ilnx;
+          else
+            line = linecount;
+          if(sy != "lparent")
+            line--;
+          emit1(line, 18, i);
           lastp = btab[tab[i].ref].lastpar;
           cp = i;
           if (sy == "lparent"){
@@ -1517,17 +1529,17 @@ function block(fsys, isfun, level){
                       Error(36, "records", "records");
                     else
                       if (x.typ == "arrays")
-                        emit1(linecount, 22, atab[x.ref].size);
+                        emit1(line, 22, atab[x.ref].size);
                       else
                         if (x.typ == "arrays")
-                          emit1(linecount, 22, atab[x.ref].size);
+                          emit1(line, 22, atab[x.ref].size);
                         else
                           if (x.typ == "records")
-                            emit1(linecount, 22, btab[x.ref].vsize);
+                            emit1(line, 22, btab[x.ref].vsize);
                   }
                   else
                     if (x.typ == "ints" && tab[cp].typ == "reals")
-                      emit1(linecount, 26,TAM_INT);
+                      emit1(line, 26,TAM_INT);
                     else
                       if (x.typ != "notyp")
                         Error(36, x.typ, tab[cp].typ);
@@ -1544,9 +1556,9 @@ function block(fsys, isfun, level){
                       x.typ = tab[k].typ;
                       x.ref = tab[k].ref;
                       if (tab[k].normal)
-                        emit2(linecount, 0, tab[k].lev, tab[k].adr);
+                        emit2(line, 0, tab[k].lev, tab[k].adr);
                       else
-                        emit2(linecount, 1, tab[k].lev, tab[k].adr, tab[k].typ);
+                        emit2(line, 1, tab[k].lev, tab[k].adr, tab[k].typ);
                       if (["lbrack", "lparent", "period"].indexOf(sy) != -1)
                         selector(fsys.concat(["comma", "colon", "rparent"]), x, false);
                       if (x.typ != tab[cp].typ || x.ref != tab[cp].ref)
@@ -1564,9 +1576,9 @@ function block(fsys, isfun, level){
           }
           if (cp < lastp)
             Error(39);
-          emit2(linecount, 19, tab[i].typ, btab[tab[i].ref].psize);
+          emit2(line, 19, tab[i].typ, btab[tab[i].ref].psize);
           if (tab[i].lev < level)
-            emit2(linecount, 3, tab[i].lev, level);
+            emit2(line, 3, tab[i].lev, level);
         }
         catch(err){
           return err;
@@ -3004,7 +3016,6 @@ try{
   cc = 0;
   ilnx = 0;
   ccx = 0;
-  CmdLn = [];
   linecount = 0;
   charcount = 0;
   ch = " ";
@@ -3103,7 +3114,8 @@ try{
   isDone = true;
   /*if (sy != "period")
     Error(22);*/
-  emit(linecount, 31);
+  finalInst = lc;
+  emit(ilnx, 31);
   if (btab[2].vsize > stacksize)
     Error(49);
   if (progname == "test0")

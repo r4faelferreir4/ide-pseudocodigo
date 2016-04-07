@@ -1,9 +1,12 @@
+//ATALHOS
+//Para depurar
 function depurar(){
 	debugger;
 	if (isOk && isDone){
 		debug_op = true;
 		call_read = false;
 		read_ok = false;
+		mostraItensDepuracao(true);
 		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
 		mostraLinhaDepurador(stopln+1);
@@ -19,7 +22,11 @@ function depurar(){
 		mostraErro();
 	}
 }
-//atalhos
+shortcut.add("F6",function() {
+	depurar();
+});
+
+
 //para compilar
 function compiler(){
 	InputFile = editor.getValue();
@@ -43,9 +50,12 @@ function reexecute(){
 	}
 	else {
 		if (debug_op){
-			read_ok = true;
+			read_ok = false;
 			call_read = true;
 			debug = false;
+			stopln = kode[finalInst].line;
+			if(kode[pc].f == 70)
+				pc++;
 			interpret();
 		}
 		else if (isOk){
@@ -68,7 +78,6 @@ shortcut.add("F10",function() {getCode();});
 
 //rodar até o cursor
 function runToCursor(){
-<<<<<<< HEAD
 	debugger;
 	if(debug_op){
 		stopln = editor.getCursor().line-1;
@@ -85,20 +94,15 @@ function runToCursor(){
 			call_read = true;
 		interpret();
 	}
-=======
-	stopln = editor.getCursor().line;
-	debug_op = true;
-	if (pc != 0)
-	call_read = true;
->>>>>>> origin/master
 }
 shortcut.add("F4",function(){runToCursor();});
 
 //passo-a-passo entrando em rotinas (step into)
 function inRoutine(){
+	debugger;
 	if(debug_op){
 		if (kode[pc].f == 18){
-			stopln = kode[pc].line;
+			stopln = kode[tab[kode[pc].y].adr].line-1;
 			mostraLinhaDepurador(stopln);
 			read_ok = true;
 		}
@@ -110,34 +114,33 @@ function inRoutine(){
 		interpret();
 	}
 	else {
-<<<<<<< HEAD
 		MsgErro = "Você não inicializou no modo depurador.";
 		mostraErro();
-=======
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
 		read_ok = true;
 		debug = true;
->>>>>>> origin/master
 	}
 }
 shortcut.add("F7",function() {inRoutine();});
 
-//passo-a-passo saindo de rotina(step out)
+//Executar até sair da rotina(step out)
 function outRoutine(){
+	debugger;
 	if(debug_op){
-		stopln = out.pop();
-		limpaLinhaDepurador();
-		mostraLinhaDepurador(stopln);
-		read_ok = true;
-		interpret();
+		stopln = out.pop()-1;
+		if(!Number.isNaN(stopln)){
+			limpaLinhaDepurador();
+			mostraLinhaDepurador(stopln);
+			read_ok = false;
+			interpret();
+		}
 	}
 }
 shortcut.add("Ctrl+F8",function() {outRoutine();});
 
 //passo-a-passo saltando rotinas (step over)
 function byRoutine(){
-<<<<<<< HEAD
 	if(debug_op){
 		limpaLinhaDepurador();
 		stopln = kode[pc].line;
@@ -150,21 +153,17 @@ function byRoutine(){
 		MsgErro = "Você não inicializou no modo depurador.";
 		mostraErro();
 	}
-=======
-	limpaLinhaDepurador();
-	stopln = kode[pc].line;
-	if (kode[pc].f == 70)
-	read_ok = true;
-	debug = true;
-	mostraLinhaDepurador(stopln);
-	interpret();
->>>>>>> origin/master
 }
 shortcut.add("F8",function() {byRoutine();});
 
 //interromper a depuração e a execução
+function stopDeb(){
+	debug_op = false;
+	pc = finalInst;
+	interpret();
+}
 shortcut.add("Ctrl+F2",function() {
-	alert("apertou ctrl+f2");
+	stopDeb();
 });
 
 //fim atalhos
@@ -1026,7 +1025,7 @@ function download(name, type) {
 	}
 }
 
-function mostraItensDepuracao(bool) {
+function mostraItensDepuracao(bool){
 	if (bool) {
 		document.getElementById("continuar").style.visibility = "visible";
 		document.getElementById("exe_cursor").style.visibility = "visible";
@@ -1051,7 +1050,7 @@ function mostraItensDepuracao(bool) {
 		document.getElementById("lb_nao_parar").style.visibility = "hidden";
 		document.getElementById("coluna_direita").style.visibility = "hidden";
 		document.getElementById("codeDiv").style.width = "98%";
-		
+
 		document.getElementById("coluna_direita").style.width = "1px;";
 		document.getElementById("coluna_direita").style.height = "1px";
 

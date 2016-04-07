@@ -19,15 +19,15 @@ function interpreter(){
             if(stopln == pc-1){
               read_ok = false;
               call_read = true;
-              runToCursor = false;
+              CursorRun = false;
               limpaLinhaDepurador();
               mostraLinhaDepurador(ir.line);
               return;
             }
           }
         }
-        else
-          read_ok = false;
+        //else
+          //read_ok = false;
       }
     }
     switch(ir.f){
@@ -482,8 +482,11 @@ function interpreter(){
       break;
 
       case 27:    //INSTRUÇÃO DE LEITURA
-        if (debug_op)
+        if (debug_op){
           mostrarModalOutput();
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(ir.line);
+        }
         switch (ir.y) {
           case 1:
           if (read_ok) {
@@ -1340,5 +1343,6 @@ function interpret(){
     removerTodaPilhaVar();
     debug_op = false;
     debug = false;
+    mostraItensDepuracao(false);
     limpaLinhaDepurador();
 }//interpret

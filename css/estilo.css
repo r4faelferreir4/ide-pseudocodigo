@@ -72,6 +72,10 @@
 }
 
 
+.CodeMirror
+{
+  line-height:18px;
+}
 
 .breakpoints {width: 15px;}
 .breakpoint { color: #822; }

@@ -176,13 +176,55 @@ function mostraLinhaDepurador(linha){
 	var info = editor.lineInfo(1);
 }
 
-//limpa depurador
+function makeMarkerLinha(linha) {
+	var span = document.getElementById("mk_"+linha);
+	var valor = 0;
+
+	if (span !== null) {
+		valor = parseInt(span.innerHTML);
+	}
+
+	valor += 1;
+	var marker = document.createElement("div");
+	marker.style.color = "#822";
+	marker.innerHTML = "<span id=mk_"+linha+" class='badge'>"+ valor +"</span>";
+	aumentaMarker();
+	return marker;
+}
+
+//altera o tamanho dos makers
+function aumentaMarker(){
+	var elements = document.querySelectorAll('.breakpoints');
+	for(var i=0; i<elements.length; i++){
+		elements[i].style.width = "28px";
+	}
+}
+//altera o tamanho dos makers
+function diminuiMarker(){
+	var elements = document.querySelectorAll('.breakpoints');
+	for(var i=0; i<elements.length; i++){
+		elements[i].style.width = "15px";
+	}
+}
+
+//limpa todas as linhas depurador
 function limpaLinhaDepurador(){
 	for(i = 0; i <= editor.lineCount(); i++){
 		editor.removeLineClass(i,'background', 'line-depurador');
 	}
 }
 
+//limpa todos os contadores
+function limpaContadores(){
+	editor.clearHistory();
+	editor.clearGutter("breakpoints");
+	diminuiMarker();
+}
+
+//funcao para incrementar o numero de vezes que a linha foi executadas
+function incrementar(linha){
+	editor.setGutterMarker(linha, "breakpoints", makeMarkerLinha(linha));
+}
 
 //funcao para adicionar linha de erro no editor
 function mostraErroNaLinha(linha, titulo){
@@ -502,7 +544,6 @@ function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 }
 
 function atualizaVariavel(adr, value, typ){
-
 	for (var i = 0; i < arrayObjetoTabela.length; i++) {
 		var objeto = arrayObjetoTabela[i];
 

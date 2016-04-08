@@ -55,7 +55,7 @@ function reexecute(){
 			call_read = true;
 			stopln = kode[finalInst].line;
 			if(kode[pc].f == 70)
-				pc++;
+			pc++;
 			interpret();
 		}
 		else if (isOk){
@@ -91,7 +91,7 @@ function runToCursor(){
 		}
 		debug_op = true;
 		if (pc != 0)
-			call_read = true;
+		call_read = true;
 		interpret();
 	}
 }
@@ -109,7 +109,7 @@ function inRoutine(){
 		else {
 			stopln = kode[pc].line;
 			if (kode[pc].f == 70)
-				debug = true;
+			debug = true;
 		}
 		interpret();
 	}
@@ -118,7 +118,7 @@ function inRoutine(){
 		mostraErro();
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
-			debug = true;
+		debug = true;
 	}
 }
 shortcut.add("F7",function() {inRoutine();});
@@ -145,7 +145,7 @@ function byRoutine(){
 		limpaLinhaDepurador();
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
-			debug = true;
+		debug = true;
 		mostraLinhaDepurador(stopln);
 		bydebug = true;
 		interpret();
@@ -477,13 +477,12 @@ function carregaVariaveis(start){
 				continue;
 			}
 			if(tab[start].obj == "variable" || tab[start].obj == "konstant")
-				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+			adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 			start++;
 		}
 	} while(tab[start].obj != undefined && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
 }
 
-var teste11 = 1;
 //objeto auxiliar
 function objetoTabela(Nome,Valor, index, lv, adr){
 	this.Nome = Nome;
@@ -503,15 +502,16 @@ function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 }
 
 function atualizaVariavel(adr, value, typ){
-	var index = -1;
-	do {
-		index++;
-		if(arrayObjetoTabela.length <= index)
-			break;
-	} while (arrayObjetoTabela[index].adr != adr);
-	if(arrayObjetoTabela.length > index){
-			var x = document.getElementById("tab_var").rows[index+2].cells;
-			x[1].innerHTML.value = value;
+
+	for (var i = 0; i < arrayObjetoTabela.length; i++) {
+		var objeto = arrayObjetoTabela[i];
+
+		if (objeto.adr === adr) {
+			var input = document.getElementById(objeto.idtab);
+			if (input !== null) {
+				input.value = value;
+			}
+		}	
 	}
 }
 

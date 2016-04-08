@@ -81,14 +81,14 @@ function runToCursor(){
 	debugger;
 	if(debug_op){
 		stopln = editor.getCursor().line-1;
-		if(stopln < kode[tab[btab[1].last].adr].line){
+		/*if(stopln < kode[tab[btab[1].last].adr].line){
 			var pcx = 0;
 			do {
 				pcx++;
 			} while (kode[pcx].line <= stopln);
 			stopln = pcx;
-			CursorRun = true;
-		}
+		}*/
+		CursorRun = true;
 		debug_op = true;
 		if (pc != 0)
 		call_read = true;
@@ -511,7 +511,7 @@ function atualizaVariavel(adr, value, typ){
 			if (input !== null) {
 				input.value = value;
 			}
-		}	
+		}
 	}
 }
 

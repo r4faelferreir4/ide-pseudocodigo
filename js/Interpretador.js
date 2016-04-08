@@ -38,7 +38,7 @@ function interpreter(){//h2
           return;
         }
         if(CursorRun){
-          if(stopln == pc-1){
+          if(stopln == ir.line-1){
             debug = false;
             call_read = true;
             CursorRun = false;
@@ -802,7 +802,7 @@ function interpreter(){//h2
         t = b;        //Função
       }
       pc = s.getInt32(b);
-      if(debug_op){
+      if(debug_op && !CursorRun){
         limpaLinhaDepurador();
         mostraLinhaDepurador(kode[pc].line);
         removerTopoPilha();

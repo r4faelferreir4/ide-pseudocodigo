@@ -873,29 +873,29 @@ function interpreter(){//h2
             str_tab[s.getInt32(t-TAM_INT)] = undefined;
             alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
             s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
             t -= 2*TAM_INT;
           }
           else {
             s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
             t -= 2*TAM_INT;
           }
           break;
           case "reals":
           s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
-          atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+          atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL), ir.x);
           t -= TAM_REAL+TAM_INT;
           break;
           case "chars":
           case "bools":    //BOOL ou CHAR
           s.setUint8(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
-          atualizaVariavel(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+          atualizaVariavel(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL), ir.x);
           t -= TAM_INT+TAM_BOOL;
           break;
           default:
           s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
-          atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+          atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT), ir.x);
           t -= 2*TAM_INT;
         }
       }
@@ -910,31 +910,31 @@ function interpreter(){//h2
               str_tab[s.getInt32(t-TAM_INT)] = undefined;
               alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
               s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
               t -= 2*TAM_INT;
             }
             else {
               s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
               t -= 2*TAM_INT;
             }
             break;
             case "reals":
             s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
-            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL), ir.x);
             s.setFloat64(t-TAM_INT-TAM_REAL, s.getFloat64(t-TAM_REAL));   //Movimenta o dado 8 bytes para baixo.
             t -= TAM_INT;
             break;
             case "bools":
             case "chars":    //BOOL ou CHAR
             s.setUint8(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL));
-            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL), ir.x);
             s.setUint8(t-TAM_INT-TAM_BOOL, s.getUint8(t-TAM_BOOL));
             t -= TAM_INT;
             break;
             default:
             s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
-            atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+            atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT), ir.x);
             s.setInt32(t-2*TAM_INT, s.getInt32(t-TAM_INT));
             t -= TAM_INT;
           }

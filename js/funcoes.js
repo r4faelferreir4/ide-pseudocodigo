@@ -4,6 +4,7 @@ function depurar(){
 	debugger;
 	if (isOk && isDone){
 		debug_op = true;
+		indebug = true;
 		call_read = false;
 		debug = false;
 		mostraItensDepuracao(true);
@@ -501,17 +502,17 @@ function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 
 }
 
-function atualizaVariavel(adr, value){
-	var index;
+function atualizaVariavel(adr, value, typ){
+	var index = -1;
 	do {
 		index++;
 		if(arrayObjetoTabela.length <= index)
 			break;
-	} while (arrayObjetoTabela[index].adr == adr);
+	} while (arrayObjetoTabela[index].adr != adr);
 	if(arrayObjetoTabela.length > index){
-
+			var x = document.getElementById("tab_var").rows[index+2].cells;
+			x[1].innerHTML.value = value;
 	}
-
 }
 
 

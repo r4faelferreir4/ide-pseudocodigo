@@ -877,6 +877,8 @@ function interpreter(){//h2
             t -= 2*TAM_INT;
           }
           else {
+            var adr = alocaVetor();
+            alocaString(getString(str_tab[s.getInt32(t-TAM_INT)]), str_tab[adr], false);
             s.setInt32(s.getInt32(t-2*TAM_INT), adr);
             atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
             t -= 2*TAM_INT;
@@ -914,6 +916,8 @@ function interpreter(){//h2
               t -= 2*TAM_INT;
             }
             else {
+              var adr = alocaVetor();
+              alocaString(getString(str_tab[s.getInt32(t-TAM_INT)]), str_tab[adr], false);
               s.setInt32(s.getInt32(t-2*TAM_INT), adr);
               atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
               t -= 2*TAM_INT;

@@ -72,11 +72,11 @@
 }
 
 
-.CodeMirror
-{
-  line-height:18px;
+/*tamanho da linha */
+.CodeMirror{ line-height:18px;}
+.CodeMirror-gutters{
+  width: 50px;
 }
-
 .breakpoints {width: 15px;}
 .breakpoint { color: #822; }
 .CodeMirror {border: 1px solid #aaa;}

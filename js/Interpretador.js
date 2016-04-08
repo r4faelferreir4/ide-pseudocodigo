@@ -1,5 +1,5 @@
 
-function interpreter(){
+function interpreter(){//h2
   do {
     ir = kode[pc];
     pc++;
@@ -7,27 +7,66 @@ function interpreter(){
     debugger;
     if (debug_op){
       if (ir.line > stopln){
-        if(!read_ok){
-          if(!CursorRun){
-            read_ok = false;
-            call_read = true;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(ir.line);
-            return;
+        if(indebug){
+          if(ir.f != 18){
+            if(firstLine[firstLine.length-1] <= stopln){
+              debug = false;
+              call_read = true;
+              indebug = false;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(ir.line);
+              return;
+            }
           }
           else {
-            if(stopln == pc-1){
-              read_ok = false;
+            if(kode[tab[ir.y].adr].line-1 != stopln){
+              debug = false;
               call_read = true;
-              CursorRun = false;
+              indebug = false;
               limpaLinhaDepurador();
               mostraLinhaDepurador(ir.line);
               return;
             }
           }
         }
-        //else
-          //read_ok = false;
+        if(outdebug){
+          debug = false;
+          outdebug = false;
+          call_read = true;
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(ir.line);
+          return;
+        }
+        if(CursorRun){
+          if(stopln == pc-1){
+            debug = false;
+            call_read = true;
+            CursorRun = false;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(ir.line);
+            return;
+          }
+        }
+        if(bydebug){
+          debug = false;
+          bydebug = false;
+          call_read = true;
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(ir.line);
+          return;
+        }
+      }
+      else {
+        if(indebug){
+          if(ir.f == 18){
+            debug = false;
+            call_read = true;
+            indebug = false;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(ir.line);
+            return;
+          }
+        }
       }
     }
     switch(ir.f){
@@ -151,10 +190,25 @@ function interpreter(){
       case 9:
         s.setInt32(t-TAM_INT, s.getInt32(t-TAM_REAL) + ir.y); //offset
       break;
-      case 10: pc = ir.y; break;//jump
-      case 11:    //conditional jump (if)
-      if (!s.getInt8(t-TAM_BOOL))
+      case 10://pulo incondicional
+      pc = ir.y;
+      if(indebug || bydebug){
+        stopln = kode[pc].line;
+        limpaLinhaDepurador();
+        mostraLinhaDepurador(stopln);
+        stopln--;
+      }
+      break;
+      case 11:    //pulo condicional
+      if (!s.getInt8(t-TAM_BOOL)){
         pc = ir.y;
+        if(indebug || bydebug){
+          stopln = kode[pc].line;
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(stopln);
+          stopln--;
+        }
+      }
       t -= TAM_BOOL;
       break;
       case 12:     //switch
@@ -179,6 +233,12 @@ function interpreter(){
         if (kode[h2].f != 13){
           if (kode[h2].f == 10){
             pc = h2 + 1;
+            if(indebug || bydebug){
+              stopln = kode[pc].line;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
             break;
           }
           h3 = 1;
@@ -189,6 +249,12 @@ function interpreter(){
           if (kode[h2].y == h1){
             h3 = 1;
             pc = kode[h2 + 1].y;
+            if(indebug || bydebug){
+              stopln = kode[pc].line;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
           }
           else
           h2 += 2;
@@ -205,6 +271,12 @@ function interpreter(){
         else{
           t -= TAM_INT*4;
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
       }
       else {
@@ -215,6 +287,12 @@ function interpreter(){
         else{
           t -= TAM_REAL*3+TAM_INT;
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
       }
       break;
@@ -226,6 +304,12 @@ function interpreter(){
         if (h1 <= s.getInt32(t-TAM_INT * 2)){
           s.setInt32(h2, h1);
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
         else{
           t -= TAM_INT * 3;
@@ -237,6 +321,12 @@ function interpreter(){
         if (h1 <= s.getFloat64(t-TAM_REAL * 2)){
           s.setFloat64(h2, h1);
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
         else{
           t -= TAM_REAL * 3;
@@ -253,6 +343,12 @@ function interpreter(){
         else{
           pc = ir.y;
           t -= TAM_INT * 4;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
       }
       else {
@@ -263,6 +359,12 @@ function interpreter(){
         else{
           pc = ir.y;
           t -= TAM_REAL * 3 + TAM_INT;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
       }
       break;
@@ -274,6 +376,12 @@ function interpreter(){
         if (h1 >= s.getInt32(t - TAM_INT * 2)){
           s.setInt32(h2, h1);
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
         else{
           t -= TAM_INT * 3;
@@ -285,6 +393,12 @@ function interpreter(){
         if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
           s.setFloat64(h2, h1);
           pc = ir.y;
+          if(indebug || bydebug){
+            stopln = kode[pc].line;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(stopln);
+            stopln--;
+          }
         }
         else{
           t -= TAM_REAL * 3;
@@ -330,13 +444,14 @@ function interpreter(){
       s.setInt32(h1, pc);
       s.setInt32(h1 + 1*TAM_INT, display[h3]);
       s.setInt32(h1 + 2*TAM_INT, b);
-      if(read_ok){
+      if(indebug){
         read_ok = false;
         stopln = kode[tab[h2].adr].line;
         limpaLinhaDepurador();
         mostraLinhaDepurador(stopln);
         stopln--;
       }
+      firstLine.push(kode[tab[h2].adr].line-1);
       out.push(kode[pc].line);
 
       for (h3 = t+TAM_INT;  h3 < h4;  h3+=TAM_INT)
@@ -690,9 +805,17 @@ function interpreter(){
       if(debug_op){
         limpaLinhaDepurador();
         mostraLinhaDepurador(kode[pc].line);
+        removerTopoPilha();
+        stopln = kode[pc].line-1;
+        var lv = arrayObjetoTabela.pop().lv;
+        removerTopoPilhaVar();
+        while (arrayObjetoTabela[arrayObjetoTabela.length-1].lv == lv) {
+          arrayObjetoTabela.pop();
+          removerTopoPilhaVar();
+        }
       }
       b = s.getInt32(b + 2*TAM_INT);
-      removerTopoPilha();
+      firstLine.pop();
       out.pop();
       break;
 
@@ -750,53 +873,71 @@ function interpreter(){
             str_tab[s.getInt32(t-TAM_INT)] = undefined;
             alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
             s.setInt32(s.getInt32(t-2*TAM_INT), adr);
+            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
             t -= 2*TAM_INT;
           }
           else {
             s.setInt32(s.getInt32(t-2*TAM_INT), adr);
+            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
             t -= 2*TAM_INT;
           }
           break;
           case "reals":
           s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+          atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
           t -= TAM_REAL+TAM_INT;
           break;
           case "chars":
           case "bools":    //BOOL ou CHAR
           s.setUint8(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+          atualizaVariavel(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
           t -= TAM_INT+TAM_BOOL;
           break;
           default:
           s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+          atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
           t -= 2*TAM_INT;
         }
-        atualizaVariavel(ir.z);
       }
       else {
         var tx = t;
         for(var i = 1; i <= ir.y; i++){
           switch (ir.x) {
-            case TAM_INT:
-            s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
-            s.setInt32(t - 2*TAM_INT, s.getInt32(t-TAM_INT));   //Movimenta o dado 4 bytes para baixo
-            t -= TAM_INT;
+            case"strings":
+            if (str_tab[s.getInt32(t-TAM_INT)].destruct){
+              var adr = alocaVetor();
+              var str = getString(str_tab[s.getInt32(t-TAM_INT)]);
+              str_tab[s.getInt32(t-TAM_INT)] = undefined;
+              alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
+              s.setInt32(s.getInt32(t-2*TAM_INT), adr);
+              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+              t -= 2*TAM_INT;
+            }
+            else {
+              s.setInt32(s.getInt32(t-2*TAM_INT), adr);
+              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]));
+              t -= 2*TAM_INT;
+            }
             break;
-            case TAM_REAL:
+            case "reals":
             s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
-            s.setFloat64(t-TAM_INT-TAM_REAL, s.getFloat64(t-TAM_REAL));   //Movimenta o dado 4 bytes para baixo.
+            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
+            s.setFloat64(t-TAM_INT-TAM_REAL, s.getFloat64(t-TAM_REAL));   //Movimenta o dado 8 bytes para baixo.
             t -= TAM_INT;
             break;
-            case TAM_BOOL:    //BOOL ou CHAR
+            case "bools":
+            case "chars":    //BOOL ou CHAR
             s.setUint8(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL));
+            atualizaVariavel(s.getInt32(t-TAM_INT-TAM_BOOL), s.getUint8(t-TAM_BOOL));
             s.setUint8(t-TAM_INT-TAM_BOOL, s.getUint8(t-TAM_BOOL));
             t -= TAM_INT;
             break;
             default:
             s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+            atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
             s.setInt32(t-2*TAM_INT, s.getInt32(t-TAM_INT));
             t -= TAM_INT;
           }
-          atualizaVariavel(ir.z[i-1]);
         }
         t -= ir.x;
       }
@@ -1238,7 +1379,7 @@ function interpreter(){
       break;
       case 70:
         if(debug_op){
-          if (read_ok){
+          if (debug){
             read_ok = false;
           }
           else {
@@ -1249,10 +1390,10 @@ function interpreter(){
           }
         }
       break;
-
       }//primeiro switch
     }while (true);
 }
+
 function interpret(){
   if (call_read){
     call_read = false;
@@ -1267,9 +1408,13 @@ function interpret(){
     s.setInt32(8, -1);
     s.setInt32(12, btab[1].last);
     b = 0;
+    display = [];
     display[1] = 0;
     t = btab[2].vsize;
     pc = tab[s.getInt32(12)].adr;
+    firstLine = [];
+    firstLine.push(kode[pc].line-1);
+    arrayObjetoTabela = [];
     ps = 'run';
     lncnt = 0;
     ocnt = 0;

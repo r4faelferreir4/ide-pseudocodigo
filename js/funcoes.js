@@ -5,7 +5,7 @@ function depurar(){
 	if (isOk && isDone){
 		debug_op = true;
 		call_read = false;
-		read_ok = false;
+		debug = false;
 		mostraItensDepuracao(true);
 		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
@@ -50,9 +50,8 @@ function reexecute(){
 	}
 	else {
 		if (debug_op){
-			read_ok = false;
-			call_read = true;
 			debug = false;
+			call_read = true;
 			stopln = kode[finalInst].line;
 			if(kode[pc].f == 70)
 				pc++;
@@ -101,15 +100,15 @@ shortcut.add("F4",function(){runToCursor();});
 function inRoutine(){
 	debugger;
 	if(debug_op){
+		indebug = true;
 		if (kode[pc].f == 18){
 			stopln = kode[tab[kode[pc].y].adr].line-1;
 			mostraLinhaDepurador(stopln);
-			read_ok = true;
 		}
 		else {
 			stopln = kode[pc].line;
 			if (kode[pc].f == 70)
-				read_ok = true;
+				debug = true;
 		}
 		interpret();
 	}
@@ -118,8 +117,7 @@ function inRoutine(){
 		mostraErro();
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
-		read_ok = true;
-		debug = true;
+			debug = true;
 	}
 }
 shortcut.add("F7",function() {inRoutine();});
@@ -132,7 +130,8 @@ function outRoutine(){
 		if(!Number.isNaN(stopln)){
 			limpaLinhaDepurador();
 			mostraLinhaDepurador(stopln);
-			read_ok = false;
+			outdebug = true;
+			debug = false;
 			interpret();
 		}
 	}
@@ -145,8 +144,9 @@ function byRoutine(){
 		limpaLinhaDepurador();
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
-			read_ok = true;
+			debug = true;
 		mostraLinhaDepurador(stopln);
+		bydebug = true;
 		interpret();
 	}
 	else {
@@ -156,7 +156,7 @@ function byRoutine(){
 }
 shortcut.add("F8",function() {byRoutine();});
 
-//interromper a depuração e a execução
+//interromper a depuração e a execuçãoread_ok
 function stopDeb(){
 	debug_op = false;
 	pc = finalInst;
@@ -243,7 +243,7 @@ function pegaValorInput() {
 	return document.getElementById("scriptBox").value;
 }
 
-//Limpar input após teclar enter
+//Limpar input
 function limpaInput() {
 	document.getElementById("scriptBox").value = "";
 }
@@ -273,12 +273,6 @@ function mostraErro(){
 	adicionarErro(MsgErro);
 }
 
-function changeOutput(){
-	call_read = true;
-	pc++;         //As instruções de leitura precisam retornar na mesma instrução, as de escrita podem seguir para a próxima instrução.
-	ocnt++;
-	interpret();
-}
 
 //Armazenamento e operações com string
 function lista(next, c, destruct){
@@ -474,7 +468,15 @@ function carregaVariaveis(start){
 				default:
 				value = s.getInt32(display[tab[start].lev]+tab[start].adr);
 			}
-			adicionarObjetoVar(tab[start].name, value, start);
+			if(tab[start].typ == "records"){
+				var lv = tab[start].lev;
+				do {
+					start++;
+				} while (tab[start].lev > lv);
+				continue;
+			}
+			if(tab[start].obj == "variable" || tab[start].obj == "konstant")
+				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 			start++;
 		}
 	} while(tab[start].obj != undefined && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
@@ -482,23 +484,37 @@ function carregaVariaveis(start){
 
 var teste11 = 1;
 //objeto auxiliar
-function objetoTabela(Nome,Valor, index){
+function objetoTabela(Nome,Valor, index, lv, adr){
 	this.Nome = Nome;
 	this.Valor = Valor;
 	this.novoValor = "";
 	this.idtab = index;
+	this.lv = lv;
+	this.adr = adr;
 }
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
-function adicionarObjetoVar(posNome,posValor, start){
-	objeto = new objetoTabela(posNome,posValor, start);
+function adicionarObjetoVar(posNome,posValor, start, lv, adr){
+	adr += display[display.length-1];
+	objeto = new objetoTabela(posNome,posValor, start, lv, adr);
 	adicionarTabelaVar(objeto);
 	arrayObjetoTabela.push(objeto);
 
 }
 
-function atualizaVariavel(index){
+function atualizaVariavel(adr, value){
+	var index;
+	do {
+		index++;
+		if(arrayObjetoTabela.length <= index)
+			break;
+	} while (arrayObjetoTabela[index].adr == adr);
+	if(arrayObjetoTabela.length > index){
+
+	}
 
 }
+
+
 function adicionarTabelaVar(objeto) {
 	var table = document.getElementById("tab_var");
 	var row = table.insertRow(2);

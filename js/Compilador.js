@@ -46,8 +46,12 @@ var read_ok = false;    //flag se já leu uma informação do teclado
 var debug_op = false;  //flag para modo debug
 var stopln;   //Linha de parada para o depurador
 var debug = false;//Parar em debugger
+var indebug = false; //operação linha-a-linha entrando em rotinas
+var outdebug = false; //sair da rotina
+var bydebug = false;  //operação linha-a-linha pulando rotinas
 var out = [];     //Vetor de posições para saída de funções
 var CursorRun = false;  //Flag para o comando runToCursor;
+var firstLine;      //Irá armazenar a primeira linha da rotina em execução.
 
 //TIPOS DEFINIDOS
 
@@ -2526,7 +2530,12 @@ function block(fsys, isfun, level){
             expression(fsys, x);
             if (["bools", "notyp"].indexOf(x.typ) == -1)
               Error(17, x.typ);
-            emit1(linecount, 11, lc1);
+              var line;
+              line = linecount;
+              do {
+                line--;
+              } while (InputFile[line].length == 0);
+            emit1(line, 11, lc1);
           }
           else
             Error(53);
@@ -2552,7 +2561,12 @@ function block(fsys, isfun, level){
           else
             Error(54);
           statement(fsys);
-          emit1(linecount, 10, lc1);
+          var line;
+          line = linecount;
+          do {
+            line--;
+          } while (InputFile[line].length == 0);
+          emit1(line, 10, lc1);
           kode[lc2].y = lc;
         }
         catch(err){
@@ -2668,7 +2682,12 @@ function block(fsys, isfun, level){
               Error(54);
           lc2 = lc;
           statement(fsys);
-          emit2(linecount, f+1, steptyp, lc2);
+          var line;
+          line = linecount;
+          do {
+            line--;
+          } while (InputFile[line].length == 0);
+          emit2(line, f+1, steptyp, lc2);
           kode[lc1].y = lc;
         }
         catch(err){
@@ -2959,7 +2978,7 @@ try{
   key[15] = 'nao'; key[16] = 'de';
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
-  key[21] = 'repete'; key[22] = 'entao';
+  key[21] = 'repita'; key[22] = 'entao';
   key[23] = 'incrementa'; key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';

@@ -1,4 +1,4 @@
-//ATALHOS
+//ATALHOSsalvar
 //Para depurar
 function depurar(){
 	debugger;
@@ -7,6 +7,7 @@ function depurar(){
 		indebug = true;
 		call_read = false;
 		debug = false;
+		limpaContadores();
 		mostraItensDepuracao(true);
 		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
@@ -546,11 +547,17 @@ function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 function atualizaVariavel(adr, value, typ){
 	for (var i = 0; i < arrayObjetoTabela.length; i++) {
 		var objeto = arrayObjetoTabela[i];
-
-		if (objeto.adr === adr) {
+		if (objeto.adr == adr) {
 			var input = document.getElementById(objeto.idtab);
 			if (input !== null) {
-				input.value = value;
+				if(typ == "bools"){
+					if(value == 1)
+						input.value = "verdadeiro";
+					else
+						input.value = "falso";
+				}
+				else
+					input.value = value;
 			}
 		}
 	}
@@ -585,7 +592,52 @@ function removerTodaPilhaVar(){
 	arrayObjetoTabela = [];
 }
 //funcao para salvar as variaveis editadas
+function eachObjetoTabela(objeto){
+	var input = document.getElementById(objeto.idtab);
+	if(input != null){
+		switch (tab[objeto.idtab].typ) {
+			case "strings":
+				var adr = s.getInt32(objeto.adr);
+				alocaString(input.value, str_tab[adr], false);
+			break;
+			case "reals":
+				number = Number(input.value);
+				if(!Number.isNaN(number))
+					s.setFloat64(objeto.adr, number);
+				else
+					input.value = "NaN";
+			break;
+			case "ints":
+			number = Number(input.value);
+			if(!Number.isNaN(number))
+				s.setInt32(objeto.adr, number);
+			else
+				input.value = "NaN";
+			break;
+			case "bools":
+				var str = input.value;
+				str = str.toLowerCase();
+				if(str == "verdadeiro")
+					s.setUint8(objeto.adr, 1);
+				else{
+					s.setUint8(objeto.adr, 0);
+					input.value = "falso";
+				}
+			break;
+			case "chars":
+				var char = input.value.charCodeAt();
+				s.setUint8(objeto.adr, char);
+				input.value = char;
+			break;
+		}
+	}
+
+}
+
 function salvar(){
+	debugger;
+	arrayObjetoTabela.forEach(eachObjetoTabela);
+	/*
 	for (var i = 0; i < arrayObjetoTabela.length; i++) {
 		var objeto = arrayObjetoTabela[i];
 		var input = document.getElementById(objeto.idinput);
@@ -596,6 +648,7 @@ function salvar(){
 			}
 		}
 	}
+	*/
 	desativarTabelaVar();
 }
 //funcao para atualizar todas as variaveis
@@ -1082,7 +1135,6 @@ function download(name, type) {
 		alert("Você precisa compilar o código antes!");
 	}
 }
-
 function mostraItensDepuracao(bool){
 	if (bool) {
 		document.getElementById("continuar").style.visibility = "visible";
@@ -1114,3 +1166,4 @@ function mostraItensDepuracao(bool){
 
 	}
 }
+mostraItensDepuracao(false);

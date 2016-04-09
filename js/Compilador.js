@@ -240,7 +240,7 @@ function compiladorPascalS(){
     Msg[58] = "É esperado a declaração de variáveis na declaração do procediment/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
-    Msg[62] = "Está faltando o ";
+    Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
     return Msg[code];
   }
 
@@ -403,10 +403,13 @@ function compiladorPascalS(){
             var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
             var tpref  = (ref == "ints")?"inteiro":(ref == "reals")?"real":(ref == "bools")?"logico":(ref == "chars")?"caracter":(ref == "strings")?"string":(ref == "records")?"registro":"";
             str += "\nEspera-se um parâmetro do tipo \'"+tpref+"\' mas você está passando um parâmetro do tipo \'"+tp+"\'";
-          break
+          break;
           case 62:
             str += errorName+"º parâmetro.";
-          break
+          break;
+          case 63:
+            str += " A variável informada é do tipo "+errorName+".";
+          break;
         }
 
         MsgErro = str;
@@ -966,8 +969,9 @@ function block(fsys, isfun, level){
           enter(id, "variable");
           insymbol();
         }
-        else
+        else{
           Error(2, "colon");
+        }
       }
       catch(err){
         return err;
@@ -1111,6 +1115,9 @@ function block(fsys, isfun, level){
                 Error(29);
               else {
                 xtype.tp = tab[x].typ;
+                if(xtype.tp == "pointers"){
+                  xtype.tp = "*"+tab[x].xtyp;
+                }
                 xtype.rf = tab[x].ref;
                 xtype.sz = tab[x].adr;
                 if(xtype.tp == "notyp")
@@ -1306,7 +1313,7 @@ function block(fsys, isfun, level){
     }//constantdeclaration
 
     function typedeclaration(){
-      var tp, rf, sz, t1;
+      var tp, rf, sz, t1, pointer = false;
       try{
         insymbol();
         test(["ident"], ["ident"], blockbegsys, 2);
@@ -1322,10 +1329,18 @@ function block(fsys, isfun, level){
               insymbol();
           }
           var xtype = new xtp(tp, rf, sz);
+          if(sy == "pointer"){
+            pointer = true;
+            insymbol();
+          }
           typ(["semicolon", "comma", "ident"].concat(fsys), xtype);
-          tab[t1].typ = xtype.tp;
+          if(pointer)
+            tab[t1].typ = "pointers";
+          else
+            tab[t1].typ = xtype.tp;
           tab[t1].ref = xtype.rf;
           tab[t1].adr = xtype.sz;
+          tab[t1].xtyp = xtype.tp;
           //TestSemicolon();
         }
       }
@@ -1358,11 +1373,14 @@ function block(fsys, isfun, level){
             tab[t0].ref = xtype.rf;
             tab[t0].lev = level;
             tab[t0].adr = dx;
-            if (xtype.tp != "pointers")
-              tab[t0].normal = true;
-            else
-              tab[t0].normal = false;
+            tab[t0].normal = true;
+            if(xtype.tp.charAt() == "*"){
+              tab[t0].xtyp = xtype.tp.slice(1, xtype.tp.length);
+              tab[t0].typ = "pointers";
+              xtype.sz = TAM_INT;
+            }
             dx += xtype.sz;
+
           }
           //TestSemicolon();
         }
@@ -1776,16 +1794,13 @@ function block(fsys, isfun, level){
                 }
               }//standfct
               try{
+                debugger;
                 x.typ = "notyp";
                 x.ref = 0;
-                test(["andsy", "times"], facbegsys.concat(["andsy", "times"]), fsys, 58);
+                test(["andsy", "times", "address"], facbegsys.concat(["andsy", "times", "address"]), fsys, 58);
                 var reference = false;  //Atribuição de endereço em ponteiro
                 var ireference = false; //Leitura de valor de ponteiro
-                if (sy == "andsy"){
-                  insymbol();
-                  reference = true;
-                }
-                if (sy == "times"){
+                if (sy == "address"){
                   insymbol();
                   ireference = true;
                 }
@@ -1793,6 +1808,15 @@ function block(fsys, isfun, level){
                   if (sy == "ident"){
                     i = loc(id);
                     insymbol();
+                    if(sy == "pointer"){
+                      if(tab[i].typ == "pointers"){
+                        reference = true;
+                        insymbol();
+                      }
+                      else {
+                        Error(63, tab[i].typ);
+                      }
+                    }
                     switch (tab[i].obj) {
                       case "konstant":
                         x.typ = tab[i].typ;
@@ -1852,12 +1876,25 @@ function block(fsys, isfun, level){
                           }
                         }
                         else {
-                          x.typ = "pointers";
+                          x.typ = tab[i].xtyp;
                           if (tab[i].normal)
-                            f = 0;
-                          else
                             f = 1;
-                          emit2(linecount, f, tab[i].lev, tab[i].adr. tab[i].typ);
+                          else
+                            f = 2;
+                          emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
+                          var len;
+                          switch (tab[i].xtyp) {
+                            case "reals":
+                              len = TAM_REAL;
+                            break;
+                            case "chars":
+                            case "bools":
+                              len = TAM_CHAR;
+                            break;
+                            default:
+                              len = TAM_INT;
+                          }
+                          emit1(linecount, 34, len);
                           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                             if (x.typ == "strings"){
                               x.typ = "chars";
@@ -2140,6 +2177,16 @@ function block(fsys, isfun, level){
             f = 0;
           else
             f = 1;
+          if(sy == "pointer"){
+            insymbol();
+            if(x.typ == "pointers"){
+              f = 1;
+              x.typ = tab[i].xtyp;
+            }
+            else {
+              Error(63, x.typ);
+            }
+          }
           ln = linecount;
           emit2(ln, f, lv, ad, "ints");
           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
@@ -2530,11 +2577,11 @@ function block(fsys, isfun, level){
             expression(fsys, x);
             if (["bools", "notyp"].indexOf(x.typ) == -1)
               Error(17, x.typ);
-              var line;
-              line = linecount;
-              do {
-                line--;
-              } while (InputFile[line].length == 0);
+            var line;
+            line = linecount;
+            while (InputFile[line].length == 0) {
+              line--;
+            }
             emit1(line, 11, lc1);
           }
           else
@@ -3004,32 +3051,32 @@ try{
   sps['='] = 'eql'; sps[','] = 'comma';
   sps['['] = 'lbrack'; sps[']'] = 'rbrack';
   sps['#'] = 'neq'; sps['&'] = 'andsy';
-  sps[';'] = 'semicolon';
+  sps[';'] = 'semicolon';   sps['^'] = "pointer"; sps['@'] = "address";
   xsps[0] = 'plus'; xsps[1] = 'minus';
   xsps[2] = 'times'; xsps[3] = 'rdiv';
   xsps[4] = 'lparent'; xsps[5] = 'rparent';
   xsps[6] = 'eql'; xsps[7] = 'comma';
   xsps[8] = 'lbrack'; xsps[9] = 'rbrack';
   xsps[10] = 'neq'; xsps[11] = 'andsy';
-  xsps[12] = 'semicolon';
+  xsps[12] = 'semicolon';   xsps[13] = 'pointer';
   nsps[0] = 'adição'; nsps[1] = 'subtração';
   nsps[2] = 'multiplicação'; nsps[3] = 'divisão';
   nsps[4] = 'parentese esquerdo'; nsps[5] = 'parentese direito';
   nsps[6] = 'igual'; nsps[7] = 'vírgula';
   nsps[8] = 'colchete esquerdo'; nsps[9] = 'colchete direito';
   nsps[10] = 'diferente'; nsps[11] = 'e lógico';
-  nsps[12] = 'ponto e vírgula';
+  nsps[12] = 'ponto e vírgula';   nsps[13] = 'circunflexo'; nsps[14] = "arroba";
   csps[0] = "+";  csps[1] = "-" ; csps[2] = "*";
   csps[3] = "/";  csps[4] = "(";  csps[5] = ")";
   csps[6] = "=";  csps[7] = ","; csps[8] = "[";
   csps[9] = "]";  csps[10] = "#"; csps[11] = "&";
-  csps[12] = ";";
+  csps[12] = ";"; csps[13] = "^"; csps[14] = "@";
   constbegsys = ['plus', 'minus', 'intcon', 'realcon', 'charcon', 'ident', 'stringsy'];
   typebegsys = ['ident', 'arraysy', 'recordsy'];
   blockbegsys = ['constsy', 'typesy', 'varsy', 'proceduresy','functionsy', 'beginsy'];
   facbegsys = ['intcon', 'realcon', 'charcon', 'stringsy', 'ident', 'lparent', 'notsy'];
   statbegsys = ['beginsy', 'ifsy', 'whilesy', 'repeatsy', 'forsy', 'casesy'];
-  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars', 'strings'];
+  stantyps = ['notyp', 'ints', 'reals', 'bools', 'chars', 'strings', "pointers"];
   lc = 0;
   ll = 0;
   cc = 0;

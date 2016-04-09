@@ -6,6 +6,10 @@ function interpreter(){//h2
     ocnt++;
     debugger;
     if (debug_op){
+      if(ir.line != linecount){
+        incrementar(ir.line);
+        linecount = ir.line;
+      }
       if (ir.line > stopln){
         if(indebug){
           if(ir.f != 18){
@@ -306,6 +310,7 @@ function interpreter(){//h2
           pc = ir.y;
           if(indebug || bydebug){
             stopln = kode[pc].line;
+            atualizaVariavel(h2, h1);
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
             stopln--;
@@ -323,6 +328,7 @@ function interpreter(){//h2
           pc = ir.y;
           if(indebug || bydebug){
             stopln = kode[pc].line;
+            atualizaVariavel(h2, h1);
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
             stopln--;
@@ -355,6 +361,9 @@ function interpreter(){//h2
         h1 = s.getFloat64(t- TAM_REAL * 3);
         if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
           s.setFloat64(s.getInt32(t - TAM_REAL * 3-TAM_INT), h1);
+          if(debug_op){
+            atualizaVariavel(s.getInt32(t - TAM_REAL * 3-TAM_INT), h1);
+          }
         }
         else{
           pc = ir.y;
@@ -606,6 +615,7 @@ function interpreter(){//h2
           case 1:
           if (read_ok) {
             s.setInt32(s.getInt32(t-TAM_INT), Number(InputFile));
+            atualizaVariavel(s.getInt32(t-TAM_INT), Number(InputFile));
             read_ok = false;
           }
           else{
@@ -616,6 +626,7 @@ function interpreter(){//h2
           case 2:
           if (read_ok) {
             s.setFloat64(s.getInt32(t - TAM_INT), Number(InputFile));
+            atualizaVariavel(s.getInt32(t - TAM_INT), Number(InputFile));
             read_ok = false;
           }
           else{
@@ -626,6 +637,7 @@ function interpreter(){//h2
           case 4:
           if (read_ok) {
             s.setUint8(s.getInt32(t - TAM_INT), InputFile.charCodeAt());
+            atualizaVariavel(s.getInt32(t - TAM_INT), InputFile.charCodeAt());
             read_ok = false;
           }
           else{
@@ -639,6 +651,7 @@ function interpreter(){//h2
                 var ref = alocaVetor();
                 s.setInt32(s.getInt32(t-TAM_INT), ref);
                 alocaString(InputFile, str_tab[ref], false);
+                atualizaVariavel(s.getInt32(t-TAM_INT), InputFile);
                 read_ok = false;
               }
               else {
@@ -891,8 +904,8 @@ function interpreter(){//h2
           break;
           case "chars":
           case "bools":    //BOOL ou CHAR
-          s.setUint8(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL));
-          atualizaVariavel(s.getInt32(t-TAM_BOOL), s.getUint8(t-TAM_BOOL), ir.x);
+          s.setUint8(s.getInt32(t-TAM_BOOL-TAM_INT), s.getUint8(t-TAM_BOOL));
+          atualizaVariavel(s.getInt32(t-TAM_BOOL-TAM_INT), s.getUint8(t-TAM_BOOL), ir.x);
           t -= TAM_INT+TAM_BOOL;
           break;
           default:
@@ -1418,6 +1431,7 @@ function interpret(){
     pc = tab[s.getInt32(12)].adr;
     firstLine = [];
     firstLine.push(kode[pc].line-1);
+    linecount = firstLine[0];
     arrayObjetoTabela = [];
     ps = 'run';
     lncnt = 0;

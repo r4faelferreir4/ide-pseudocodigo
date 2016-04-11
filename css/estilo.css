@@ -2,6 +2,9 @@
     display: none;
 }
 
+table .collapse.in {
+	display:table-row;
+}
 
 #codeDiv{
   margin:5px 5px 5px 5px;

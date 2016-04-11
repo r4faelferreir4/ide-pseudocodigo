@@ -83,18 +83,18 @@ function runToCursor(){
 	if(debug_op){
 		stopln = editor.getCursor().line-1;
 		/*if(stopln < kode[tab[btab[1].last].adr].line){
-			var pcx = 0;
-			do {
-				pcx++;
-			} while (kode[pcx].line <= stopln);
-			stopln = pcx;
-		}*/
-		CursorRun = true;
-		debug_op = true;
-		if (pc != 0)
-		call_read = true;
-		interpret();
-	}
+		var pcx = 0;
+		do {
+		pcx++;
+	} while (kode[pcx].line <= stopln);
+	stopln = pcx;
+}*/
+CursorRun = true;
+debug_op = true;
+if (pc != 0)
+call_read = true;
+interpret();
+}
 }
 shortcut.add("F4",function(){runToCursor();});
 
@@ -488,7 +488,6 @@ function removerTodaPilhaFuncoes(){
 //funcoes para pilha de variaveis
 //array de objetos
 var arrayObjetoTabela = [];
-
 //Carregar variáveis no depurador
 function carregaVariaveis(start){
 	debugger;
@@ -514,8 +513,10 @@ function carregaVariaveis(start){
 			}
 			if(tab[start].typ == "records"){
 				var lv = tab[start].lev;
+					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 				do {
 					start++;
+					adicionarObjetoFilho(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 				} while (tab[start].lev > lv);
 				continue;
 			}
@@ -535,13 +536,20 @@ function objetoTabela(Nome,Valor, index, lv, adr){
 	this.lv = lv;
 	this.adr = adr;
 }
+
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
 function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 	adr += display[display.length-1];
 	objeto = new objetoTabela(posNome,posValor, start, lv, adr);
 	adicionarTabelaVar(objeto);
 	arrayObjetoTabela.push(objeto);
-
+}
+//adicionar objeto filho na tabela
+function adicionarObjetoFilho(posNome,posValor, start, lv, adr){
+	adr += display[display.length-1];
+	objeto = new objetoTabela(posNome,posValor, start, lv, adr);
+	adicionaFilhos(objeto);
+	arrayObjetoTabela.push(objeto);
 }
 
 function atualizaVariavel(adr, value, typ){
@@ -552,27 +560,59 @@ function atualizaVariavel(adr, value, typ){
 			if (input !== null) {
 				if(typ == "bools"){
 					if(value == 1)
-						input.value = "verdadeiro";
+					input.value = "verdadeiro";
 					else
-						input.value = "falso";
+					input.value = "falso";
 				}
 				else
-					input.value = value;
+				input.value = value;
 			}
 		}
 	}
 }
 
+//var para pegar o id do pai
+var id_linha_pai = 0;
 
 function adicionarTabelaVar(objeto) {
 	var table = document.getElementById("tab_var");
 	var row = table.insertRow(2);
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
-	cell1.innerHTML = objeto.Nome;
-	cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
+	switch (tab[objeto.idtab].typ) {
+
+		case "records":
+		row.setAttribute("class", "clickable");
+		row.setAttribute("data-toggle", "collapse");
+		row.setAttribute("data-target", ".row"+objeto.idtab);
+		row.setAttribute("id", "linha_"+objeto.idtab);
+		cell1.innerHTML = "<i class='glyphicon glyphicon-plus'></i>";
+		cell2.innerHTML = objeto.Nome;
+		id_linha_pai = objeto.idtab;
+
+		break;
+
+		default:
+		cell1.innerHTML = objeto.Nome;
+		cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
+		break;
+	}
+
 	desativarTabelaVar();
 }
+
+function adicionaFilhos(objeto){
+	var table = document.getElementById("tab_var");
+	var row = table.insertRow();
+	var cell1 = row.insertCell(0);
+	var cell2 = row.insertCell(1);
+
+	row.setAttribute("class", "collapse active row"+id_linha_pai);
+
+	cell1.innerHTML = objeto.Nome;
+	cell2.innerHTML = "<input type='text' value='"+ objeto.Valor +"'name='"+objeto.idtab+"' id='"+ objeto.idtab +"'>";
+}
+
 function desativarTabelaVar(){
 	$("#tab_var").find("input").attr("disabled", "disabled");
 }
@@ -597,37 +637,37 @@ function eachObjetoTabela(objeto){
 	if(input != null){
 		switch (tab[objeto.idtab].typ) {
 			case "strings":
-				var adr = s.getInt32(objeto.adr);
-				alocaString(input.value, str_tab[adr], false);
+			var adr = s.getInt32(objeto.adr);
+			alocaString(input.value, str_tab[adr], false);
 			break;
 			case "reals":
-				number = Number(input.value);
-				if(!Number.isNaN(number))
-					s.setFloat64(objeto.adr, number);
-				else
-					input.value = "NaN";
+			number = Number(input.value);
+			if(!Number.isNaN(number))
+			s.setFloat64(objeto.adr, number);
+			else
+			input.value = "NaN";
 			break;
 			case "ints":
 			number = Number(input.value);
 			if(!Number.isNaN(number))
-				s.setInt32(objeto.adr, number);
+			s.setInt32(objeto.adr, number);
 			else
-				input.value = "NaN";
+			input.value = "NaN";
 			break;
 			case "bools":
-				var str = input.value;
-				str = str.toLowerCase();
-				if(str == "verdadeiro")
-					s.setUint8(objeto.adr, 1);
-				else{
-					s.setUint8(objeto.adr, 0);
-					input.value = "falso";
-				}
+			var str = input.value;
+			str = str.toLowerCase();
+			if(str == "verdadeiro")
+			s.setUint8(objeto.adr, 1);
+			else{
+				s.setUint8(objeto.adr, 0);
+				input.value = "falso";
+			}
 			break;
 			case "chars":
-				var char = input.value.charCodeAt();
-				s.setUint8(objeto.adr, char);
-				input.value = char;
+			var char = input.value.charCodeAt();
+			s.setUint8(objeto.adr, char);
+			input.value = char;
 			break;
 		}
 	}
@@ -639,17 +679,17 @@ function salvar(){
 	arrayObjetoTabela.forEach(eachObjetoTabela);
 	/*
 	for (var i = 0; i < arrayObjetoTabela.length; i++) {
-		var objeto = arrayObjetoTabela[i];
-		var input = document.getElementById(objeto.idinput);
-		if (input !== null && input !== undefined) {
-			objeto.novoValor = input.value;
-			if (s[objeto.posValor] !== objeto.novoValor) {
-				s[objeto.posValor] = objeto.novoValor;
-			}
-		}
-	}
-	*/
-	desativarTabelaVar();
+	var objeto = arrayObjetoTabela[i];
+	var input = document.getElementById(objeto.idinput);
+	if (input !== null && input !== undefined) {
+	objeto.novoValor = input.value;
+	if (s[objeto.posValor] !== objeto.novoValor) {
+	s[objeto.posValor] = objeto.novoValor;
+}
+}
+}
+*/
+desativarTabelaVar();
 }
 //funcao para atualizar todas as variaveis
 function atualizarTodasVar(){

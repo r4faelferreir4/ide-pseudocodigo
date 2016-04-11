@@ -813,11 +813,11 @@ function interpreter(){//h2
 
       case 32:    //Saída de função/procedimento
       case 33:
-      if (ir.f == 32)   //Procedimento
-        t = b - TAM_INT;
-      else{
+      //if (ir.f == 32)   //Procedimento
+      //  t = b - TAM_INT;
+      //else{
         t = b;        //Função
-      }
+      //}
       pc = s.getInt32(b);
       if(debug_op && !CursorRun){
         limpaLinhaDepurador();

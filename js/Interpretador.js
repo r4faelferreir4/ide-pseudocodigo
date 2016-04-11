@@ -1,4 +1,3 @@
-
 function interpreter(){//h2
   do {
     ir = kode[pc];
@@ -192,7 +191,7 @@ function interpreter(){//h2
       }//switch case 8
       break;
       case 9:
-        s.setInt32(t-TAM_INT, s.getInt32(t-TAM_REAL) + ir.y); //offset
+        s.setInt32(t-TAM_INT, s.getInt32(t-TAM_INT) + ir.y); //offset
       break;
       case 10://pulo incondicional
       pc = ir.y;
@@ -417,7 +416,7 @@ function interpreter(){//h2
 
       case 18:
       h1 = btab[tab[ir.y].ref].vsize;
-      if (t + h1 > stacksize){
+      if (t + h1 > ax){
         ps = 'stkchk';
         return;
       }
@@ -515,7 +514,7 @@ function interpreter(){//h2
       h1 = s.getInt32(t-TAM_INT);
       t -= TAM_INT;
       h2 = ir.y + t;
-      if(h2 > stacksize){
+      if(h2 > ax){
         ps = 'stkchk';
         return;
       }
@@ -542,7 +541,7 @@ function interpreter(){//h2
       break;
 
       case 24://Carrega valor literal na pilha
-      if (t > stacksize){
+      if (t > ax){
         ps = 'stkchk';
         return;
       }
@@ -738,6 +737,11 @@ function interpreter(){//h2
             str_tab[s.getInt32(t - TAM_INT)] = undefined;
           t -= TAM_INT;
         break;
+        default:
+        var str = "";
+          str += s.getInt32(t - TAM_INT);
+          atualizarConsole(str);
+          t -= TAM_INT;
       }
       //debugger;
       /*if (ir.y == 4)
@@ -1018,9 +1022,9 @@ function interpreter(){//h2
         s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - TAM_CHAR) != s.getUint8(t - 2*TAM_CHAR)));
         t -= TAM_CHAR;
         break;
-
         default:
-
+        s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) != s.getInt32(t-TAM_INT)));
+        t -= 7;   //Libera 7 bytes
       }
       break;
 
@@ -1052,6 +1056,9 @@ function interpreter(){//h2
         s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - 2*TAM_CHAR) < s.getUint8(t - TAM_CHAR)));
         t -= TAM_CHAR;
         break;
+        default:
+        s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) < s.getInt32(t-TAM_INT)));
+        t -= 7;   //Libera 7 bytes
       }
       break;
 
@@ -1083,6 +1090,9 @@ function interpreter(){//h2
         s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - 2*TAM_CHAR) <= s.getUint8(t - TAM_CHAR)));
         t -= TAM_CHAR;
         break;
+        default:
+        s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) <= s.getInt32(t-TAM_INT)));
+        t -= 7;   //Libera 7 bytes
       }
       break;
 
@@ -1114,6 +1124,9 @@ function interpreter(){//h2
         s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - 2*TAM_CHAR) > s.getUint8(t - TAM_CHAR)));
         t -= TAM_CHAR;
         break;
+        default:
+        s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) > s.getInt32(t-TAM_INT)));
+        t -= 7;   //Libera 7 bytes
       }
       break;
 
@@ -1145,6 +1158,9 @@ function interpreter(){//h2
         s.setUint8(t - 2*TAM_CHAR,(s.getUint8(t - 2*TAM_CHAR) >= s.getUint8(t - TAM_CHAR)));
         t -= TAM_CHAR;
         break;
+        default:
+        s.setUint8(t - TAM_INT - TAM_INT, (s.getInt32(t - 2*TAM_INT) >= s.getInt32(t-TAM_INT)));
+        t -= 7;   //Libera 7 bytes
       }
       break;
 
@@ -1311,10 +1327,10 @@ function interpreter(){//h2
         var char;
         if (pos != 0){
           if (pos < 0){
-            if ((-pos) < lenString(str_tab[adr]))
+            if ((-pos) <= lenString(str_tab[adr]))
               char = getChar(str_tab[adr], pos);
           }
-          else if(pos < lenString(str_tab[adr]))
+          else if(pos <= lenString(str_tab[adr]))
             char = getChar(str_tab[adr], pos);
           else{
             atualizarConsole("ERRO! Posição não permitida");
@@ -1407,6 +1423,16 @@ function interpreter(){//h2
           }
         }
       break;
+      case 71:    //Alocação de memória
+        if(ttx+ir.x < stacksize){
+          s.setInt32(t, ttx);
+          t += TAM_INT;
+          ttx += ir.x;
+        }
+        else{
+          atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
+        }
+      break;
       }//primeiro switch
     }while (true);
 }
@@ -1428,6 +1454,8 @@ function interpret(){
     display = [];
     display[1] = 0;
     t = btab[2].vsize;
+    ax = stacksize*0.75;
+    ttx = ax;
     pc = tab[s.getInt32(12)].adr;
     firstLine = [];
     firstLine.push(kode[pc].line-1);

@@ -1,7 +1,7 @@
 //INTERPRETADOR DE ALGORITMOS EM JAVASCRIPT
 //Alunos: Jacons Morais e Rafael Ferreira
 //Orientador: Prof. Dr. Welllington Lima dos Santos
-//VARIÁVEIS COMPILADOR
+//VARIÁVEIS COMPILADORdebugger
 var nkw = 27;		//Nº de palavras chave
 var alng = 10;		//Nº de caracteres significativos nos identificadores
 var llng = 120;		//Tamanho da linha de entrada
@@ -34,8 +34,10 @@ var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
 var ps = "";
 var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
 "lngchk", "redchk"];
-var t; //índice do top da pilha temporária
+var t; //índice do topo da pilha temporária
 var b; //índice base pilha temporária
+var ax; //índice base alocação de memória
+var ttx; //índice do topo de alocação de memória
 var h1, h2, h3, h4;
 var fld = new Array(4);//tamanho padrão dos campos
 var display = new Array(lmax);
@@ -241,6 +243,8 @@ function compiladorPascalS(){
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
     Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
+    Msg[64] = "Você precisa informar um identificador na função \'alocamem\'.";
+    Msg[65] = "Você precisa informar um tipo ou uma variável para alocar memória.";
     return Msg[code];
   }
 
@@ -398,6 +402,15 @@ function compiladorPascalS(){
           case 26:
           var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
             str += "\nO tipo permitido para o índice deste arranjo é "+tp+".";
+          break;
+          case 46:
+            line-=2;
+            limparCodeBox();
+            str = ErrorMsg(code);
+            mostraErroNaLinha(line, str);
+            var type1 = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":(errorName =="notyp")?"sem tipo":(errorName == "pointers")?"ponteiro":"";
+            var type2 = (ref == "ints")?"inteiro":(ref == "reals")?"real":(ref == "chars")?"caracter":(ref == "strings")?"string":(ref == "records")?"registro":(ref =="notyp")?"sem tipo":(ref == "pointers")?"ponteiro":"";
+            str += " Você está atribuindo um valor "+type2+" a uma variável "+type1+".";
           break;
           case 36:
             var tp = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":"";
@@ -656,10 +669,13 @@ function compiladorPascalS(){
             inum = stab[sx].charCodeAt();
           }
           else
-          if (k === 0){
-            Error(38);
-            sy = "charcon";
-            inum = 0;
+          if (k == 0){
+            debugger;
+            //Error(38);
+            sy = "stringsy";
+            sleng = 1;
+            stab[sx] = "";
+            sx++;
           }
           else {
             sy = "stringsy";
@@ -1042,7 +1058,7 @@ function block(fsys, isfun, level){
       }
     }//constant
 
-    function typ(fsys, xtype){
+    function typ(fsys, xtype, pointer){
       var x, eltp, elrf, elsz, offset, t0, t1;
       function arraytyp(xtype){
         var eltp, low, high, elrf, elsz;
@@ -1163,13 +1179,18 @@ function block(fsys, isfun, level){
                     Error(5);
                   t1 = t;
                   var xtype2 = new xtp(eltp, elrf, elsz);
-                  typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), xtype2);
+                  typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), xtype2, pointer);
                   eltp = xtype2.tp;
                   elrf = xtype2.rf;
                   elsz = xtype2.sz;
                   while (t0 < t1){
                     t0++;
-                    tab[t0].typ = eltp;
+                    if(eltp.charAt() != "*")
+                      tab[t0].typ = eltp;
+                    else {
+                      tab[t0].typ = "pointers";
+                      tab[t0].xtyp = eltp.slice(1,eltp.length);
+                    }
                     tab[t0].ref = elrf;
                     tab[t0].normal = true;
                     tab[t0].adr = offset;
@@ -1189,6 +1210,7 @@ function block(fsys, isfun, level){
                   //test(["ident", "endsy","semicolon"], fsys, 6);*/
                 //}
               }
+
               btab[xtype.rf].vsize = offset;
               xtype.sz = offset;
               btab[xtype.rf].psize = 0;
@@ -1251,6 +1273,8 @@ function block(fsys, isfun, level){
           while(t0 < t){
             t0++;
             tab[t0].typ = tp;
+            if(tp == "pointers")
+              tab[t0].xtyp = tab[x].xtyp;
             tab[t0].ref = rf;
             tab[t0].normal = valpar;
             tab[t0].adr = dx;
@@ -1330,16 +1354,25 @@ function block(fsys, isfun, level){
           }
           var xtype = new xtp(tp, rf, sz);
           if(sy == "pointer"){
-            pointer = true;
             insymbol();
+            pointer = true;
+            tab[t1].typ = "pointers";
+            if(sy == "recordsy")
+              tab[t1].xtyp = "records";
+            else if (sy == "arraysy")
+              tab[t1].xtyp = "arrays";
+            tab[t1].adr = TAM_INT;
           }
           typ(["semicolon", "comma", "ident"].concat(fsys), xtype);
-          if(pointer)
+          if(pointer){
             tab[t1].typ = "pointers";
-          else
+            tab[t1].adr = TAM_INT;
+          }
+          else{
             tab[t1].typ = xtype.tp;
+            tab[t1].adr = xtype.sz;
+          }
           tab[t1].ref = xtype.rf;
-          tab[t1].adr = xtype.sz;
           tab[t1].xtyp = xtype.tp;
           //TestSemicolon();
         }
@@ -1350,7 +1383,7 @@ function block(fsys, isfun, level){
     }//typedeclaration
 
     function variabledeclaration(){
-      var t0, t1, rf, sz, tp;
+      var t0, t1, rf, sz, tp, pointer = false;
       try{
         insymbol();
         while(sy == "ident"){
@@ -1365,11 +1398,20 @@ function block(fsys, isfun, level){
           else
             Error(5);
           t1 = t;
+          if(sy == "pointer"){
+            insymbol();
+            pointer = true;
+          }
           var xtype = new xtp(tp, rf, sz);
           typ(["semicolon", "comma", "ident"].concat(fsys), xtype);
           while(t0 < t1){
             t0++;
-            tab[t0].typ = xtype.tp;
+            if(!pointer)
+              tab[t0].typ = xtype.tp;
+            else{
+              tab[t0].typ = "pointers";
+              tab[t0].xtyp = xtype.tp;
+            }
             tab[t0].ref = xtype.rf;
             tab[t0].lev = level;
             tab[t0].adr = dx;
@@ -1379,7 +1421,11 @@ function block(fsys, isfun, level){
               tab[t0].typ = "pointers";
               xtype.sz = TAM_INT;
             }
-            dx += xtype.sz;
+            if(!pointer)
+              dx += xtype.sz;
+            else
+              dx += TAM_INT;
+            pointer = false;
 
           }
           //TestSemicolon();
@@ -1393,8 +1439,6 @@ function block(fsys, isfun, level){
     function procdeclaration(){
       try{
         var isfun, tx, len;
-        if(debug)
-        debugger;
         isfun = sy == "functionsy";
         insymbol();
         if (sy != "ident"){
@@ -1526,7 +1570,6 @@ function block(fsys, isfun, level){
       function call(fsys, i){
         var x, lastp, cp, k, line;
         try{
-          debugger;
           x = new item("", 1);
           if(changed)
             line = ilnx;
@@ -1663,138 +1706,182 @@ function block(fsys, isfun, level){
                     insymbol();
                   else
                     Error(9);
+                  if(n != 22)
                     expression(fsys.concat(["rparent", "comma"]), x);
-                    switch (n) {
-                      case 0:
-                      case 2:
-                        ts = ["ints", "reals"];
-                        tab[i].typ = x.typ;
-                        if (x.typ == "reals")
-                          n++;
-                      break;
-                      case 4:
-                      case 5:
-                        ts = ["ints"];
-                      break;
-                      case 6:
-                      ts = ["ints", "bools", "chars"];
-                      break;
-                      case 7:
-                      case 8:
-                        ts = ["chars"];
-                      break;
-                      case 9:
-                      case 10:
-                      case 11:
-                      case 12:
-                      case 13:
-                      case 14:
-                      case 15:
-                      case 16:
-                        ts = ["ints", "reals"];
-                        if (x.typ == "ints")
-                          emit1(linecount, 26,TAM_INT);
-                      break;
-                      case 17:
-                        ts = ["strings"];
-                        if (x.typ == "strings"){
-                          emit(linecount, 65);
-                        }
-                        else {
-                          Error(36, x.typ, "strings");
-                        }
-                      break;
-                      case 18:
-                        ts = ["strings"];
-                        if (x.typ == "strings"){
-                          emit(linecount, 66);
-                        }
-                        else {
-                          Error(36, x.typ, "strings");
-                        }
-                      break;
-                      case 19:
-                      ts = ["ints", "strings"];
+                  switch (n) {
+                    case 0:
+                    case 2:
+                      ts = ["ints", "reals"];
+                      tab[i].typ = x.typ;
+                      if (x.typ == "reals")
+                        n++;
+                    break;
+                    case 4:
+                    case 5:
+                      ts = ["ints"];
+                    break;
+                    case 6:
+                    ts = ["ints", "bools", "chars"];
+                    break;
+                    case 7:
+                    case 8:
+                      ts = ["chars"];
+                    break;
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                      ts = ["ints", "reals"];
+                      if (x.typ == "ints")
+                        emit1(linecount, 26,TAM_INT);
+                    break;
+                    case 17:
+                      ts = ["strings"];
                       if (x.typ == "strings"){
-                        emit(linecount, 64);
+                        emit(linecount, 65);
                       }
                       else {
                         Error(36, x.typ, "strings");
                       }
-                      break;
-                      case 20:
+                    break;
+                    case 18:
+                      ts = ["strings"];
+                      if (x.typ == "strings"){
+                        emit(linecount, 66);
+                      }
+                      else {
+                        Error(36, x.typ, "strings");
+                      }
+                    break;
+                    case 19:
+                    ts = ["ints", "strings"];
+                    if (x.typ == "strings"){
+                      emit(linecount, 64);
+                    }
+                    else {
+                      Error(36, x.typ, "strings");
+                    }
+                    break;
+                    case 20:
+                    if (x.typ == "strings"){
+                        insymbol();
+                        var y = new item("", 1);
+                        expression(fsys.concat(["rparent"]), y);
+                        if (y.typ == "strings" || y.typ == "chars"){
+                          ts = ["ints", "strings", "chars"];
+                          if (y.typ == "chars")
+                            emit1(linecount, 67, 0);
+                          else
+                            emit1(linecount, 67, 1);
+                        }
+                        else {
+                          Error(36, y.typ, "strings");
+                        }
+                      }
+                      else {
+                        Error(36, x.typ, "strings");
+                      }
+                    break;
+                    case 21:
+                    if (sy == "comma"){
+                      insymbol();
+                      var y = new item("", 1);
+                      expression(fsys.concat(["comma", "rparent"]), y);
+                      if (sy == "comma"){
+                        insymbol();
+                        var z = new item("", 1);
+                        expression(fsys.concat(["comma", "rparent"]), z);
                         if (x.typ == "strings"){
-                          insymbol();
-                          var y = new item("", 1);
-                          expression(fsys.concat(["rparent"]), y);
-                          if (y.typ == "strings" || y.typ == "chars"){
-                            ts = ["ints", "strings", "chars"];
-                            if (y.typ == "chars")
-                              emit1(linecount, 67, 0);
-                            else
-                              emit1(linecount, 67, 1);
+                          if (y.typ == "ints"){
+                            if (z.typ == "strings"){
+                              ts = ["strings", "chars", "ints"];
+                              emit(linecount, 63);
+                            }
+                            else {
+                              Error(36, z.typ, "strings");
+                            }
                           }
                           else {
-                            Error(36, y.typ, "strings");
+                            Error(36, y.typ, "ints");
                           }
                         }
                         else {
                           Error(36, x.typ, "strings");
                         }
-                      break;
-                      case 21:
-                      if (sy == "comma"){
+                      }
+                      else {
+                        Error(62, 3);
+                      }
+                    }
+                    else {
+                      Error(62,2);
+                    }
+                    break;
+                    case 22:
+                    var length;
+                      if(sy == "ident"){
+                        var line = linecount;
+                        var ix = loc(id);
                         insymbol();
-                        var y = new item("", 1);
-                        expression(fsys.concat(["comma", "rparent"]), y);
-                        if (sy == "comma"){
-                          insymbol();
-                          var z = new item("", 1);
-                          expression(fsys.concat(["comma", "rparent"]), z);
-                          if (x.typ == "strings"){
-                            if (y.typ == "ints"){
-                              if (z.typ == "strings"){
-                                ts = ["strings", "chars", "ints"];
-                                emit(linecount, 63);
-                              }
-                              else {
-                                Error(36, z.typ, "strings");
+                        if(sy == "lbrack" || sy == "period")
+                          Error(65);
+                        else
+                          if(tab[ix].obj == "variable"){     //O programador introduziu uma variável na função alocamem
+                            if(stantyps.indexOf(tab[ix].typ) != -1){
+                              switch (tab[ix].typ) {
+                                case "reals":
+                                  length = TAM_REAL;
+                                break;
+                                case "bools":
+                                case "chars":
+                                  length = TAM_CHAR;
+                                break;
+                                default:
+                                  length = TAM_INT;
                               }
                             }
                             else {
-                              Error(36, y.typ, "ints");
+                              if(tab[ix].typ == "records"){
+                                length = btab[tab[ix].ref].vsize;
+                              }
+                              else if (tab[ix].typ == "arrays") {
+                                length = atab[tab[ix].ref].size;
+                              }
                             }
                           }
-                          else {
-                            Error(36, x.typ, "strings");
+                          else if(tab[ix].obj == "type1"){
+                            length = tab[ix].adr;
                           }
-                        }
-                        else {
-                          Error(62, 3);
-                        }
+                          else
+                            Error(65);
+                          emit2(line, 71, length);
+                          ts = ["pointers"];
+                          x.typ = "pointers";
                       }
-                      else {
-                        Error(62,2);
-                      }
-                      break;
-                    }
-                    if (ts.indexOf(x.typ) != -1)
+                      else
+                        Error(64);
+                    break;
+                  }
+                  if (ts.indexOf(x.typ) != -1)
                     emit1(linecount, 8, n);
-                    else
+                  else
                     if (x.typ != "notyp")
-                    Error(48);
+                      Error(48);
                   x.typ = tab[i].typ;
                   if (sy == "rparent")
-                  insymbol();
+                    insymbol();
                   else
-                  Error(4);
+                    Error(4);
                 }
                 catch(err){
                   return err;
                 }
               }//standfct
               try{
-                debugger;
                 x.typ = "notyp";
                 x.ref = 0;
                 test(["andsy", "times", "address"], facbegsys.concat(["andsy", "times", "address"]), fsys, 58);
@@ -1812,6 +1899,7 @@ function block(fsys, isfun, level){
                       if(tab[i].typ == "pointers"){
                         reference = true;
                         insymbol();
+                        x.typ = tab[i].xtyp;
                       }
                       else {
                         Error(63, tab[i].typ);
@@ -1830,8 +1918,6 @@ function block(fsys, isfun, level){
                         x.typ = tab[i].typ;
                         x.ref = tab[i].ref;
                         if (!reference){ //Não está atribuindo endereço
-                          if (x.typ == "pointers")
-                            x.typ = tab[i].xtyp;
                           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                             if (tab[i].normal)
                               f = 0;
@@ -1870,8 +1956,12 @@ function block(fsys, isfun, level){
                                 f = 0;
                               else
                                 f = 1;
-                            if (ireference && f > 0)
+                            if (ireference && f > 0){
                               f--;    //O programador quer acessar o valor do ponteiro e não da variável apontada
+                              x.typ = "pointers";
+                            }
+                            else if(ireference)
+                              x.typ = "pointers";
                             emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                           }
                         }
@@ -1894,12 +1984,25 @@ function block(fsys, isfun, level){
                             default:
                               len = TAM_INT;
                           }
-                          emit1(linecount, 34, len);
+                          if(stantyps.indexOf(tab[i].xtyp) != -1)
+                            emit1(linecount, 34, len);
                           if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                             if (x.typ == "strings"){
                               x.typ = "chars";
                             }
-                            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
+                            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, false);
+                            if (stantyps.indexOf(x.typ) != -1 /*&& x.typ != "strings"*/){
+                              var ltyp;
+                              switch (x.typ) {
+                                case "reals": ltyp = TAM_REAL;break;
+                                case "ints":ltyp = TAM_INT;break;
+                                case "bools":ltyp = TAM_BOOL;break;
+                                case "chars":ltyp = TAM_CHAR;break;
+                                default:
+                                ltyp = TAM_INT;
+                              }
+                              emit1(linecount, 34, ltyp);
+                            }
                           }
                         }
                       break;
@@ -2113,7 +2216,7 @@ function block(fsys, isfun, level){
             op = sy;
             insymbol();
             simpleexpression(fsys, y);
-            if (["notyp", "ints", "bools", "chars", "strings", "reals"].indexOf(x.typ) != -1 && x.typ == y.typ)
+            if (["notyp", "ints", "bools", "chars", "strings", "reals", "pointers"].indexOf(x.typ) != -1 && x.typ == y.typ)
               switch (op) {
                 case "eql": emit1(linecount, 39, x.typ);break;
                 case "neq": emit1(linecount, 40, x.typ);break;
@@ -2172,7 +2275,6 @@ function block(fsys, isfun, level){
           y = new item("", 1);
           x.typ = tab[i].typ;
           x.ref = tab[i].ref;
-          debugger;
           if (tab[i].normal)
             f = 0;
           else
@@ -2255,8 +2357,6 @@ function block(fsys, isfun, level){
                 case "minus":
                   op = "minus";
                   insymbol();
-                  if(debug)
-                  debugger;
                   if (sy == "eql")
                     insymbol();
                   else
@@ -2287,8 +2387,6 @@ function block(fsys, isfun, level){
             }
           }
           expression(fsys, y);
-          if(debug)
-          debugger;
           if (x.typ == y.typ)
             if (stantyps.indexOf(x.typ) != -1){
               if(x.typ == "strings" && x.ref == 1){
@@ -2319,7 +2417,7 @@ function block(fsys, isfun, level){
                   case "div":emit1(ln, 58, x.typ); break;
                 }
 
-                emit2(ln, 38, tab[i].typ, assign, i);
+                emit2(ln, 38, x.typ, assign, i);
               }
             }
             else
@@ -2331,56 +2429,60 @@ function block(fsys, isfun, level){
                 else
                   emit1(ln, 23, btab[x.ref].vsize);
           else{
-            if(x.typ == 'strings' || fstring){
-              if (x.ref == 1){
-                if (y.typ != "chars"){
-                  Error(46);
+            if(x.typ == "pointers" || y.typ == "pointers"){
+              Error(46, x.typ, y.typ)
+            }
+            else
+              if(x.typ == 'strings' || fstring){
+                if (x.ref == 1){
+                  if (y.typ != "chars"){
+                    Error(46);
+                  }
+                  else {
+                    if (tab[i].typ != "arrays")
+                      emit2(ln, 1, tab[i].lev, tab[i].adr, tab[i].typ);
+                    else {
+                      var ltyp;
+                      switch (y.typ) {
+                        case "reals":ltyp = TAM_REAL;break;
+                        case "ints":ltyp = TAM_INT;break;
+                        case "bools":ltyp = TAM_BOOL;break;
+                        case "chars":ltyp = TAM_CHAR;break;
+                      }
+                      emit1(ln, 34, ltyp);
+                    }
+                    emit(ln, 63);
+                    if(!fstring)
+                      emit2(ln, 38, x.typ, assign, i);
+                    else
+                      emit2(ln, 38, "strings", assign, i);
+                  }
                 }
                 else {
-                  if (tab[i].typ != "arrays")
-                    emit2(ln, 1, tab[i].lev, tab[i].adr, tab[i].typ);
-                  else {
-                    var ltyp;
-                    switch (y.typ) {
-                      case "reals":ltyp = TAM_REAL;break;
-                      case "ints":ltyp = TAM_INT;break;
-                      case "bools":ltyp = TAM_BOOL;break;
-                      case "chars":ltyp = TAM_CHAR;break;
-                    }
-                    emit1(ln, 34, ltyp);
+                  emit2(ln, 38, x.typ, assign, i);
+                }
+              }
+              else{
+                if (x.typ == "reals" && y.typ == "ints"){
+                  emit1(ln, 26,TAM_INT);
+                  switch (op) {
+                    case "plus": emit1(ln, 52, x.typ); break;
+                    case "minus":emit1(ln, 53, x.typ); break;
+                    case "mult":emit1(ln, 57, x.typ); break;
+                    case "div": emit1(ln, 58, x.typ); break;
                   }
-                  emit(ln, 63);
-                  if(!fstring)
+                  emit2(ln, 38, x.typ, assign, i);
+                }
+                else if(x.typ == "ints"){
+                  if(y.typ == "reals")
+                    Error(46);
+                }
+                else
+                  if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
                     emit2(ln, 38, x.typ, assign, i);
                   else
-                    emit2(ln, 38, "strings", assign, i);
-                }
+                    Error(46);
               }
-              else {
-                emit2(ln, 38, x.typ, assign, i);
-              }
-            }
-            else{
-              if (x.typ == "reals" && y.typ == "ints"){
-                emit1(ln, 26,TAM_INT);
-                switch (op) {
-                  case "plus": emit1(ln, 52, x.typ); break;
-                  case "minus":emit1(ln, 53, x.typ); break;
-                  case "mult":emit1(ln, 57, x.typ); break;
-                  case "div": emit1(ln, 58, x.typ); break;
-                }
-                emit2(ln, 38, x.typ, assign, i);
-              }
-              else if(x.typ == "ints"){
-                if(y.typ == "reals")
-                  Error(46);
-              }
-              else
-                if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
-                  emit2(ln, 38, x.typ, assign, i);
-                else
-                  Error(46);
-            }
           }
         }
         catch(err){
@@ -2523,7 +2625,6 @@ function block(fsys, isfun, level){
           }
           var exittab = new Array(csmax);
           insymbol();
-          debugger;
           i = 0;
           j = 0;
           expression(fsys.concat(["ofsy", "comma", "colon"]), x);
@@ -2540,7 +2641,6 @@ function block(fsys, isfun, level){
             onecase();
           }
           kode[lc1].y = lc;
-          debugger;
           for (k = 1; k <= i; k++) {
             emit1(linecount, 13, casetab[k].val);
             emit1(linecount, 13, casetab[k].lc);
@@ -2843,7 +2943,6 @@ function block(fsys, isfun, level){
         }
       }
       try{
-        debugger;
         if (statbegsys.concat(["ident"]).indexOf(sy) != -1)
         switch (sy) {
           case "ident":
@@ -3139,7 +3238,7 @@ try{
   }
   enter('', "variable", "notyp", 0);
   enter('falso', "konstant", "bools", 0);
-  enter('verdadeiro', "konstant", "bools", 1);
+  enter('nulo', 'konstant', 'pointers', 0);
   enter('real', "type1", "reals", TAM_REAL);
   enter('caracter', "type1", "chars", TAM_CHAR);
   enter('logico', "type1", "bools", TAM_BOOL);
@@ -3167,15 +3266,13 @@ try{
   enter('strtmo', 'funktion', 'ints', 19);
   enter('strbusca', "funktion", "ints", 20);
   enter('strinsere', 'funktion', 'strings', 21);
+  enter('alocamem', "funktion", "pointers", 22);
   enter('escreva', "prozedure", "notyp", 3);
-  //enter('escreveln', "prozedure", "notyp", 4);
   enter('', "prozedure", "notyp", 0);
   btab[1].last = t;
   btab[1].lastpar = 1;
   btab[1].psize = 0;
   btab[1].vsize = 0;
-  if(debug)
-  debugger;
   block(blockbegsys.concat(statbegsys), false, 1);
   isDone = true;
   /*if (sy != "period")

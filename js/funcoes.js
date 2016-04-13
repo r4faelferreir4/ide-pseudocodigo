@@ -490,7 +490,6 @@ function removerTodaPilhaFuncoes(){
 var arrayObjetoTabela = [];
 //Carregar variáveis no depurador
 function carregaVariaveis(start){
-	debugger;
 	var value;
 	do {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){

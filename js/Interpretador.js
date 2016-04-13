@@ -3,7 +3,6 @@ function interpreter(){//h2
     ir = kode[pc];
     pc++;
     ocnt++;
-    debugger;
     if (debug_op){
       if(ir.line != linecount){
         incrementar(ir.line);
@@ -72,6 +71,7 @@ function interpreter(){//h2
         }
       }
     }
+    debugger;
     switch(ir.f){
       case 0:
       s.setInt32(t, (display[ir.x]+ir.y));
@@ -125,7 +125,7 @@ function interpreter(){//h2
       do{
         display[h1] = h3;
         h1--;
-        h3 = s.getInt32(h3 + 2);
+        h3 = s.getInt32(h3 + 2*TAM_INT);
       }
       while( h1 == h2);
       break;
@@ -452,7 +452,7 @@ function interpreter(){//h2
       s.setInt32(h1, pc);
       s.setInt32(h1 + 1*TAM_INT, display[h3]);
       s.setInt32(h1 + 2*TAM_INT, b);
-      if(indebug){
+      if(indebug && !bydebug){
         read_ok = false;
         stopln = kode[tab[h2].adr].line;
         limpaLinhaDepurador();
@@ -462,9 +462,9 @@ function interpreter(){//h2
       firstLine.push(kode[tab[h2].adr].line-1);
       out.push(kode[pc].line);
 
-      for (h3 = t+TAM_INT;  h3 < h4;  h3+=TAM_INT)
-        s.setInt32(h3, 0);
-      b = h1;
+      for (h3 = t;  h3 < h4;  h3++)
+        s.setUint8(h3, 0);
+      b = hx;
       t = h4;
       pc = tab[h2].adr;
       carregaVariaveis(h2+1);
@@ -707,6 +707,7 @@ function interpreter(){//h2
       break;
 
       case 29:
+      debugger;
       chrcnt = chrcnt + fld[ir.y];
       switch (ir.y) {
         case 1:
@@ -813,13 +814,13 @@ function interpreter(){//h2
 
       case 32:    //Saída de função/procedimento
       case 33:
-      //if (ir.f == 32)   //Procedimento
-      //  t = b - TAM_INT;
-      //else{
-        t = b;        //Função
-      //}
-      pc = s.getInt32(b);
-      if(debug_op && !CursorRun){
+      if (ir.f == 32)   //Procedimento
+        t = b;
+      else{
+        t = b+ir.y;        //Função
+      }
+      pc = s.getInt32(b+ir.y);
+      if(debug_op && !CursorRun && !bydebug){
         limpaLinhaDepurador();
         mostraLinhaDepurador(kode[pc].line);
         removerTopoPilha();
@@ -831,7 +832,7 @@ function interpreter(){//h2
           removerTopoPilhaVar();
         }
       }
-      b = s.getInt32(b + 2*TAM_INT);
+      b = s.getInt32(b + 2*TAM_INT+ir.y);
       firstLine.pop();
       out.pop();
       break;

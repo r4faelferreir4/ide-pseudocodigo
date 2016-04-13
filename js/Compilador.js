@@ -2873,6 +2873,14 @@ function block(fsys, isfun, level){
                     f = 0;
                     else
                     f = 1;
+                    if(sy == "pointer" && x.typ == "pointers"){
+                      insymbol();
+                      x.typ = tab[i].xtyp;
+                      f++;
+                    }
+                    else if (sy == "pointer") {
+                      Error(63);
+                    }
                     emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                     if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
                     selector(fsys.concat(["comma", "rparent"]), x, false);

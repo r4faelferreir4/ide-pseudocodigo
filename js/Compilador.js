@@ -1458,7 +1458,7 @@ function block(fsys, isfun, level){
         else
           Error(14);*/
         var bool = 0;
-        len = TAM_INT;
+        len = 0;
         if(isfun){
           bool++;
           switch (tab[tx].typ) {

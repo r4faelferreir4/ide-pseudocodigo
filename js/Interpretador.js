@@ -71,7 +71,6 @@ function interpreter(){//h2
         }
       }
     }
-    debugger;
     switch(ir.f){
       case 0:
       s.setInt32(t, (display[ir.x]+ir.y));
@@ -814,6 +813,7 @@ function interpreter(){//h2
 
       case 32:    //Saída de função/procedimento
       case 33:
+      debugger;
       if (ir.f == 32)   //Procedimento
         t = b;
       else{

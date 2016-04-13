@@ -385,7 +385,6 @@ function getString(head){
 
 function getChar(head, pos){
 	var str = "", i = 1, len;
-	debugger;
 	if (typeof head == "object"){
 		if (pos < 0){
 			len = lenString(head);

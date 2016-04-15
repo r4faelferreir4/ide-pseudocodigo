@@ -222,7 +222,7 @@ function compiladorPascalS(){
     Msg[18] = "Tipo de dado da variável não suportado pela instrução \'para\'."; Msg[19] = "O tipo dos valores de inicio, fim e passo da instrução \'para\' precisam ser iguais ao tipo da variavel inicial.";
     Msg[20] = ""; Msg[21] = "Número muito grande.";
     Msg[22] = ""; Msg[23] = "Tipo de dado não suportado pela instrução \'caso\'.";
-    Msg[24] = "Caracter não reconhecido."; Msg[25] = "o identificador \'"+id+"\' precisa ser uma constante.";
+    Msg[24] = "Caracter \' "+line[cc-1]+" \' não reconhecido."; Msg[25] = "o identificador \'"+id+"\' precisa ser uma constante.";
     Msg[26] = "Este tipo de índice não é permitido para este arranjo."; Msg[27] = "Os limites inferior e superior deste arranjo estão irregulares.";
     Msg[28] = "A variável \'"+id+"\' não é do tipo arranjo nem string, você não pode utilizar colchetes."; Msg[29] = "O identificador "+id+" não é um tipo de dado.";
     Msg[30] = "Tipo indefinido."; Msg[31] = "A variável \'"+id+"\' que você está tentando acessar um atributo não é do tipo \'registro\'. ";
@@ -245,6 +245,7 @@ function compiladorPascalS(){
     Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
     Msg[64] = "Você precisa informar um identificador na função \'alocamem\'.";
     Msg[65] = "Você precisa informar um tipo ou uma variável para alocar memória.";
+    Msg[66] = "Não é necessário introduzir ( e ) após o nome do programa.";
     return Msg[code];
   }
 
@@ -3125,7 +3126,7 @@ try{
   key[1] = 'e'; key[2] = 'arranjo';
   key[3] = 'inicio'; key[4] = 'caso';
   key[5] = 'const'; key[6] = 'div';
-  key[7] = 'faca'; key[8] = 'decrementa';
+  key[7] = 'faca'; //key[8] = 'decrementa';
   key[9] = 'senao'; key[10] = 'fim';
   key[11] = 'para'; key[12] = 'funcao';
   key[13] = 'se'; key[14] = 'mod';
@@ -3133,7 +3134,8 @@ try{
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
   key[21] = 'repita'; key[22] = 'entao';
-  key[23] = 'incrementa'; key[24] = 'tipos';
+  //key[23] = 'incrementa';
+  key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
   key[29] = "passo";  key[30] = 'depurar';
@@ -3216,8 +3218,14 @@ try{
     Error(2, "progname");
     else {
       progname = id;
-      insymbol();
-      if (sy != "lparent")
+      insymbol()
+      if(sy == "lparent"){
+        Error(66);
+        insymbol();
+        if(sy == "rparent")
+          insymbol();
+      }
+      /*if (sy != "lparent")
       Error(9);
       else
       insymbol();
@@ -3235,11 +3243,11 @@ try{
           Error(0);
           insymbol();
         }
-      }while(sy == "comma");*/
+      }while(sy == "comma");
       if (sy == "rparent")
       insymbol();
       else
-      Error(4);
+      Error(4);*/
       if (!oflag)
       Error(20);
     }
@@ -3248,7 +3256,7 @@ try{
   enter('falso', "konstant", "bools", 0);
   enter('nulo', 'konstant', 'pointers', 0);
   enter('real', "type1", "reals", TAM_REAL);
-  enter('caracter', "type1", "chars", TAM_CHAR);
+  enter('caractere', "type1", "chars", TAM_CHAR);
   enter('logico', "type1", "bools", TAM_BOOL);
   enter('inteiro', "type1", "ints", TAM_INT);
   enter('string', 'type1', 'strings', TAM_INT);

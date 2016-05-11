@@ -1,10 +1,8 @@
 //ATALHOSsalvar
 //Para depurar
 function depurar(){
-	debugger;
 	if (isOk && isDone){
 		debug_op = true;
-		indebug = true;
 		call_read = false;
 		debug = false;
 		limpaContadores();
@@ -24,9 +22,7 @@ function depurar(){
 		mostraErro();
 	}
 }
-shortcut.add("F6",function() {
-	depurar();
-});
+//shortcut.add("F6",function() {	depurar();});
 
 
 //para compilar
@@ -79,63 +75,52 @@ shortcut.add("F10",function() {getCode();});
 
 //rodar até o cursor
 function runToCursor(){
-	debugger;
-	if(debug_op){
-		stopln = editor.getCursor().line-1;
-		/*if(stopln < kode[tab[btab[1].last].adr].line){
-		var pcx = 0;
-		do {
-		pcx++;
-	} while (kode[pcx].line <= stopln);
-	stopln = pcx;
-}*/
-CursorRun = true;
-debug_op = true;
-if (pc != 0)
-call_read = true;
-interpret();
-}
+	if(!debug_op){
+		depurar();
+	}
+	stopln = editor.getCursor().line-1;
+	CursorRun = true;
+	debug_op = true;
+	if (pc != 0)
+		call_read = true;
+	interpret();
+
 }
 shortcut.add("F4",function(){runToCursor();});
 
 //passo-a-passo entrando em rotinas (step into)
 function inRoutine(){
 	debugger;
-	if(debug_op){
-		indebug = true;
-		if (kode[pc].f == 18){
-			stopln = kode[tab[kode[pc].y].adr].line-1;
-			mostraLinhaDepurador(stopln);
-		}
-		else {
-			stopln = kode[pc].line;
-			if (kode[pc].f == 70)
-			debug = true;
-		}
-		interpret();
+	if(!debug_op){
+		depurar();
+	}
+	indebug = true;
+	if (kode[pc].f == 18){
+		stopln = kode[tab[kode[pc].y].adr].line-1;
+		mostraLinhaDepurador(stopln);
 	}
 	else {
-		MsgErro = "Você não inicializou no modo depurador.";
-		mostraErro();
 		stopln = kode[pc].line;
 		if (kode[pc].f == 70)
 		debug = true;
 	}
+	interpret();
 }
 shortcut.add("F7",function() {inRoutine();});
 
 //Executar até sair da rotina(step out)
 function outRoutine(){
 	debugger;
-	if(debug_op){
-		stopln = out.pop()-1;
-		if(!Number.isNaN(stopln)){
-			limpaLinhaDepurador();
-			mostraLinhaDepurador(stopln);
-			outdebug = true;
-			debug = false;
-			interpret();
-		}
+	if(!debug_op){
+		depurar();
+	}
+	stopln = out.pop()-1;
+	if(!Number.isNaN(stopln)){
+		limpaLinhaDepurador();
+		mostraLinhaDepurador(stopln);
+		outdebug = true;
+		debug = false;
+		interpret();
 	}
 }
 shortcut.add("Ctrl+F8",function() {outRoutine();});
@@ -143,22 +128,20 @@ shortcut.add("Ctrl+F8",function() {outRoutine();});
 //passo-a-passo saltando rotinas (step over)
 function byRoutine(){
 	if(debug_op){
-		limpaLinhaDepurador();
-		stopln = kode[pc].line;
-		if (kode[pc].f == 70)
-		debug = true;
-		mostraLinhaDepurador(stopln);
-		bydebug = true;
-		interpret();
+		depurar();
 	}
-	else {
-		MsgErro = "Você não inicializou no modo depurador.";
-		mostraErro();
-	}
+	limpaLinhaDepurador();
+	stopln = kode[pc].line;
+	if (kode[pc].f == 70)
+	debug = true;
+	mostraLinhaDepurador(stopln);
+	bydebug = true;
+	interpret();
+
 }
 shortcut.add("F8",function() {byRoutine();});
 
-//interromper a depuração e a execuçãoread_ok
+//interromper a depuração e a execução
 function stopDeb(){
 	debug_op = false;
 	pc = finalInst;
@@ -306,8 +289,7 @@ function limpaConsole() {
 
 //Imprime informações no console de saída
 function atualizarConsole(string){
-	string = document.getElementById("output").value + string;
-	document.getElementById("output").value = string;
+	document.getElementById("output").value = document.getElementById("output").value.concat(string);
 	scrollOutput();
 }
 
@@ -325,7 +307,7 @@ function lista(next, c, destruct){
 	this.destruct = destruct;
 }
 
-function alocaString(str, head, destruct){//Aloca string reutilizando espaço já alocado
+function alocaString(str, head, destruct, end){//Aloca string reutilizando espaço já alocado
 	if (str !== undefined && head !== undefined){
 		head.c = str.charAt();   //Definindo o inicio da lista
 		head.destruct = destruct;
@@ -339,7 +321,7 @@ function alocaString(str, head, destruct){//Aloca string reutilizando espaço j�
 			head.destruct = destruct;
 			i++;
 		}
-		head.next = undefined;
+		head.next = end;
 	}
 }
 
@@ -352,7 +334,7 @@ function liberaString(head){//Retira as referências para que o coletor de lixo 
 	}
 }
 
-function lenString(head){
+function lenString(head){		//retorna o tamanho de uma string
 	var len = 1;
 	if (head.c === "" && head.next === undefined)
 	return 0;
@@ -365,7 +347,7 @@ function lenString(head){
 	}
 }
 
-function getString(head){
+function getString(head){		//retorna uma string
 	var str= "", destruct, destroi;
 	if (head.destruct){
 		destroi = head;
@@ -383,7 +365,7 @@ function getString(head){
 	}
 }
 
-function getChar(head, pos){
+function getChar(head, pos){		//busca uma caractere em uma posição de uma string
 	var str = "", i = 1, len;
 	if (typeof head == "object"){
 		if (pos < 0){
@@ -400,7 +382,7 @@ function getChar(head, pos){
 	}
 }
 
-function alocaVetor(){
+function alocaVetor(){		//aloca uma posição no vetor de strings
 	var i = 2;
 	while(str_tab[i] !== undefined){
 		i++;
@@ -409,7 +391,7 @@ function alocaVetor(){
 	return i;
 }
 
-function setChar(head, char, pos){
+function setChar(head, char, pos){		//seta um caractere em uma string
 	var i = 1, len;
 	char = String.fromCharCode(char);
 	if (typeof head == "object"){
@@ -420,6 +402,29 @@ function setChar(head, char, pos){
 		while(head !== undefined){
 			if (i == pos){
 				head.c = char;
+				return true;
+			}
+			else
+			head = head.next;
+			i++;
+		}
+		return false;
+	}
+}
+
+function setStr(head, str, pos){
+	var i = 1, len, nhead, nxt;
+	if (head instanceof lista){
+		if (pos < 0){
+			len = lenString(head);
+			pos = len + pos + 1;
+		}
+		while(head !== undefined){
+			if (i == pos){
+				nhead = new lista();
+				nxt = head.next;
+				head.next = nhead;
+				alocaString(str, nhead, false, nxt);
 				return true;
 			}
 			else

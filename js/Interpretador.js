@@ -473,7 +473,20 @@ function interpreter(){//h2
       case 20:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s.getInt32(t-TAM_INT);
+      switch (atab[h1].inxtyp) {
+        case "reals":
+          ps = 'inxchk';
+          return;
+        break;
+        case "bools":
+        case "chars":
+          h3 = s.getUint8(t-TAM_CHAR);
+          t -= TAM_CHAR;
+        break;
+        default:
+          h3 = s.getInt32(t-TAM_INT);
+          t -= TAM_INT;
+      }
       if (h3 < h2){
         ps = 'inxchk';
         return;
@@ -484,7 +497,6 @@ function interpreter(){//h2
           return;
         }
         else{
-          t -= TAM_INT;
           s.setInt32(t-TAM_INT, s.getInt32(t-TAM_INT)+(h3-h2));
         }
       }
@@ -493,7 +505,21 @@ function interpreter(){//h2
       case 21:
       h1 = ir.y; //{h1 points to atab}
       h2 = atab[h1].low;
-      h3 = s.getInt32(t-TAM_INT);
+      switch (atab[h1].inxtyp) {
+        case "reals":
+          ps = 'inxchk';
+          return;
+        break;
+        case "bools":
+        case "chars":
+          h3 = s.getUint8(t-TAM_CHAR);
+          t -= TAM_CHAR;
+        break;
+        default:
+          h3 = s.getInt32(t-TAM_INT);
+          t -= TAM_INT;
+
+      }
       if (h3 < h2) {
         ps = 'inxchk';
         return;
@@ -504,7 +530,6 @@ function interpreter(){//h2
           return;
         }
         else{
-          t -= TAM_INT;
           s.setInt32(t-TAM_INT, s.getInt32(t-TAM_INT) + (h3 - h2) * atab[h1].elsize);
         }
       }
@@ -674,12 +699,12 @@ function interpreter(){//h2
       t -= TAM_INT;
       break;
 
-      case 28:
+      case 28:    //Impressão string literal
       h1 = s.getInt32(t-TAM_INT);
       h2 = ir.y;
       t -= TAM_INT;
       chrcnt = chrcnt + h1;
-      var string = "";
+      var string = "";/*
       do {
         while (stab[h2] == "\\"){
           if (stab[h2+1] == "n"){
@@ -699,7 +724,9 @@ function interpreter(){//h2
         string += stab[h2];
         h1--;
         h2++;
-      } while (h1 > 0);
+      } while (h1 > 0);*/
+      string = stab.slice(h2,h1);
+      string = string.join("");
       atualizarConsole(string);
       //call_read = true;
       //return;
@@ -723,7 +750,7 @@ function interpreter(){//h2
         break;
         case 3:
           var str = "";
-          str += s.getInt8(t - TAM_BOOL);
+          str += (s.getInt8(t - TAM_BOOL) == 0)?'falso':'verdadeiro';
           atualizarConsole(str);
           t -= TAM_BOOL;
         break;
@@ -736,6 +763,11 @@ function interpreter(){//h2
           if (str_tab[s.getInt32(t - TAM_INT)].destruct)
             str_tab[s.getInt32(t - TAM_INT)] = undefined;
           t -= TAM_INT;
+        break;
+        case 8:
+          var str = "";
+          str += (s.getInt32(t-TAM_INT) == 0)?'nulo':s.getInt32(t-TAM_INT);
+          atualizarConsole(str);
         break;
         default:
         var str = "";
@@ -1316,8 +1348,13 @@ function interpreter(){//h2
 
       break;
 
-      case 61://livre
-
+      case 61://seta uma substring em uma string
+        var str = getString(str_tab[s.getInt32(t-TAM_INT)]);
+        t -= TAM_INT;
+        var pos = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+        setStr(str_tab[s.getInt32(t-TAM_INT)], str, pos);
+        t -= TAM_INT;
       break;
 
       case 62: //Pega caracter da posição de uma string
@@ -1400,7 +1437,8 @@ function interpreter(){//h2
         var str2 = getString(str_tab[adr2]);
         if (str_tab[adr2].destruct)
           str_tab[adr2] = undefined;
-        var result = str2.localeCompare(str1);
+        debugger;
+        var result = str1.indexOf(str2)+1;
         s.setInt32(t-TAM_INT, result);
       break;
       case 68:    //Avaliação curta do operador 'ou'

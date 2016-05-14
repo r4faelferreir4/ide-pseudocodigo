@@ -249,6 +249,7 @@ function compiladorPascalS(){
     Msg[67] = "O 1º parâmetro do procedimento \'strinsere\' deve ser do tipo string.";
     Msg[68] = "Você não pode utilizar o operador \'@\' e \'^\' ao mesmo tempo.";
     Msg[69] = "Programa incompleto";
+    Msg[70] = "Os rótulos devem ser informados antes do senão na estrutura caso.";
     return Msg[code];
   }
 
@@ -2597,16 +2598,25 @@ function block(fsys, isfun, level){
 
         function onecase(){
           try{
-            if (constbegsys.indexOf(sy) != -1){
-              caselabel();
+            if (constbegsys.indexOf(sy) != -1 || sy == "elsesy"){
+              if(sy == "elsesy")
+                elsesy = true;
+              else{
+                if(!elsesy)
+                  caselabel();
+                else
+                  Error(70);
+              }
               while (sy == "comma") {
                 insymbol();
                 caselabel();
               }
-              if (sy == "colon")
+              if (sy == "colon" || elsesy)
                 insymbol();
               else
                 Error(5);
+              if(elsesy)
+                elselc = lc;    //Marca inicio das instruções de senao
               statement(["semicolon", "endsy"].concat(fsys));
               j++;
               exittab[j] = lc;
@@ -2621,6 +2631,7 @@ function block(fsys, isfun, level){
           var x;
           x = new item("", 1);
           var i, j, k, lc1;
+          var elsesy = false, elselc = 0;   //Senao da instrução caso
           var casetab = new Array(csmax);
           function CaseRecord(val, lc){
             this.val = val;
@@ -2646,7 +2657,8 @@ function block(fsys, isfun, level){
           else
             Error(8);
           onecase();
-          while (sy != "endsy") {
+          debugger;
+          while (sy != "endsy" && isOk) {
             onecase();
           }
           kode[lc1].y = lc;
@@ -2654,7 +2666,7 @@ function block(fsys, isfun, level){
             emit1(linecount, 13, casetab[k].val);
             emit1(linecount, 13, casetab[k].lc);
           }
-          emit1(linecount, 10, 0);
+          emit1(linecount, 10, elselc);
           for (k = 1; k <= j; k++)
             kode[exittab[k]].y = lc;
           if (sy == "endsy")

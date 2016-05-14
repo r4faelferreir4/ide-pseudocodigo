@@ -3,6 +3,7 @@ function interpreter(){//h2
     ir = kode[pc];
     pc++;
     ocnt++;
+    debugger;
     if (debug_op){
       if(ir.line != linecount){
         incrementar(ir.line);
@@ -234,7 +235,7 @@ function interpreter(){//h2
       do {
         if (kode[h2].f != 13){
           if (kode[h2].f == 10){
-            pc = h2 + 1;
+            pc = (kode[h2].y == 0)? h2+1 : kode[h2].y;
             if(indebug || bydebug){
               stopln = kode[pc].line;
               limpaLinhaDepurador();
@@ -700,36 +701,12 @@ function interpreter(){//h2
       break;
 
       case 28:    //Impressão string literal
+      debugger;
       h1 = s.getInt32(t-TAM_INT);
       h2 = ir.y;
       t -= TAM_INT;
       chrcnt = chrcnt + h1;
-      var string = "";/*
-      do {
-        while (stab[h2] == "\\"){
-          if (stab[h2+1] == "n"){
-              atualizarConsole(string+"\n");
-              string = "";
-              h2 += 2;
-              h1 -= 2;
-          }
-          else{
-            string += stab[h2];
-            h1--;
-            h2++;
-          }
-          if (h1 <= 0)  break;
-        }
-        if (h1 <= 0) break;
-        string += stab[h2];
-        h1--;
-        h2++;
-      } while (h1 > 0);*/
-      string = stab.slice(h2,h1);
-      string = string.join("");
-      atualizarConsole(string);
-      //call_read = true;
-      //return;
+      atualizarConsole(stab.slice(h2, h2+h1).join(""));
       break;
 
       case 29:

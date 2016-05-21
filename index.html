@@ -205,11 +205,13 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
 </script>
 <script async>
 function getCode(){
+  time = new Date().getTime();
   InputFile = editor.getValue();
   isOk = true;
   isDone = false;
   compiladorPascalS();
   document.getElementById("output").value = "";
+  time = new Date().getTime() - time;
   if (isOk && isDone){
     mostraErro();
     mostrarModalOutput();

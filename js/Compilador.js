@@ -98,7 +98,7 @@ function xtp(tp, rf, sz){
 
 
 //record
-//DECLARAÇÃO DE VARIÁVEIS
+//DECLARAÇÃO DE VARIÁVEIS COMPILADOR
 
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
 var sy="";  //Ultimo simbolo lido por insymbol
@@ -135,10 +135,10 @@ var xname;
 var t, a, b, sx, c1, c2;    //Indices para tabelas
 var stantyps;
 var display = [];
-var tab = [];
-var atab = [];
-var btab = [];
-var stab = [];
+var tab = [];   //Tabela de símbolos
+var atab = [];  //Tabela auxiliar arranjos
+var btab = [];  //Tabela auxiliar blocos
+var stab = [];  //Tabela string literal
 var rconst = new Array(c2max);
 var kode = [];
 var iln = 0;  //contador de caracteres total
@@ -147,6 +147,7 @@ var isOk = true;    //Verifica se o código foi compilado corretamente
 var isDone = false; //Verifica se o código foi compilado
 var MsgErro = ""; //Mensagem de erro para o usuário.
 var debug;  //flag para ponto de parada da palavra "depurar"
+var time;   //Tempo de compilação/execução
 function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
   this.name = name;
   this.link = link;

@@ -10,7 +10,6 @@ function depurar(){
 		stopln = kode[tab[btab[1].last].adr].line-1;
 		limpaLinhaDepurador();
 		mostraLinhaDepurador(stopln+1);
-		interpret();
 	}
 	else {
 		if (isOk){
@@ -27,11 +26,13 @@ function depurar(){
 
 //para compilar
 function compiler(){
+	time = new Date().getTime();
 	InputFile = editor.getValue();
 	isOk = true;
 	isDone = false;
 	compiladorPascalS();
 	document.getElementById("output").value = "";
+	time = new Date().getTime() - time;
 	mostraErro();
 }
 shortcut.add("F9",function() {
@@ -93,18 +94,23 @@ function inRoutine(){
 	debugger;
 	if(!debug_op){
 		depurar();
-	}
-	indebug = true;
-	if (kode[pc].f == 18){
-		stopln = kode[tab[kode[pc].y].adr].line-1;
-		mostraLinhaDepurador(stopln);
+		indebug = true;
+		interpret();
 	}
 	else {
-		stopln = kode[pc].line;
-		if (kode[pc].f == 70)
-		debug = true;
+		indebug = true;
+		if (kode[pc].f == 18){
+			stopln = kode[tab[kode[pc].y].adr].line-1;
+			mostraLinhaDepurador(stopln);
+		}
+		else {
+			stopln = kode[pc].line;
+			if (kode[pc].f == 70)
+				debug = true;
+		}
+		interpret();
 	}
-	interpret();
+
 }
 shortcut.add("F7",function() {inRoutine();});
 
@@ -296,7 +302,7 @@ function atualizarConsole(string){
 //Imprime erros no console debug abaixo do editor
 function mostraErro(){
 	limpaDebug();
-	adicionarErro(MsgErro);
+	adicionarErro(MsgErro+"\nTempo de compilação: "+time+" ms.");
 }
 
 

@@ -54,52 +54,62 @@
         <form name="form">
           <textarea id="codebox"></textarea>
         </form>
-        <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar" onclick="depurar();">
-          <span class="glyphicon glyphicon-sort"></span>
-        </button>
 
-        <button name="depurar" id="compilar" type="button" class="btn btn-default" title="Compilar" onclick="getCode();">
-          <span class="glyphicon glyphicon-play"></span>
-        </button>
+        <div style="float:right;">
 
+          <button  id="continuar" type="button" class="btn btn-default" title="Continuar Execução">
+            <span class="glyphicon glyphicon-step-forward"></span>
+          </button>
 
-        <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
-          <span class="glyphicon glyphicon-upload"></span>
-        </button>
+          <button  id="exe_cursor" type="button" class="btn btn-default" title="Executar até o cursor">
+            <span class="glyphicon glyphicon-arrow-down"></span>
+          </button>
 
-        <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
+          <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função" onclick ="byRoutine();">
+            <span class="glyphicon glyphicon-share-alt"></span>
+          </button>
 
-        <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden"onclick="download('arquivo.pse', 'application/octet-stream')">
-          <span class="glyphicon glyphicon-floppy-disk"></span>
-        </button>
+          <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções" onclick="inRoutine();">
+            <span class="glyphicon glyphicon-resize-small"></span>
+          </button>
 
-        <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput();">
-          <span class="glyphicon glyphicon-list-alt"></span>
-        </button>
-
-        <button  id="continuar" type="button" class="btn btn-default" title="Continuar Execução">
-          <span class="glyphicon glyphicon-step-forward"></span>
-        </button>
-
-        <button  id="exe_cursor" type="button" class="btn btn-default" title="Executar até o cursor">
-          <span class="glyphicon glyphicon-arrow-down"></span>
-        </button>
-
-        <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função" onclick ="byRoutine();">
-          <span class="glyphicon glyphicon-share-alt"></span>
-        </button>
-
-        <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções" onclick="inRoutine();">
-          <span class="glyphicon glyphicon-resize-small"></span>
-        </button>
-
-        <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções" onclick="outRoutine();">
-          <span class="glyphicon glyphicon-resize-full"></span>
-        </button>
+          <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções" onclick="outRoutine();">
+            <span class="glyphicon glyphicon-resize-full"></span>
+          </button>
 
 
-        <input type="checkbox" name="checkbox" id="nao_parar" value="value">
-        <label id="lb_nao_parar" for="nao_parar">Não Parar</label>
+          <input type="checkbox" name="checkbox" id="nao_parar" value="value">
+          <label id="lb_nao_parar" for="nao_parar">Não Parar</label>
+
+
+
+          <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
+            <span class="glyphicon glyphicon-upload"></span>
+          </button>
+
+          <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
+
+          <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden"onclick="download('arquivo.pse', 'application/octet-stream')">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+          </button>
+
+          <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput();">
+            <span class="glyphicon glyphicon-list-alt"></span>
+          </button>
+
+          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar" onclick="depurar();">
+            <span class="glyphicon glyphicon-sort"></span>
+          </button>
+
+          <button id="btCompilar" type="button" class="btn btn-default" title="Compilar" onclick="compiler();">
+            <span class="glyphicon glyphicon-cog"></span>
+          </button>
+
+          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar" onclick="getCode();">
+            <span class="glyphicon glyphicon-play"></span>
+          </button>
+
+        </div>
 
         <!-- <button name="depurar" id="compilar" type="button" class="btn btn-default" onclick="mostraItensDepuracao(true)">
         <span class="glyphicon glyphicon-floppy-disk">add</span>
@@ -175,7 +185,7 @@
 <div style="clear:both;"/>
 <br>
 <!--Debug painel -->
-<div class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
+<div id="painelDebug" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
   <div class="panel-heading">
     <h3 class="panel-title">Debug</h3>
   </div>
@@ -196,6 +206,9 @@
 <!--fim debug painel -->
 </div>
 <script>
+
+document.getElementById("painelDebug").style.visibility = "hidden";
+
 var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
   lineNumbers: true,
   mode: "text/x-pascal",

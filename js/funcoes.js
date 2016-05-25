@@ -83,7 +83,7 @@ function runToCursor(){
 	CursorRun = true;
 	debug_op = true;
 	if (pc != 0)
-		call_read = true;
+	call_read = true;
 	interpret();
 
 }
@@ -106,7 +106,7 @@ function inRoutine(){
 		else {
 			stopln = kode[pc].line;
 			if (kode[pc].f == 70)
-				debug = true;
+			debug = true;
 		}
 		interpret();
 	}
@@ -465,6 +465,7 @@ function renderInput(bool) {
 //debug
 function adicionarErro(erro) {
 	var table = document.getElementById("panel-error");
+	document.getElementById("painelDebug").style.visibility = "visible";
 	var row = table.insertRow(1);
 	var cell1 = row.insertCell(0);
 	cell1.innerHTML = erro;
@@ -472,6 +473,7 @@ function adicionarErro(erro) {
 
 function limpaDebug(){
 	$("#panel-error tr:gt(0)").remove();
+	document.getElementById("painelDebug").style.visibility = "hidden";
 }
 
 //fim funcoes debug
@@ -522,7 +524,7 @@ function carregaVariaveis(start){
 			}
 			if(tab[start].typ == "records"){
 				var lv = tab[start].lev;
-					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 				do {
 					start++;
 					adicionarObjetoFilho(tab[start].name, value, start, tab[start].lev, tab[start].adr);

@@ -1229,6 +1229,11 @@ function block(fsys, isfun, level){
                   //if (sy == "semicolon")
                     //insymbol();
                 }
+                else {
+                  if(isOk)
+                    Error(2);
+                  return;
+                }
                 /*if (sy != "endsy"){
                   if (sy == "semicolon")
                     insymbol();

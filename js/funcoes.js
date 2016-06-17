@@ -119,6 +119,8 @@ function outRoutine(){
 	debugger;
 	if(!debug_op){
 		depurar();
+		bydebug = true;
+		interpret();
 	}
 	stopln = out.pop()-1;
 	if(!Number.isNaN(stopln)){
@@ -133,13 +135,16 @@ shortcut.add("Ctrl+F8",function() {outRoutine();});
 
 //passo-a-passo saltando rotinas (step over)
 function byRoutine(){
-	if(debug_op){
+	if(!debug_op){
 		depurar();
+		depurar();
+		bydebug = true;
+		interpret();
 	}
 	limpaLinhaDepurador();
-	stopln = kode[pc].line;
+	stopln = kode[pc].line+1;
 	if (kode[pc].f == 70)
-	debug = true;
+		debug = true;
 	mostraLinhaDepurador(stopln);
 	bydebug = true;
 	interpret();

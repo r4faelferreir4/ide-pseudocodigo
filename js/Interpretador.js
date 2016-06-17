@@ -436,7 +436,7 @@ function interpreter(){//h2
       break;
 
       case 19:
-      h1 = t - ir.y; //{h1 points to base}
+      h1 = t - ir.y; //bytes até a base
       var hx = h1;    //Posição de inicio da pilha do procedimento ou função
       switch (ir.x) {//espaço para o retorno da função
         case "reals": h1 += TAM_REAL; break;

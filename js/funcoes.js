@@ -82,8 +82,11 @@ function runToCursor(){
 	stopln = editor.getCursor().line-1;
 	CursorRun = true;
 	debug_op = true;
-	if (pc != 0)
-	call_read = true;
+	if(!debug_op){
+		depurar();
+		indebug = true;
+		interpret();
+	}
 	interpret();
 
 }
@@ -99,37 +102,30 @@ function inRoutine(){
 	}
 	else {
 		indebug = true;
-		if (kode[pc].f == 18){
-			stopln = kode[tab[kode[pc].y].adr].line-1;
-			mostraLinhaDepurador(stopln);
-		}
-		else {
-			stopln = kode[pc].line;
-			if (kode[pc].f == 70)
-			debug = true;
-		}
+		stopln = kode[pc].line;
 		interpret();
 	}
 
 }
 shortcut.add("F7",function() {inRoutine();});
 
+//Executar até o finalInst
+shortcut.add("Ctrl+F7", function(){FinishIt();});
+function FinishIt(){
+	indebug = false;
+	bydebug = false;
+	runToCursor = false;
+	outdebug = false;
+	interpret();
+}
+
 //Executar até sair da rotina(step out)
 function outRoutine(){
 	debugger;
-	if(!debug_op){
-		depurar();
-		bydebug = true;
-		interpret();
-	}
-	stopln = out.pop()-1;
-	if(!Number.isNaN(stopln)){
-		limpaLinhaDepurador();
-		mostraLinhaDepurador(stopln);
-		outdebug = true;
-		debug = false;
-		interpret();
-	}
+	outdebug = true;
+	sNumber = getNumberStacks();
+	debug = false;
+	interpret();
 }
 shortcut.add("Ctrl+F8",function() {outRoutine();});
 
@@ -137,17 +133,21 @@ shortcut.add("Ctrl+F8",function() {outRoutine();});
 function byRoutine(){
 	if(!debug_op){
 		depurar();
-		depurar();
-		bydebug = true;
+		indebug = true;
 		interpret();
 	}
-	limpaLinhaDepurador();
-	stopln = kode[pc].line+1;
-	if (kode[pc].f == 70)
-		debug = true;
-	mostraLinhaDepurador(stopln);
-	bydebug = true;
-	interpret();
+	else{
+		if(kode[pc].f == 18){
+			sNumber = getNumberStacks();
+			debug_op = true;
+			stopln = kode[pc].line;
+			bydebug = true;
+			interpret();
+		}
+		else
+			inRoutine();
+	}
+
 
 }
 shortcut.add("F8",function() {byRoutine();});
@@ -307,7 +307,7 @@ function atualizarConsole(string){
 //Imprime erros no console debug abaixo do editor
 function mostraErro(){
 	limpaDebug();
-	adicionarErro(MsgErro+"\nTempo de compilação: "+time+" ms.");
+	adicionarErro(MsgErro+"\nTempo de compilação: "+(time != undefined)?time:0+" ms.");
 }
 
 
@@ -496,6 +496,10 @@ function removerTopoPilha() {
 	document.getElementById("tab_logic").deleteRow(1);
 }
 
+function getNumberStacks(){
+	return document.getElementById("tab_logic").rows.length - 1;
+}
+
 function removerTodaPilhaFuncoes(){
 	$("#tab_logic tr:gt(0)").remove();
 }
@@ -515,8 +519,10 @@ function carregaVariaveis(start){
 				value = s.getFloat64(display[tab[start].lev]+tab[start].adr);
 				break;
 				case "chars":
+				value = String.fromCharCode(s.getUint8(display[tab[start].lev]+tab[start].adr));
+				break;
 				case "bools":
-				value = s.getUint8(display[tab[start].lev]+tab[start].adr);
+				value = (s.getUint8(display[tab[start].lev]+tab[start].adr) == 0)?"falso":"verdadeiro";
 				break;
 				case "strings":
 				if (str_tab[s.getInt32(display[tab[start].lev]+tab[start].adr)] != undefined)
@@ -575,13 +581,16 @@ function atualizaVariavel(adr, value, typ){
 			var input = document.getElementById(objeto.idtab);
 			if (input !== null) {
 				if(typ == "bools"){
-					if(value == 1)
-					input.value = "verdadeiro";
+					if(value != 0)
+						input.value = "verdadeiro";
 					else
-					input.value = "falso";
+						input.value = "falso";
+				}
+				else if(typ == "chars"){
+					input.value = String.fromCharCode(input.value);
 				}
 				else
-				input.value = value;
+					input.value = value;
 			}
 		}
 	}
@@ -691,21 +700,20 @@ function eachObjetoTabela(objeto){
 }
 
 function salvar(){
-	debugger;
-	arrayObjetoTabela.forEach(eachObjetoTabela);
-	/*
-	for (var i = 0; i < arrayObjetoTabela.length; i++) {
-	var objeto = arrayObjetoTabela[i];
-	var input = document.getElementById(objeto.idinput);
-	if (input !== null && input !== undefined) {
-	objeto.novoValor = input.value;
-	if (s[objeto.posValor] !== objeto.novoValor) {
-	s[objeto.posValor] = objeto.novoValor;
-}
-}
-}
-*/
-desativarTabelaVar();
+		arrayObjetoTabela.forEach(eachObjetoTabela);
+		/*
+		for (var i = 0; i < arrayObjetoTabela.length; i++) {
+		var objeto = arrayObjetoTabela[i];
+		var input = document.getElementById(objeto.idinput);
+		if (input !== null && input !== undefined) {
+		objeto.novoValor = input.value;
+		if (s[objeto.posValor] !== objeto.novoValor) {
+		s[objeto.posValor] = objeto.novoValor;
+		}
+		}
+		}
+		*/
+		desativarTabelaVar();
 }
 //funcao para atualizar todas as variaveis
 function atualizarTodasVar(){

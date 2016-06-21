@@ -3,7 +3,6 @@ function interpreter(){//h2
     ir = kode[pc];
     pc++;
     ocnt++;
-    debugger;
     if (debug_op){
       if(ir.line != linecount){
         incrementar(ir.line);
@@ -32,14 +31,14 @@ function interpreter(){//h2
             }
           }
         }
-        if(outdebug){
+        /*if(outdebug){
           debug = false;
           outdebug = false;
           call_read = true;
           limpaLinhaDepurador();
           mostraLinhaDepurador(ir.line);
           return;
-        }
+        }*/
         if(CursorRun){
           if(stopln == ir.line-1){
             debug = false;
@@ -51,15 +50,18 @@ function interpreter(){//h2
           }
         }
         if(bydebug){
-          debug = false;
-          bydebug = false;
-          call_read = true;
-          limpaLinhaDepurador();
-          mostraLinhaDepurador(ir.line);
-          return;
+          debugger;
+          if(sNumber >= getNumberStacks()){
+            debug = false;
+            bydebug = false;
+            call_read = true;
+            limpaLinhaDepurador();
+            mostraLinhaDepurador(ir.line);
+            return;
+          }
         }
       }
-      else {
+      else {/*
         if(indebug){
           if(ir.f == 18){
             debug = false;
@@ -69,7 +71,7 @@ function interpreter(){//h2
             mostraLinhaDepurador(ir.line);
             return;
           }
-        }
+        }*/
       }
     }
     switch(ir.f){
@@ -126,8 +128,7 @@ function interpreter(){//h2
         display[h1] = h3;
         h1--;
         h3 = s.getInt32(h3 + 2*TAM_INT);
-      }
-      while( h1 == h2);
+      }while( h1 == h2);
       break;
 
       case 8:
@@ -195,7 +196,7 @@ function interpreter(){//h2
       break;
       case 10://pulo incondicional
       pc = ir.y;
-      if(indebug || bydebug){
+      if(indebug){
         stopln = kode[pc].line;
         limpaLinhaDepurador();
         mostraLinhaDepurador(stopln);
@@ -205,11 +206,10 @@ function interpreter(){//h2
       case 11:    //pulo condicional
       if (!s.getInt8(t-TAM_BOOL)){
         pc = ir.y;
-        if(indebug || bydebug){
-          stopln = kode[pc].line;
+        if(indebug){
+          stopln = kode[pc].line-1;
           limpaLinhaDepurador();
-          mostraLinhaDepurador(stopln);
-          stopln--;
+          mostraLinhaDepurador(stopln+1);
         }
       }
       t -= TAM_BOOL;
@@ -236,7 +236,7 @@ function interpreter(){//h2
         if (kode[h2].f != 13){
           if (kode[h2].f == 10){
             pc = (kode[h2].y == 0)? h2+1 : kode[h2].y;
-            if(indebug || bydebug){
+            if(indebug){
               stopln = kode[pc].line;
               limpaLinhaDepurador();
               mostraLinhaDepurador(stopln);
@@ -252,7 +252,7 @@ function interpreter(){//h2
           if (kode[h2].y == h1){
             h3 = 1;
             pc = kode[h2 + 1].y;
-            if(indebug || bydebug){
+            if(indebug){
               stopln = kode[pc].line;
               limpaLinhaDepurador();
               mostraLinhaDepurador(stopln);
@@ -274,7 +274,7 @@ function interpreter(){//h2
         else{
           t -= TAM_INT*4;
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -290,7 +290,7 @@ function interpreter(){//h2
         else{
           t -= TAM_REAL*3+TAM_INT;
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -307,7 +307,7 @@ function interpreter(){//h2
         if (h1 <= s.getInt32(t-TAM_INT * 2)){
           s.setInt32(h2, h1);
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             atualizaVariavel(h2, h1);
             limpaLinhaDepurador();
@@ -325,7 +325,7 @@ function interpreter(){//h2
         if (h1 <= s.getFloat64(t-TAM_REAL * 2)){
           s.setFloat64(h2, h1);
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             atualizaVariavel(h2, h1);
             limpaLinhaDepurador();
@@ -348,7 +348,7 @@ function interpreter(){//h2
         else{
           pc = ir.y;
           t -= TAM_INT * 4;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -367,7 +367,7 @@ function interpreter(){//h2
         else{
           pc = ir.y;
           t -= TAM_REAL * 3 + TAM_INT;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -384,7 +384,7 @@ function interpreter(){//h2
         if (h1 >= s.getInt32(t - TAM_INT * 2)){
           s.setInt32(h2, h1);
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -401,7 +401,7 @@ function interpreter(){//h2
         if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
           s.setFloat64(h2, h1);
           pc = ir.y;
-          if(indebug || bydebug){
+          if(indebug){
             stopln = kode[pc].line;
             limpaLinhaDepurador();
             mostraLinhaDepurador(stopln);
@@ -452,7 +452,7 @@ function interpreter(){//h2
       s.setInt32(h1, pc);
       s.setInt32(h1 + 1*TAM_INT, display[h3]);
       s.setInt32(h1 + 2*TAM_INT, b);
-      if(indebug && !bydebug){
+      if(indebug){
         read_ok = false;
         stopln = kode[tab[h2].adr].line;
         limpaLinhaDepurador();
@@ -829,21 +829,38 @@ function interpreter(){//h2
         t = b+ir.y;        //Função
       }
       pc = s.getInt32(b+ir.y);
-      if(debug_op && !CursorRun && !bydebug){
+      removerTopoPilha();
+      var last = arrayObjetoTabela[arrayObjetoTabela.length - 1];     //Última variável retirada da pilha
+      while (arrayObjetoTabela[arrayObjetoTabela.length-1].lv == last.lv) {
+        if(arrayObjetoTabela[arrayObjetoTabela.length - 1].idtab <= last.idtab){     //Verificação para chamadas recursivas
+          removerTopoPilhaVar();
+          last = arrayObjetoTabela.pop();
+        }
+        else
+          break;
+      }
+      if(indebug){
+        debugger;
         limpaLinhaDepurador();
         mostraLinhaDepurador(kode[pc].line);
-        removerTopoPilha();
         stopln = kode[pc].line-1;
-        var lv = arrayObjetoTabela.pop().lv;
-        removerTopoPilhaVar();
-        while (arrayObjetoTabela[arrayObjetoTabela.length-1].lv == lv) {
-          arrayObjetoTabela.pop();
-          removerTopoPilhaVar();
-        }
       }
       b = s.getInt32(b + 2*TAM_INT+ir.y);
       firstLine.pop();
       out.pop();
+      var marker = document.getElementById("mk_"+kode[pc].line);
+      if(marker != null)
+        marker.innerHTML = marker.innerHTML - 1;
+      if(outdebug && sNumber > getNumberStacks()){
+        stopln = kode[pc].line;
+        limpaLinhaDepurador();
+        mostraLinhaDepurador(stopln);
+        call_read = true;
+        outdebug = false;
+        pc++;
+        ocnt++;
+        return;
+      }
       break;
 
       case 34:
@@ -1427,17 +1444,7 @@ function interpreter(){//h2
           pc = ir.y;
       break;
       case 70:
-        if(debug_op){
-          if (debug){
-            read_ok = false;
-          }
-          else {
-            call_read = true;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(ir.line);
-            return;
-          }
-        }
+        //livre
       break;
       case 71:    //Alocação de memória
         if(ttx+ir.x < stacksize){
@@ -1490,6 +1497,7 @@ function interpret(){
     carregaVariaveis(btab[1].last+1);
     removerTodaPilhaFuncoes();
     adicionarTabelaPilha(progname);
+    limpaContadores();
     limpaConsole();
     interpreter();
   }
@@ -1548,6 +1556,7 @@ function interpret(){
     }
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();
+    removerTodaPilhaFuncoes();
     debug_op = false;
     debug = false;
     mostraItensDepuracao(false);

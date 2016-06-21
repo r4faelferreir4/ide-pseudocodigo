@@ -27,6 +27,7 @@ var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
 var str_tab = [];   //Vetor de listas para armazenar strings
 var finalInst;      //Armazena o índice da última instrução do programa.
+var SourceCode;     //Armazena o código fonte compilado.
 
 //VARIÁVEIS INTERPRETADOR
 var ir; //buffer de instrução
@@ -54,6 +55,7 @@ var bydebug = false;  //operação linha-a-linha pulando rotinas
 var out = [];     //Vetor de posições para saída de funções
 var CursorRun = false;  //Flag para o comando runToCursor;
 var firstLine;      //Irá armazenar a primeira linha da rotina em execução.
+var sNumber;      //StackNumber Armazena o tamanho da pilha de chamadas.
 
 //TIPOS DEFINIDOS
 
@@ -546,22 +548,8 @@ function compiladorPascalS(){
             break;
         }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9") || ch == "_"));
       i = key.indexOf(id);
-      if (i != -1){
+      if (i != -1)
         sy = ksy[i];
-        if (sy == "debugsy"){
-          if(changed){
-            var line = ilnx;
-            do {
-              line--;
-            } while (InputFile[line].length == 0);
-            emit(line, 70);
-          }
-          else
-            emit(linecount, 70);
-          insymbol();
-          return;
-        }
-      }
       else
         sy = "ident";
     }

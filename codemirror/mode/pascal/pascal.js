@@ -17,7 +17,7 @@ CodeMirror.defineMode("pascal", function() {
   var keywords = words("alocamem nulo caso programa fim var const procedimento funcao inicio inteiro real logico string enumerado ponteiro " +
                        "enquanto fimenquanto escreva e ou xou nao repita leia " +
                        "para fimpara se entao fimse retorne de ate passo senao faca " +
-					   "caracter depurar string arranjo registro verdadeiro falso strtmo strbusca strinsere strmax strmin");
+					   "caractere depurar string arranjo registro verdadeiro falso strtmo strbusca strinsere strmax strmin");
 
 
 

@@ -8,11 +8,10 @@ table .collapse.in {
 
 #codeDiv{
   margin:5px 5px 5px 5px;
-  width:100%;
+  width:76.5%;
   height:300px;
   float:left;
 }
-
 #codeExec{
   width:40%;
   height:300px;
@@ -22,9 +21,8 @@ table .collapse.in {
   background: #000000;
   border: 3px double #CCCCCC;
 }
-
-#container{
-  /*width:100%;*/
+#containerCode{
+  width:100%;
   min-height: 400px;
   background-color:#E4E4E4;
 }

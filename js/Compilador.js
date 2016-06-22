@@ -20,7 +20,7 @@ var omax = 63;		//Ordem do código de alto nível
 var xmax = 1000;	//131071 2**17 - 1
 var nmax = 2147643648;	//281474976710655 2**48-1
 var lmax = 10;		//Nível máximo de chamadas de rotinas
-var stacksize = (1024*1024)*5;   //5 megabytes de espaço
+var stacksize = (1024*1024)*10;   //5 megabytes de espaço
 var TAM_REAL = 8;   //Tamanho em bytes do tipo real
 var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
@@ -30,7 +30,7 @@ var finalInst;      //Armazena o índice da última instrução do programa.
 var SourceCode;     //Armazena o código fonte compilado.
 
 //VARIÁVEIS INTERPRETADOR
-var ir; //buffer de instrução
+var ir; //Instrução a ser executada.
 var lncnt, ocnt, blkcnt, chrcnt, pc;//contadores
 var ps = "";
 var ps1 = ["run", "fin", "caschk", "divchk", "inxchk", "stkchk", "linchk",
@@ -39,11 +39,11 @@ var t; //índice do topo da pilha temporária
 var b; //índice base pilha temporária
 var ax; //índice base alocação de memória
 var ttx; //índice do topo de alocação de memória
-var h1, h2, h3, h4;
+var h1, h2, h3, h4;     //Índices auxiliaries para as tabelas
 var fld = new Array(4);//tamanho padrão dos campos
-var display = new Array(lmax);
-var stack = new ArrayBuffer(stacksize);
-var s = new DataView(stack);//new Array(stacksize);
+var display = new Array(lmax);    //Display para acesso aos níveis de escopo
+var stack = new ArrayBuffer(stacksize);     //Pilha de memória.
+var s = new DataView(stack);//Visualizador da pilha
 var call_read = false;  //flag para leitura de informação do teclado
 var read_ok = false;    //flag se já leu uma informação do teclado
 var debug_op = false;  //flag para modo debug
@@ -56,6 +56,7 @@ var out = [];     //Vetor de posições para saída de funções
 var CursorRun = false;  //Flag para o comando runToCursor;
 var firstLine;      //Irá armazenar a primeira linha da rotina em execução.
 var sNumber;      //StackNumber Armazena o tamanho da pilha de chamadas.
+var lineLimit = 200;    //Limite de linhas do console de saída.
 
 //TIPOS DEFINIDOS
 
@@ -141,7 +142,7 @@ var tab = [];   //Tabela de símbolos
 var atab = [];  //Tabela auxiliar arranjos
 var btab = [];  //Tabela auxiliar blocos
 var stab = [];  //Tabela string literal
-var rconst = new Array(c2max);
+var rconst = new Array(c2max);    //Tabela de constantes reais
 var kode = [];
 var iln = 0;  //contador de caracteres total
 var indexmax;  //Tamanho total do código

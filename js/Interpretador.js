@@ -472,7 +472,7 @@ function interpreter(){//h2
       break;
 
       case 20:
-      h1 = ir.y; //{h1 points to atab}
+      h1 = ir.y; //apontador para atab
       h2 = atab[h1].low;
       switch (atab[h1].inxtyp) {
         case "reals":
@@ -504,7 +504,7 @@ function interpreter(){//h2
       break;
 
       case 21:
-      h1 = ir.y; //{h1 points to atab}
+      h1 = ir.y; //apontador para atab
       h2 = atab[h1].low;
       switch (atab[h1].inxtyp) {
         case "reals":
@@ -546,7 +546,6 @@ function interpreter(){//h2
       else
       while (t < h2) {
         t += TAM_INT;
-        //var s1 = new record(s[h1].i, s[h1].r, s[h1].b, s[h1].c);
         s.setInt32(t-TAM_INT, s.getInt32(h1));
         h1 += TAM_INT;
       }

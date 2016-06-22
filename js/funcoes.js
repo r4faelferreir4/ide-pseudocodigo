@@ -298,16 +298,30 @@ function limpaConsole() {
 	document.getElementById("output").value = "";
 }
 
+function StringFilter(str){			//Retorna o final da string no tamanho máximo de linhas delimitado por lineLimit
+	var count = 0, index = str.length;
+	debugger;
+	do {
+		index = str.lastIndexOf('\n', index-1);
+		count++;
+		if(count >= lineLimit || index == -1){
+			return str.substring(index+1);
+		}
+		else
+			index1 = index;
+	} while (true);
+}
+
 //Imprime informações no console de saída
 function atualizarConsole(string){
-	document.getElementById("output").value = document.getElementById("output").value.concat(string);
+	document.getElementById("output").value = StringFilter(document.getElementById("output").value.concat(string));
 	scrollOutput();
 }
 
 //Imprime erros no console debug abaixo do editor
 function mostraErro(){
 	limpaDebug();
-	adicionarErro(MsgErro+"\nTempo de compilação: "+(time != undefined)?time:0+" ms.");
+	adicionarErro(MsgErro+"\nTempo de compilação: "+((time != undefined)?time:0)+" ms.");
 }
 
 

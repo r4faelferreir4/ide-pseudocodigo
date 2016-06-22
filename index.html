@@ -131,11 +131,11 @@
           </div>
           <div id="modalBody" class="modal-body">
             <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
-            <input id="scriptBox" type="text" onkeypress="return runScript(event)" />
+            <input id="scriptBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
           </div>
           <div id="modalFooter" class="modal-footer">
             <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
-            <button type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
+            <button id="btNovamente" type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Esconder</button>
           </div>
         </div>

@@ -1230,4 +1230,14 @@ function mostraItensDepuracao(bool){
 
 	}
 }
+
+
+function mostraBtExecucarNovamente(bool){
+		if (bool) {
+			document.getElementById("btNovamente").style.visibility = "visible";
+		}else{
+			document.getElementById("btNovamente").style.visibility = "hidden";
+		}
+}
+
 mostraItensDepuracao(false);

@@ -536,10 +536,10 @@ function compiladorPascalS(){
     try{
       while(ch == " " || ch == "\t" || ch == "\n")  //Pula espaços em branco
         NextCh();
-      ch = ch.toLowerCase(); //Torna palavras chave case insensitive
-      if(ch >= "a" && ch <= "z"){
+      //ch = ch.toLowerCase();
+      if(isLetter(ch) || ch == "_"){
         k = 0;
-        id = "";      //Seta a variavel id com espaços em branco
+        id = "";
         do{
             k++;
             id += ch;
@@ -547,25 +547,27 @@ function compiladorPascalS(){
           ch = ch.toLowerCase();
           if (cc == 1 || !isOk)
             break;
-        }while(ch != " " && ((ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9") || ch == "_"));
-      i = key.indexOf(id);
+        }while(isLetter(ch) || isNumber(ch) || ch == "_");
+
+      i = key.indexOf(id.toLowerCase());
       if (i != -1)
         sy = ksy[i];
       else
         sy = "ident";
     }
     else {
-      if (ch >= "0" && ch <= "9" && ch != " " && ch != "\t"){
+      if (isNumber(ch)){
         k = 0;
         inum = 0;
         sy = "intcon";
+        debugger;
         do{
           inum = inum * 10 + Number(ch);
           k++;
           NextCh();
           if(!isOk)
             break;
-        }while(ch >= 0 && ch <= 9 && ch != " " && ch != "\t");
+        }while(isNumber(ch));
         if(k > kmax || inum > nmax){
           Error(21);
           inum = 0;
@@ -579,21 +581,21 @@ function compiladorPascalS(){
             sy = "realcon";
             rnum = inum;
             e = 0;
-            while(ch >= 0 && ch <= 9){
+            while(isNumber(ch)){
               e--;
               rnum = 10 * rnum + Number(ch);
               NextCh();
               if(!isOk)
                 break;
             }
-            if (ch == "e")
+            if (ch == "e" && linecount == ilnx)
             readscale();
             if (e !== 0)
             AdjustScale();
           }
         }
         else {
-          if (ch == "e"){
+          if (ch == "e" && ilnx == linecount){
             sy = "realcon";
             rnum = inum;
             e = 0;
@@ -2425,7 +2427,7 @@ function block(fsys, isfun, level){
             }
             else
               if(x.ref != y.ref)
-                Error(46);
+                Error(46, x.typ, y.typ);
               else
                 if (x.typ == "arrays")
                   emit1(ln, 23, atab[x.ref].size);
@@ -2439,7 +2441,7 @@ function block(fsys, isfun, level){
               if(x.typ == 'strings' || fstring){
                 if (x.ref == 1){
                   if (y.typ != "chars"){
-                    Error(46);
+                    Error(46, x.typ, y.typ);
                   }
                   else {
                     if (tab[i].typ != "arrays")
@@ -2478,13 +2480,13 @@ function block(fsys, isfun, level){
                 }
                 else if(x.typ == "ints"){
                   if(y.typ == "reals")
-                    Error(46);
+                    Error(46, x.typ, y.typ);
                 }
                 else
                   if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
                     emit2(ln, 38, x.typ, assign, i);
                   else
-                    Error(46);
+                    Error(46, x.typ, y.typ);
               }
           }
         }
@@ -2957,6 +2959,8 @@ function block(fsys, isfun, level){
               else
               Error(4);
             }
+            if(n == 4)
+              emit1(linecount, 45);
             break;
             case 21:
               if(sy == "lparent")
@@ -3370,6 +3374,7 @@ try{
   enter('strinsere', 'prozedure', 'strings', 21);
   enter('alocamem', "funktion", "pointers", 22);
   enter('escreva', "prozedure", "notyp", 3);
+  enter('escrevaln', 'prozedure', 'notyp', 4);
   enter('', "prozedure", "notyp", 0);
   btab[1].last = t;
   btab[1].lastpar = 1;

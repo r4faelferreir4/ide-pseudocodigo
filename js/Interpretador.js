@@ -1190,8 +1190,8 @@ function interpreter(){//h2
       }
       break;
 
-      case 45:  //livre
-
+      case 45:  //quebra de linha
+        atualizarConsole("\n");
       break;
       case 46://livre
 

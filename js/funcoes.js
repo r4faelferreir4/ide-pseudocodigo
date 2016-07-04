@@ -407,6 +407,22 @@ function getChar(head, pos){		//busca uma caractere em uma posição de uma stri
 	}
 }
 
+function isLetter(char){
+	var a = "a".charCodeAt();
+	var A = "A".charCodeAt();
+	var z = "z".charCodeAt();
+	var Z = "Z".charCodeAt();
+	char = char.charCodeAt();
+	if(char >= a && char <= z || char >= A && char <= Z)
+		return true;
+	else
+		return false;
+}
+
+function isNumber(n){
+	return n in [1,2,3,4,5,6,7,8,9,0];
+}
+
 function alocaVetor(){		//aloca uma posição no vetor de strings
 	var i = 2;
 	while(str_tab[i] !== undefined){

@@ -49,8 +49,21 @@ function MemoryFree(start, length){
 		if(Blocks[i].start < start){
 			var size = Blocks[i].size;
 			Blocks[i].size = start - Blocks[i].start;
-			Blocks.splice(i+1, 0, new MemoryBlock(start+length, size, false));
-		  Blocks.splice(i+1, 0, new MemoryBlock(start, length, true));
+			size -= Blocks[i].size;
+			size -= length;
+			if(size > 0){
+				Blocks.splice(i+1, 0, new MemoryBlock(start+length, size, false));
+				Blocks.splice(i+1, 0, new MemoryBlock(start, length, true));
+			}
+			else{
+				if(Blocks[i+1] instanceof MemoryBlock && Blocks[i+1].isAvailable){
+					Blocks[i+1].start = start;
+					Blocks[i+1].size += length;
+				}
+				else {
+					Blocks.splice(i+1, 0, new MemoryBlock(start, length, true));
+				}
+			}
 		}
 		else{
 			Blocks[i].start += length;

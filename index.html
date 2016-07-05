@@ -18,14 +18,16 @@
   <script src="codemirror/mode/pascal/pascal.js"></script>
 
   <!-- JS e CSS para pagina -->
+  <script async src="js/Declarações.js"></script>
   <script async src="js/shortcuts.js"></script>
-  <script async src="js/funcoes.js"></script>
+  <script async src="js/Auxiliares.js"></script>
+  <script async src="js/Depurador.js"></script>
   <script async src="js/Compilador.js"></script>
   <script async src="js/Interpretador.js"></script>
   <link rel=stylesheet href="css/estilo.css"/>
 
 </head>
-<body>
+<body onload="SetTemplate();">
   <div id="container">
     <!-- Static navbar -->
     <div class="navbar navbar-default" role="navigation">

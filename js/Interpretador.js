@@ -1,4 +1,4 @@
-function interpreter(){//h2
+function interpreter(){
   do {
     ir = kode[pc];
     pc++;
@@ -416,7 +416,7 @@ function interpreter(){//h2
 
       case 18:
       h1 = btab[tab[ir.y].ref].vsize;
-      if (t + h1 > ax){
+      if (t + h1 > StartAddressMemory){
         ps = 'stkchk';
         return;
       }
@@ -539,7 +539,7 @@ function interpreter(){//h2
       h1 = s.getInt32(t-TAM_INT);
       t -= TAM_INT;
       h2 = ir.y + t;
-      if(h2 > ax){
+      if(h2 > StartAddressMemory){
         ps = 'stkchk';
         return;
       }
@@ -565,7 +565,7 @@ function interpreter(){//h2
       break;
 
       case 24://Carrega valor literal na pilha
-      if (t > ax){
+      if (t > StartAddressMemory){
         ps = 'stkchk';
         return;
       }
@@ -1476,8 +1476,8 @@ function interpret(){
     display = [];
     display[1] = 0;
     t = btab[2].vsize;
-    ax = stacksize*0.75;
-    ttx = ax;
+    StartAddressMemory = stacksize*0.75;
+    ttx = StartAddressMemory;
     pc = tab[s.getInt32(12)].adr;
     firstLine = [];
     firstLine.push(kode[pc].line-1);

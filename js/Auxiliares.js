@@ -31,19 +31,21 @@ function MemoryAloc(length){
 //Função para apontar memória livre no gerenciador de memória
 function MemoryFree(start, length){
 	var i;
-	if(start+length >= stacksize){
+	debugger;
+	if(start+length >= Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
 		console.log("Posição de memória não existe.");
 		return;
 	}
 
 	for(i in Blocks)
-		if(start >= Blocks[i].start && start <= Blocks[i].start+Blocks[i].size)
+		if(start >= Blocks[i].start && start < Blocks[i].start+Blocks[i].size)
 			break;
+	i = Number(i);
 
-	if(Blocks[i].isAvailable){
-		console.log("Bloco de memória já liberado");
-		return null;
-	}
+	//if(Blocks[i].isAvailable){
+	//	console.log("Bloco de memória já liberado");
+	//	return null;
+	//}
 
 	if(start+length <= Blocks[i].start+Blocks[i].size){
 		if(Blocks[i].start < start){
@@ -66,20 +68,34 @@ function MemoryFree(start, length){
 			}
 		}
 		else{
-			Blocks[i].start += length;
-			Blocks[i].size -= length;
-			if(Blocks[i-1] instanceof MemoryBlock && Blocks[i-1].isAvailable)
-				Blocks[i-1].size += length;
-			else
-				Blocks.splice(i, 0, new MemoryBlock(Blocks[i].start-length, length, true));
+			if(Blocks[i].size == length){
+				if(Blocks[i-1] instanceof MemoryBlock && Blocks[i-1].isAvailable){
+					Blocks[i-1].size += length;
+					Blocks.splice(i,1);
+				}
+				else
+					i++;
+				if(Blocks[i] instanceof MemoryBlock && Blocks[i].isAvailable){
+					Blocks[i-1].size += Blocks[i].size;
+					Blocks[i-1].isAvailable = true;
+					Blocks.splice(i,1);
+				}
+			}
+			else{
+				Blocks[i].start += length;
+				Blocks[i].size -= length;
+				if(Blocks[i-1] instanceof MemoryBlock && Blocks[i-1].isAvailable)
+					Blocks[i-1].size += length;
+				else
+					Blocks.splice(i, 0, new MemoryBlock(Blocks[i].start-length, length, true));
+			}
 		}
-
 	}
 	else {
-		var LastByte = Blocks[i].size + Blocks[i].start;
-		var CorrectSize = LastByte - start;
+		var firstByte = Blocks[i].size + Blocks[i].start;
+		var CorrectSize = firstByte - start;
 		MemoryFree(start, CorrectSize);
-		MemoryFree(LastByte+1, length);
+		MemoryFree(firstByte, length);
 	}
 
 }

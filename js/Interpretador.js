@@ -1492,6 +1492,7 @@ function interpret(){
     fld[3] = 10;
     fld[4] = 1;
     str_tab = [];
+    SetAllMemoryFree();
     removerTodaPilhaVar();
     carregaVariaveis(btab[1].last+1);
     removerTodaPilhaFuncoes();

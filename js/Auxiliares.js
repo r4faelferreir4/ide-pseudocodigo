@@ -1,38 +1,70 @@
 //Funções de gerenciamento de memória
-//Função para apontar memória ocupada no gerenciador de memória
+//Função para alocar memória no gerenciador de memória
 function MemoryAloc(length){
-	for(var i in Blocks){
-		if (Blocks[i].isAvailable()){
-			if(Blocks[i].size < length){
-				continue;
+	var i, start;
+	debugger;
+	for(i in Blocks)
+		if (Blocks[i].isAvailable && Blocks[i].size >= length)
+			break;
+	i = Number(i);
+
+	if(Blocks[i].size == length){
+		if(Blocks[i-1] instanceof MemoryBlock && !Blocks[i-1].isAvailable){
+			Blocks[i-1].size += length;
+			start = Blocks[i].start;
+			if(Blocks[i+1] instanceof MemoryBlock && !Blocks[i+1].isAvailable){
+				Blocks[i-1].size += Blocks[i+1].size;
+				Blocks.splice(i+1,1);
 			}
-			else if(Blocks[i].size == length){
-				Blocks[i].isAvailable = false;
-				return Blocks[i].start;
-			}
-			else {
-				if(Blocks[i-1].isAvailable){
-					Blocks[i].start += length;
-					Blocks[i].size -= length;
-					Blocks.splice(i, 0, new MemoryBlock(Blocks[i].start-length, length, false));
-					return Blocks[i].start;
-				}
-				else {
-					Blocks[i].start += length;
-					Blocks[i].size -= length;
-					Blocks[i-1].size += length;
-					return Blocks[i].start;
-				}
-			}
+			Blocks.splice(i,1).start;
+			return start;
 		}
+		else if (Blocks[i-1] instanceof MemoryBlock){
+			Blocks[i].isAvailable = false;
+			if(Blocks[i+1] instanceof MemoryBlock && !Blocks[i+1].isAvailable){
+				Blocks[i].size += Blocks[i+1].size;
+				start = Blocks[i].start;
+				Blocks.splice(i+1, 1);
+				return start;
+			}
+			return Blocks[i].start;
+		}
+
+	}
+	if(Blocks[i-1] instanceof MemoryBlock && !Blocks[i-1].isAvailable){
+		Blocks[i-1].size += length;
+		start = Blocks[i].start;
+		Blocks[i].start += length;
+		Blocks[i].size -= length;
+		return start;
+	}
+	else if(Blocks[i-1] instanceof MemoryBlock){
+		start = Blocks[i].start;
+		Blocks[i].start += length;
+		Blocks[i].size -= length;
+		Blocks.splice(i, 0, new MemoryBlock(start, length, false));
+		return start;
+	}
+	else if(i == 0){
+		start = Blocks[0].start;
+		Blocks[0].start += length;
+		Blocks[0].size -= length;
+		Blocks.splice(0, 0, new MemoryBlock(start, length, false));
+		return start;
 	}
 }
 
-//Função para apontar memória livre no gerenciador de memória
+//Função para zerar o gerenciador de memória e liberar todo o espaço
+function SetAllMemoryFree(){
+	Blocks = [];
+	Blocks[0] = new MemoryBlock(StartAddressMemory, stacksize-StartAddressMemory, true);
+}
+
+//Função para liberar espaços de memória alocados.
 function MemoryFree(start, length){
 	var i;
 	debugger;
-	if(start+length >= Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
+	if(start+length > Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
 		console.log("Posição de memória não existe.");
 		return;
 	}
@@ -42,12 +74,9 @@ function MemoryFree(start, length){
 			break;
 	i = Number(i);
 
-	//if(Blocks[i].isAvailable){
-	//	console.log("Bloco de memória já liberado");
-	//	return null;
-	//}
-
 	if(start+length <= Blocks[i].start+Blocks[i].size){
+		if(Blocks[i].isAvailable)
+			return;
 		if(Blocks[i].start < start){
 			var size = Blocks[i].size;
 			Blocks[i].size = start - Blocks[i].start;
@@ -80,6 +109,8 @@ function MemoryFree(start, length){
 					Blocks[i-1].isAvailable = true;
 					Blocks.splice(i,1);
 				}
+				else
+					Blocks[i-1].isAvailable = true;
 			}
 			else{
 				Blocks[i].start += length;
@@ -95,7 +126,7 @@ function MemoryFree(start, length){
 		var firstByte = Blocks[i].size + Blocks[i].start;
 		var CorrectSize = firstByte - start;
 		MemoryFree(start, CorrectSize);
-		MemoryFree(firstByte, length);
+		MemoryFree(firstByte, length-CorrectSize);
 	}
 
 }

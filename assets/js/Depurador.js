@@ -41,6 +41,7 @@ shortcut.add("F9",function() {
 
 //executar o programa
 function reexecute(){
+	if(lastCompiledCode	!= GetHashCode(editor.getValue()))	compiler();
 	if (isOk && isDone && !debug_op){
 		limpaConsole();
 		mostrarModalOutput();

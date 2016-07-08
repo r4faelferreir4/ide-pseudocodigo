@@ -66,7 +66,6 @@ var Blocks = [];   //Vetor de blocos de gerenciamento de memória.
 
 //TIPOS DEFINIDOS
 
-var xstring;  //Não é necessário atribuir uma string com tamanho definido
 var symbol;// = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
 //"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
 //"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
@@ -157,6 +156,7 @@ var isDone = false; //Verifica se o código foi compilado
 var MsgErro = ""; //Mensagem de erro para o usuário.
 var debug;  //flag para ponto de parada da palavra "depurar"
 var time;   //Tempo de compilação/execução
+var lastCompiledCode = 0;	//Hash com o último código fonte compilado.
 function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
   this.name = name;
   this.link = link;

@@ -751,13 +751,6 @@ function interpreter(){
           atualizarConsole(str);
           t -= TAM_INT;
       }
-      //debugger;
-      /*if (ir.y == 4)
-        s[t] = String.fromCharCode(s[t]);
-      var str = "";
-      str += s[t];
-      window.setTimeout(atualizarConsole(str), 1000);
-      t = t - 1;*/
       break;
 
       case 30:
@@ -1193,7 +1186,7 @@ function interpreter(){
       case 45:  //quebra de linha
         atualizarConsole("\n");
       break;
-      case 46://livre
+      case 46://desalocação de memória
 
       break;
 

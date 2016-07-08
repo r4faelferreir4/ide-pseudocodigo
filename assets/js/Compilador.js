@@ -30,11 +30,12 @@ function initArray(){
 }
 
 function compiladorPascalS(){
+  if(lastCompiledCode == GetHashCode(InputFile) && isDone)  return;
+  lastCompiledCode = GetHashCode(InputFile);
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
-
   function ErrorMsg(code){
-    var k, Msg = [];
+    var k, Msg = [];//registro
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
     Msg[4] = "Está faltando o delimitador \')\'."; Msg[5] = "Está faltando o caractere \':\'.";
@@ -54,8 +55,8 @@ function compiladorPascalS(){
     Msg[32] = "Operadores lógicos como \'e\', \'ou\' e \'nao\' só podem ser usados com variáveis ou expressões que resultam em um dado do tipo lógico."; Msg[33] = "tipo de dado não permitido para expressões aritméticas.";
     Msg[34] = "A variável nessa expressão precisa ser do tipo \'inteiro\'."; Msg[35] = "tipo de dado não permitido para expressões relacionais.";
     Msg[36] = "Tipo do parametro incorreto."; Msg[37] = "O identificador "+id+" precisa ser uma variável.";
-    Msg[38] = "A literal do tipo string não pode ser vazia."; Msg[39] = "você está passando parametros não declarados nessa chamada.";
-    Msg[40] = "Tipo de dado não suportado pela instrução \'leia\'."; Msg[41] = "tipo de dado não suportado pela instrução \'escreva\'.";
+    Msg[38] = "A literal do tipo string não pode ser vazia."; Msg[39] = "Você está passando parametros não declarados nessa chamada.";
+    Msg[40] = "Tipo de dado não suportado pela instrução \'leia\'."; Msg[41] = "Tipo de dado não suportado pela instrução \'escreva\'.";
     Msg[42] = ""; Msg[43] = "";
     Msg[44] = "Você não pode introduzir um procedimento em uma expressão"; Msg[45] = "o identificador não é uma variável.";
     Msg[46] = "Tipo incompatível para atribuição."; Msg[47] = "o tipo do rótulo na instrução \'caso\' é incompatível com a variável analisada.";
@@ -68,7 +69,7 @@ function compiladorPascalS(){
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
     Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
-    Msg[64] = "Você precisa informar um identificador na função \'alocamem\'.";
+    Msg[64] = "Você precisa informar um identificador na função \'aloca\'.";
     Msg[65] = "Você precisa informar um tipo ou uma variável para alocar memória.";
     Msg[66] = "Não é permitido introduzir ( e ) após o nome do programa.";
     Msg[67] = "O 1º parâmetro do procedimento \'strinsere\' deve ser do tipo string.";
@@ -357,7 +358,6 @@ function compiladorPascalS(){
     try{
       while(ch == " " || ch == "\t" || ch == "\n")  //Pula espaços em branco
         NextCh();
-      //ch = ch.toLowerCase();
       if(isLetter(ch) || ch == "_"){
         k = 0;
         id = "";
@@ -368,7 +368,6 @@ function compiladorPascalS(){
           if (cc == 1 || !isOk)
             break;
         }while(isLetter(ch) || isNumber(ch) || ch == "_");
-
       i = key.indexOf(id.toLowerCase());
       if (i != -1)
         sy = ksy[i];
@@ -542,6 +541,7 @@ function compiladorPascalS(){
           }
           break;
           case " ":
+          case "?":
           return;
           default:
           if (csps.indexOf(ch) != -1){
@@ -1045,16 +1045,6 @@ function block(fsys, isfun, level){
                     Error(2);
                   return;
                 }
-                /*if (sy != "endsy"){
-                  if (sy == "semicolon")
-                    insymbol();
-                  else {
-                    Error(14);
-                    if (sy == "comma")
-                      insymbol();
-                  }
-                  //test(["ident", "endsy","semicolon"], fsys, 6);*/
-                //}
               }
 
               btab[xtype.rf].vsize = offset;
@@ -1546,13 +1536,13 @@ function block(fsys, isfun, level){
               var i, f;
 
               function standfct(n){
-                var ts;
+                var ts, x = new item();
                 try{
                   if (sy == "lparent")
                     insymbol();
                   else
                     Error(9);
-                  if(n != 22)
+                  if(n != 21)
                     expression(fsys.concat(["rparent", "comma"]), x);
                   switch (n) {
                     case 0:
@@ -1635,7 +1625,90 @@ function block(fsys, isfun, level){
                     }
                     break;
                     case 21:
-                      //livre
+                    debugger;
+                    if(sy == "ident"){
+                      var i = loc(id);
+                      var z = new item();
+                      insymbol();
+                      if(i == 0){
+                        Error(0);
+                        return;
+                      }
+                      z.typ = tab[i].typ;
+                      while(sy == "lbrack" || sy == "period"){
+                        if(sy == "lbrack"){
+                          if(tab[i].typ != "arrays" && tab[i].typ != "strings"){
+                            Error(28);
+                          }
+                          else if(tab[i].typ == "strings")
+                            z.typ = "chars";
+                          else if(tab[i].typ == "arrays")
+                            z.typ = atab[tab[i].ref].eltyp;
+                          while(isOk && sy != "rbrack")
+                            insymbol();
+                          insymbol();
+                        }
+                        else if(tab[i].typ != "records")
+                          Error(31);
+                        else {
+                          insymbol();
+                          if(sy != "ident")
+                            Error(2, "period", loc(id));
+                          else{
+                            var o = btab[tab[i].ref].last;
+                            tab[0].name = id;
+                            while(tab[o].name != id)
+                              o = tab[o].link;
+                            if(o == 0)
+                              Error(0);
+                            z.typ = tab[o].typ;
+                            insymbol();
+                          }
+                        }
+                      }
+                      if(z.typ == "pointers")
+                        z.typ = tab[i].xtyp;
+                      switch (tab[i].obj) {
+                        case "type1":
+                          if(["ints", "reals", "bools", "chars", "strings"].indexOf(z.typ) != -1)
+                            emit1(linecount, 24, tab[i].adr, "ints");
+                          else if(tab[i].typ == "arrays")
+                            emit1(linecount, 24, atab[tab[i].ref].size, "ints");
+                          else if(tab[i].typ == "records")
+                            emit1(linecount, 24, btab[tab[i].ref].vsize, "ints");
+                          else
+                            Error(48);
+                        break;
+                        case "variable":
+                        switch (z.typ) {
+                          case 'reals':
+                            emit1(linecount, 24, TAM_REAL, "ints");
+                          break;
+                          case "pointers":
+                          case 'ints':
+                          case "strings":
+                            emit1(linecount, 24, TAM_INT, "ints");
+                          break;
+                          case "chars":
+                          case "bools":
+                            emit1(linecount, 24, TAM_CHAR, "ints");
+                          break;
+                          default:
+                            if(tab[i].typ == "arrays")
+                              emit1(linecount, 24, atab[tab[i].ref].size, "ints");
+                            else if(tab[i].typ == "records")
+                              emit1(linecount, 24, btab[tab[i].ref].vsize, "ints");
+                            else
+                              Error(48);
+
+                        }
+                        break;
+                      }
+                      x.typ = z.typ;
+                    }
+                    else
+                      Error(2);
+                    ts = ["ints", "strings", "reals", "records", "arrays", "bools", "chars", "pointers"];
                     break;
                     case 22:
                     var length;
@@ -1681,6 +1754,7 @@ function block(fsys, isfun, level){
                       else
                         Error(64);
                     break;
+
                   }
                   if (ts.indexOf(x.typ) != -1)
                     emit1(linecount, 8, n);
@@ -2150,7 +2224,7 @@ function block(fsys, isfun, level){
                   break;
                 }
                 insymbol();
-                if (sy in ["lbrack", "lparent", "period"])
+                if (["lbrack", "lparent", "period"].indexOf(sy))
                   Error(61);
               }
               if(sy == "becomes")
@@ -2831,28 +2905,37 @@ function block(fsys, isfun, level){
                         if(sy == "rparent")
                           insymbol();
                       }
-                      else {
+                      else
                         Error(36, z.typ, "strings");
-                      }
                     }
-                    else {
+                    else
                       Error(36, y.typ, "ints");
-                    }
                   }
-                  else {
+                  else
                     Error(36, x.typ, "strings");
-                  }
                 }
-                else {
+                else
                   Error(62, 3);
-                }
               }
-              else {
+              else
                 Error(62,2);
-              }
             break;
             if (n == 4)
             emit(linecount, 63);
+            break;
+            case 22:
+              if(sy == "lparent"){
+                var x = new item();
+                expression(fsys.concat("rparent"), x);
+                if(x.typ == "ints"){
+                  emit(linecount, 46);
+                  insymbol();
+                }
+                else
+                  Error(36);
+              }
+              else
+                Error(9, x.typ, "ints");
             break;
           }
         }
@@ -3047,7 +3130,7 @@ try{
   key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
-  key[29] = "passo";  key[30] = 'depurar';
+  key[29] = "passo";
   ksy[1] = "andsy"; ksy[2] = "arraysy";
   ksy[3] = 'beginsy'; ksy[4] = "casesy";
   ksy[5] = 'constsy'; ksy[6] = "idiv";
@@ -3062,7 +3145,7 @@ try{
   ksy[23] = 'tosy'; ksy[24] = 'typesy';
   ksy[25] = 'untilsy'; ksy[26] = 'varsy';
   ksy[27] = 'whilesy'; ksy[28] = 'refsy';
-  ksy[29] = "stepsy"; ksy[30] = 'debugsy';
+  ksy[29] = "stepsy";
   sps['+'] = 'plus'; sps['-'] = 'minus';
   sps['*'] = 'times'; sps['/'] = 'rdiv';
   sps['('] = 'lparent'; sps[')'] = 'rparent';
@@ -3134,31 +3217,6 @@ try{
         if(sy == "rparent")
           insymbol();
       }
-      /*if (sy != "lparent")
-      Error(9);
-      else
-      insymbol();
-      /*do{
-        insymbol();
-        if (sy != "ident")
-        Error(2);
-        else {
-          if (id == "input")
-          iflag = true;
-          else
-          if (id == "output")
-          oflag = true;
-          else
-          Error(0);
-          insymbol();
-        }
-      }while(sy == "comma");
-      if (sy == "rparent")
-      insymbol();
-      else
-      Error(4);*/
-      if (!oflag)
-      Error(20);
     }
   }
   enter('', "variable", "notyp", 0);
@@ -3192,7 +3250,9 @@ try{
   enter('strtmo', 'funktion', 'ints', 19);
   enter('strbusca', "funktion", "ints", 20);
   enter('strinsere', 'prozedure', 'strings', 21);
-  enter('alocamem', "funktion", "pointers", 22);
+  enter('aloca', "funktion", "pointers", 22);
+  enter('tmobytes', 'funktion', 'ints', 21);
+  enter('desaloca', 'prozedure', 'notyp', 22);
   enter('escreva', "prozedure", "notyp", 3);
   enter('escrevaln', 'prozedure', 'notyp', 4);
   enter('', "prozedure", "notyp", 0);

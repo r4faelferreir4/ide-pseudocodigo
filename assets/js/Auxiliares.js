@@ -63,7 +63,6 @@ function SetAllMemoryFree(){
 //Função para liberar espaços de memória alocados.
 function MemoryFree(start, length){
 	var i;
-	debugger;
 	if(start+length > Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
 		console.log("Posição de memória não existe.");
 		return;
@@ -128,7 +127,19 @@ function MemoryFree(start, length){
 		MemoryFree(start, CorrectSize);
 		MemoryFree(firstByte, length-CorrectSize);
 	}
+}
 
+//Função para gerar uma hash do código fonte compilado.
+function GetHashCode(str) {
+	debugger;
+  var hash = 0, i;
+  if (str.length == 0)
+		return hash;
+  for (i in str) {
+    hash  = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
 }
 
 
@@ -295,14 +306,14 @@ function isLetter(char){
 	var z = "z".charCodeAt();
 	var Z = "Z".charCodeAt();
 	char = char.charCodeAt();
-	if(char >= a && char <= z || char >= A && char <= Z)
-		return true;
-	else
-		return false;
+	return char >= a && char <= z || char >= A && char <= Z
 }
 
 function isNumber(n){
-	return n in [1,2,3,4,5,6,7,8,9,0];
+	n = n.charCodeAt();
+	var _0 = "0".charCodeAt();
+	var _9 = "9".charCodeAt();
+	return n >= _0 && n <= _9;
 }
 
 function alocaVetor(){		//aloca uma posição no vetor de strings

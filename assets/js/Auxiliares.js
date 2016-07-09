@@ -46,10 +46,18 @@ function MemoryAloc(length){
 		return start;
 	}
 	else if(i == 0){
-		start = Blocks[0].start;
-		Blocks[0].start += length;
-		Blocks[0].size -= length;
-		Blocks.splice(0, 0, new MemoryBlock(start, length, false));
+		if(Blocks[i+1] instanceof MemoryBlock && !Blocks[i+1].isAvailable){
+			Blocks[i+1].start -= length;
+			Blocks[i+1].size += length;
+		  start = Blocks[i+1].start;
+			Blocks.splice(i,1);
+		}
+		else{
+			start = Blocks[0].start;
+			Blocks[0].start += length;
+			Blocks[0].size -= length;
+			Blocks.splice(0, 0, new MemoryBlock(start, length, false));
+		}
 		return start;
 	}
 }
@@ -62,6 +70,7 @@ function SetAllMemoryFree(){
 
 //Função para liberar espaços de memória alocados.
 function MemoryFree(start, length){
+	debugger;
 	var i;
 	if(start+length > Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
 		console.log("Posição de memória não existe.");

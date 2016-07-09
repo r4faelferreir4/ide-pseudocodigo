@@ -31,47 +31,22 @@ function interpreter(){
             }
           }
         }
-        /*if(outdebug){
+        if(CursorRun && stopln == ir.line-1){
           debug = false;
-          outdebug = false;
+          call_read = true;
+          CursorRun = false;
+          limpaLinhaDepurador();
+          mostraLinhaDepurador(ir.line);
+          return;
+        }
+        if(bydebug && sNumber >= getNumberStacks()){
+          debug = false;
+          bydebug = false;
           call_read = true;
           limpaLinhaDepurador();
           mostraLinhaDepurador(ir.line);
           return;
-        }*/
-        if(CursorRun){
-          if(stopln == ir.line-1){
-            debug = false;
-            call_read = true;
-            CursorRun = false;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(ir.line);
-            return;
-          }
         }
-        if(bydebug){
-          debugger;
-          if(sNumber >= getNumberStacks()){
-            debug = false;
-            bydebug = false;
-            call_read = true;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(ir.line);
-            return;
-          }
-        }
-      }
-      else {/*
-        if(indebug){
-          if(ir.f == 18){
-            debug = false;
-            call_read = true;
-            indebug = false;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(ir.line);
-            return;
-          }
-        }*/
       }
     }
     switch(ir.f){
@@ -1186,7 +1161,7 @@ function interpreter(){
       case 45:  //quebra de linha
         atualizarConsole("\n");
       break;
-      case 46://desalocação de memória
+      case 46:
 
       break;
 
@@ -1435,20 +1410,20 @@ function interpreter(){
         if (!s.getUint8(t-TAM_BOOL))
           pc = ir.y;
       break;
-      case 70:
-        //livre
+      case 70:  //Desalocação de memória
+        var address = s.getInt32(t-TAM_INT);
+        MemoryFree(address, ir.y);
+        t -= TAM_INT;
       break;
       case 71:    //Alocação de memória
-        if(ttx+ir.x < stacksize){
-          s.setInt32(t, ttx);
-          t += TAM_INT;
-          ttx += ir.x;
-        }
-        else{
-          atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
-        }
+      debugger;
+      var address = MemoryAloc(s.getInt32(t-TAM_INT));
+      if(address == "undefined")
+        atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
+      else
+        s.setInt32(t-TAM_INT, address);
       break;
-      }//primeiro switch
+      }
     }while (true);
 }
 

@@ -254,7 +254,7 @@ function compiladorPascalS(){
             str += errorName+"º parâmetro.";
           break;
           case 63:
-            str += " A variável informada é do tipo "+errorName+".";
+            str += " A variável informada é do tipo "+((errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "bools")?"logico":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":(errorName =="notyp")?"sem tipo":(errorName == "pointers")?"ponteiro":"")+".";
           break;
           case 66:
             limparCodeBox();
@@ -1211,7 +1211,7 @@ function block(fsys, isfun, level){
           }
           tab[t1].ref = xtype.rf;
           tab[t1].xtyp = xtype.tp;
-          //TestSemicolon();
+          pointer = false;
         }
       }
       catch(err){
@@ -1263,10 +1263,8 @@ function block(fsys, isfun, level){
               dx += xtype.sz;
             else
               dx += TAM_INT;
-            pointer = false;
-
           }
-          //TestSemicolon();
+          pointer = false;
         }
       }
       catch(err){
@@ -3264,7 +3262,7 @@ try{
   enter('strbusca', "funktion", "ints", 20);
   enter('strinsere', 'prozedure', 'strings', 21);
   enter('aloca', "funktion", "pointers", 22);
-  enter('tmobytes', 'funktion', 'ints', 21);
+  enter('bytes', 'funktion', 'ints', 21);
   enter('desaloca', 'prozedure', 'notyp', 22);
   enter('escreva', "prozedure", "notyp", 3);
   enter('escrevaln', 'prozedure', 'notyp', 4);

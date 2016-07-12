@@ -3,6 +3,10 @@
 function MemoryAloc(length){
 	var i, start;
 	debugger;
+	if(length == 0){
+		atualizarConsole("\nERRO! Quantidade de bytes para alocação incorreta. Você está tentando alocar 0 bytes.");
+		return undefined;
+	}
 	for(i in Blocks)
 		if (Blocks[i].isAvailable && Blocks[i].size >= length)
 			break;

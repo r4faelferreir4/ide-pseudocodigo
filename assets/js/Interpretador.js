@@ -571,6 +571,7 @@ function interpreter(){
       break;
 
       case 25://Conversão caracter para string
+      debugger;
       switch (ir.y) {
         case 1:
           var char = s.getUint8(t-TAM_CHAR);
@@ -798,7 +799,7 @@ function interpreter(){
       pc = s.getInt32(b+ir.y);
       removerTopoPilha();
       var last = arrayObjetoTabela[arrayObjetoTabela.length - 1];     //Última variável retirada da pilha
-      while (arrayObjetoTabela[arrayObjetoTabela.length-1].lv == last.lv) {
+      while (arrayObjetoTabela.splice(-1,1) instanceof objetoTabela && arrayObjetoTabela.splice(-1,1).lv == last.lv) {
         if(arrayObjetoTabela[arrayObjetoTabela.length - 1].idtab <= last.idtab){     //Verificação para chamadas recursivas
           removerTopoPilhaVar();
           last = arrayObjetoTabela.pop();

@@ -1,5 +1,5 @@
 
-
+//stab
 function initArray(){
   var j = 0;
   console.log("iniciando tab");
@@ -237,10 +237,10 @@ function compiladorPascalS(){
             str += "\nO tipo permitido para o índice deste arranjo é "+tp+".";
           break;
           case 46:
-            line-=2;
-            limparCodeBox();
-            str = ErrorMsg(code);
-            mostraErroNaLinha(line, str);
+            //line-=2;
+            //limparCodeBox();
+            //str = ErrorMsg(code);
+            //mostraErroNaLinha(line, str);
             var type1 = (errorName == "ints")?"inteiro":(errorName == "reals")?"real":(errorName == "chars")?"caracter":(errorName == "strings")?"string":(errorName == "records")?"registro":(errorName =="notyp")?"sem tipo":(errorName == "pointers")?"ponteiro":"";
             var type2 = (ref == "ints")?"inteiro":(ref == "reals")?"real":(ref == "chars")?"caracter":(ref == "strings")?"string":(ref == "records")?"registro":(ref =="notyp")?"sem tipo":(ref == "pointers")?"ponteiro":"";
             str += " Você está atribuindo um valor "+type2+" a uma variável "+type1+".";
@@ -822,6 +822,7 @@ function block(fsys, isfun, level){
 
     function entervariable(){
       try{
+        debugger;
         if (sy == "ident"){
           enter(id, "variable");
           insymbol();
@@ -1222,6 +1223,7 @@ function block(fsys, isfun, level){
       var t0, t1, rf, sz, tp, pointer = false;
       try{
         insymbol();
+        debugger;
         while(sy == "ident"){
           t0 = t;
           entervariable();
@@ -1490,7 +1492,7 @@ function block(fsys, isfun, level){
         try{
           var result;
           if (types1.indexOf(a) > types1.indexOf("reals") || types1.indexOf(b) > types1.indexOf("reals")){
-            if (a == "strings" || b == "strings")
+            if (a == "strings" || b == "strings" || a == "chars" && b == "chars")
               result = "strings";
             else if((a == "pointers" && b == "ints") || (a == "ints" || b == "pointers"))
               result = "pointers";
@@ -2056,6 +2058,10 @@ function block(fsys, isfun, level){
                 if(y.typ == "strings")
                   if (x.typ == "chars")
                     emit1(linecount, 25, 2);
+                if(y.typ == "chars" && x.typ == "chars" && op == "plus"){
+                  emit1(linecount, 25, 1);
+                  emit1(linecount, 25, 2);
+                }
                 x.typ = resulttype(x.typ, y.typ);
                 switch (x.typ) {
                   case "strings":

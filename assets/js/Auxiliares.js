@@ -326,10 +326,9 @@ function isNumber(n){
 }
 
 function alocaVetor(){		//aloca uma posição no vetor de strings
-	var i = 2;
-	while(str_tab[i] !== undefined){
+	var i = 0;
+	while(str_tab[i] != undefined)
 		i++;
-	}
 	str_tab[i] = new lista();
 	return i;
 }

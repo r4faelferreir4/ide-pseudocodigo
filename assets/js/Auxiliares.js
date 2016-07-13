@@ -1,16 +1,16 @@
 //Funções de gerenciamento de memória
 //Função para alocar memória no gerenciador de memória
 function MemoryAloc(length){
-	var i, start;
-	debugger;
+	var i, start, nBlocks = Blocks.length;
 	if(length == 0){
 		atualizarConsole("\nERRO! Quantidade de bytes para alocação incorreta. Você está tentando alocar 0 bytes.");
 		return undefined;
 	}
-	for(i in Blocks)
+	for(i = 0; i < nBlocks; i = i + 2)
 		if (Blocks[i].isAvailable && Blocks[i].size >= length)
 			break;
-	i = Number(i);
+    else if(!Blocks[i].isAvailable)
+      i--;
 
 	if(Blocks[i].size == length){
 		if(Blocks[i-1] instanceof MemoryBlock && !Blocks[i-1].isAvailable){
@@ -74,17 +74,29 @@ function SetAllMemoryFree(){
 
 //Função para liberar espaços de memória alocados.
 function MemoryFree(start, length){
-	debugger;
-	var i;
+	var i, half, left, right;
 	if(start+length > Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
 		console.log("Posição de memória não existe.");
 		return;
 	}
-
-	for(i in Blocks)
-		if(start >= Blocks[i].start && start < Blocks[i].start+Blocks[i].size)
-			break;
-	i = Number(i);
+  left = 0;
+  right = Blocks.length-1;
+	while(left <= right){
+    half = left+right >> 1;
+		if(start > Blocks[half].start)
+      left = half+1;
+    else
+      right = half-1;
+  }
+  if(Blocks[right].start <= start && start < Blocks[right].start + Blocks[right].size)
+    i = right;
+  else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
+    i = right+1;
+  else{
+    console.log("Não foi encontrado");
+    debugger;
+    return;
+  }
 
 	if(start+length <= Blocks[i].start+Blocks[i].size){
 		if(Blocks[i].isAvailable)
@@ -140,6 +152,34 @@ function MemoryFree(start, length){
 		MemoryFree(start, CorrectSize);
 		MemoryFree(firstByte, length-CorrectSize);
 	}
+}
+
+//Testar gerenciador de memória
+function testBlocks(){
+  var nBlocks = Blocks.length;
+  var i;
+  for (i = 0; i < nBlocks-1; i++){
+    if(Blocks[i].isAvailable && Blocks[i+1].isAvailable)
+      console.log("Índice "+i+" não juntou");
+    if(!Blocks[i].isAvailable && !Blocks[i+1].isAvailable)
+      console.log("Índice "+i+" não juntou");
+    if(Blocks[i].size <= 0)
+      console.log("Índice "+i+" de tamanho inválido.");
+  }
+}
+
+function testAloc(n){
+  var i;
+  var date = new Date;
+  var time = date.getTime();
+  for(i = 0; i < n; i++){
+    if(Math.random() < 0.5)
+      MemoryAloc(Math.random() * 10|1);
+    else
+      MemoryFree(stacksize*Math.random()|1, Math.random() * 10|1);
+  }
+  date = new Date;
+  console.log('Tempo: '+(date.getTime()-time));
 }
 
 //Função para gerar uma hash do código fonte compilado.

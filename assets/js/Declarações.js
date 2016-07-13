@@ -168,9 +168,10 @@ function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
   this.lev = lev;
   this.adr = adr;
 }
-function Tatab(inxtyp, eltyp, elref, low, high, elsize, size){
+function Tatab(inxtyp, eltyp, elxtyp, elref, low, high, elsize, size){
   this.inxtyp = inxtyp;
   this.eltyp = eltyp;
+	this.elxtyp = elxtyp;
   this.elref = elref;
   this.low = low;
   this.high = high;

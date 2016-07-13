@@ -1434,6 +1434,7 @@ function interpret(){
     interpreter();
   }
   else{
+    mostraBtExecucarNovamente(false);
     read_ok = false;
     stack = new ArrayBuffer(stacksize);
     s = new DataView(stack);//new Array(stacksize);
@@ -1530,4 +1531,5 @@ function interpret(){
     debug = false;
     mostraItensDepuracao(false);
     limpaLinhaDepurador();
+    mostraBtExecucarNovamente(true);
 }//interpret

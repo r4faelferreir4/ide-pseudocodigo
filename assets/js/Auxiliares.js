@@ -335,6 +335,13 @@ function getString(head){		//retorna uma string
 		return str;
 	}
 }
+/*function getString(head,length){
+	var str = "";
+	for(var i = head; i <= head+length; i++){
+		str += s.getUint8(i);
+	}
+	return str;
+}*/
 
 function getChar(head, pos){		//busca uma caractere em uma posição de uma string
 	var str = "", i = 1, len;
@@ -352,6 +359,12 @@ function getChar(head, pos){		//busca uma caractere em uma posição de uma stri
 		}
 	}
 }
+
+/*function getChar(head,pos){
+	return s.getUint8(head+pos);
+}*/
+
+
 
 function isLetter(char){
 	var a = "a".charCodeAt();
@@ -398,6 +411,10 @@ function setChar(head, char, pos){		//seta um caractere em uma string
 	}
 }
 
+/*function setChar(head, char, pos){
+	s.setUint8(head+pos, char);
+}*/
+
 function setStr(head, str, pos){
 	var i = 1, len, nhead, nxt;
 	if (head instanceof lista){
@@ -421,8 +438,10 @@ function setStr(head, str, pos){
 	}
 }
 
+
 function mostrarModalOutput(){
 	$('#modalOutput').modal('show');
+	document.getElementById('scriptBox').focus();
 }
 
 function esconderModalOutput(){
@@ -521,7 +540,7 @@ function carregaVariaveis(start){
 			adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 			start++;
 		}
-	} while(tab[start].obj != undefined && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
+	} while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
 }
 
 //objeto auxiliar

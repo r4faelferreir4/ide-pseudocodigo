@@ -812,7 +812,7 @@ function interpreter(){
       }
       break;
 
-      case 34:
+      case 34:    //Carregamento indireto
       switch (ir.y) {
         case TAM_INT:
           s.setInt32(t-TAM_INT, s.getInt32(s.getInt32(t-TAM_INT)));
@@ -821,7 +821,6 @@ function interpreter(){
           s.setFloat64(t-TAM_INT, s.getFloat64(s.getInt32(t-TAM_INT)));
           t += TAM_INT;     //Espaço a mais na conversão inteiro => real
         break;
-        case TAM_BOOL:
         case TAM_CHAR:
           s.setUint8(t-TAM_INT, s.getUint8(s.getInt32(t-TAM_INT)));
           t -= 3;     //Libera espaço da conversão inteiro => caractere
@@ -1336,12 +1335,12 @@ function interpreter(){
             setChar(adr, char, pos);
           }
           else{
-            atualizarConsole("ERRO! Posição não permitida");
+            atualizarConsole("\nERRO! Posição não permitida");
             return;
           }
         }
         else {
-          atualizarConsole("ERRO! Posição não permitida");
+          atualizarConsole("\nERRO! Posição não permitida");
           return;
         }
         s.setInt32(t, adr);

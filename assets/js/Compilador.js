@@ -2406,6 +2406,8 @@ function block(fsys, isfun, level){
                   }
                 }
                 else {
+                  if(x.typ == "strings" && y.typ == "chars")
+                    emit1(ln, 25, 1);
                   emit2(ln, 38, x.typ, assign, i);
                 }
               }

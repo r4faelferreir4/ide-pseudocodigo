@@ -25,7 +25,6 @@ var TAM_REAL = 8;   //Tamanho em bytes do tipo real
 var TAM_INT = 4;    //Tamanho em bytes do tipo inteiro
 var TAM_BOOL = 1;   //Tamanho em bytes do tipo logico
 var TAM_CHAR = 1;   //Tamanho em bytes do tipo caractere
-var str_tab = [];   //Vetor de listas para armazenar strings
 var finalInst;      //Armazena o índice da última instrução do programa.
 var SourceCode;     //Armazena o código fonte compilado.
 
@@ -57,6 +56,7 @@ var CursorRun = false;  //Flag para o comando runToCursor;
 var firstLine;      //Irá armazenar a primeira linha da rotina em execução.
 var sNumber;      //StackNumber Armazena o tamanho da pilha de chamadas.
 var lineLimit = 200;    //Limite de linhas do console de saída.
+var StringLiteral = [];	//Arranjo com os valores literais de string a serem auto liberados após uma operação
 function MemoryBlock(start, size, isAvailable){   //Objeto para gerenciamento de memória
 	this.start = start;
 	this.size = size;

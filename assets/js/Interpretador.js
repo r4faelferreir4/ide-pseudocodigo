@@ -531,7 +531,6 @@ function interpreter(){
       h2 = s.getInt32(t-TAM_INT);
       h3 = h1 + ir.y;
       while (h1 < h3){
-        //var s1 = new record(s[h2].i, s[h2].r, s[h2].b, s[h2].c);
         s.setInt32(h1, s.getInt32(h2));
         h1 += TAM_INT;
         h2 += TAM_INT;
@@ -556,36 +555,25 @@ function interpreter(){
             t += TAM_CHAR;
           break;
           case "strings":
-          var index = alocaVetor();
-          str_tab[index] = new lista();
-          alocaString(ir.y, str_tab[index], true);
-          s.setInt32(t, index);
+          s.setInt32(t, StringAlloc(ir.y, undefined, true));
           t += TAM_INT;
           break;
           default:
             s.setInt32(t, ir.y);
             t += TAM_INT;
         }
-
       }
       break;
 
       case 25://Conversão caracter para string
-      debugger;
       switch (ir.y) {
         case 1:
-          var char = s.getUint8(t-TAM_CHAR);
-          var adr = alocaVetor();
-          alocaString(String.fromCharCode(char), str_tab[adr], true);
-          s.setInt32(t-TAM_CHAR, adr);
+          s.setInt32(t-TAM_CHAR, StringAlloc(String.fromCharCode(s.getUint8(t-TAM_CHAR)), undefined, true));
           t += 3;
         break;
         case 2:
-          var char = s.getUint8(t-TAM_CHAR-TAM_INT);
-          var adr = alocaVetor();
-          alocaString(String.fromCharCode(char), str_tab[adr], true);
           s.setInt32(t-1, s.getInt32(t-TAM_INT));
-          s.setInt32(t-TAM_INT-TAM_CHAR, adr);
+          s.setInt32(t-TAM_INT-TAM_CHAR, StringAlloc(String.fromCharCode(s.getUint8(t-TAM_CHAR-TAM_INT))), undefined, true);
           t += 3;
         break;
       }
@@ -646,24 +634,22 @@ function interpreter(){
           break;
           case 7:
             if (read_ok) {
-              if (s.getInt32(s.getInt32(t-TAM_INT)) == 0){
-                var ref = alocaVetor();
-                s.setInt32(s.getInt32(t-TAM_INT), ref);
-                alocaString(InputFile, str_tab[ref], false);
-                atualizaVariavel(s.getInt32(t-TAM_INT), InputFile);
-                read_ok = false;
-              }
-              else {
-                if (typeof str_tab[s.getInt32(s.getInt32(t-TAM_INT))] == "object"){
-                  alocaString(InputFile, str_tab[s.getInt32(s.getInt32(t - TAM_INT))], false);
-                  read_ok = false;
+              var adr = s.getInt32(s.getInt32(t-TAM_INT));
+              var len = s.getUint8(adr);
+              if(adr == 0)
+                s.setInt32(s.getInt32(t-TAM_INT), StringAlloc(InputFile));
+              else
+                if(len < InputFile.length){
+                    StringFree(adr);
+                    s.setInt32(s.getInt32(t-TAM_INT), StringAlloc(InputFile));
                 }
-                else{
-                  str_tab[s.getInt32(s.getInt32(t - TAM_INT))] = new lista();
-                  alocaString(InputFile, str_tab[s.getInt32(s.getInt32(t-TAM_INT))], false);
-                  read_ok = false;
+                else if(len == InputFile.length)
+                  s.setInt32(s.getInt32(t-TAM_INT), StringAlloc(InputFile, adr));
+                else {
+                  s.setInt32(s.getInt32(t-TAM_INT), StringAlloc(InputFile, adr));
+                  MemoryFree(adr+InputFile.length+1, len - InputFile.length);
                 }
-              }
+              read_ok = false;
             }
             else{
               call_read = true;
@@ -671,7 +657,6 @@ function interpreter(){
             }
           break;
         }
-      //}
       t -= TAM_INT;
       break;
 
@@ -711,9 +696,7 @@ function interpreter(){
           t -= TAM_CHAR;
         break;
         case 7:
-          atualizarConsole(getString(str_tab[s.getInt32(t - TAM_INT)]));
-          if (str_tab[s.getInt32(t - TAM_INT)].destruct)
-            str_tab[s.getInt32(t - TAM_INT)] = undefined;
+          atualizarConsole(getString(s.getInt32(t - TAM_INT)));
           t -= TAM_INT;
         break;
         case 8:
@@ -769,9 +752,7 @@ function interpreter(){
           t -= TAM_CHAR;
         break;
         case 7:
-        atualizarConsole(getString(str_tab[s.getInt32(t - TAM_INT)]));
-        if (str_tab[s.getInt32(t - TAM_INT)].destruct)
-          str_tab[s.getInt32(t - TAM_INT)] = undefined;
+        atualizarConsole(getString(s.getInt32(t - TAM_INT)));
         t -= TAM_INT;
         break;
       }
@@ -879,22 +860,14 @@ function interpreter(){
       if (ir.y == 1){
         switch (ir.x) {
           case "strings":
-          if (str_tab[s.getInt32(t-TAM_INT)].destruct){
-            var adr = alocaVetor();
-            var str = getString(str_tab[s.getInt32(t-TAM_INT)]);
-            str_tab[s.getInt32(t-TAM_INT)] = undefined;
-            alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
-            s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
-            t -= 2*TAM_INT;
+          if(StringLiteral.indexOf(s.getInt32(t-TAM_INT)) != -1){
+            StringLiteral.splice(StringLiteral.indexOf(s.getInt32(t-TAM_INT)));
+            s.setInt32(s.getInt32(t - 2*TAM_INT), StringCopy(s.getInt32(t-TAM_INT)));
+            StringFree(s.getInt32(t-TAM_INT));
           }
-          else {
-            var adr = alocaVetor();
-            alocaString(getString(str_tab[s.getInt32(t-TAM_INT)]), str_tab[adr], false);
-            s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-            atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
-            t -= 2*TAM_INT;
-          }
+          else
+            s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
+          t -= 2*TAM_INT;
           break;
           case "reals":
           s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
@@ -907,7 +880,7 @@ function interpreter(){
           atualizaVariavel(s.getInt32(t-TAM_BOOL-TAM_INT), s.getUint8(t-TAM_BOOL), ir.x);
           t -= TAM_INT+TAM_BOOL;
           break;
-          default:
+          default://ints pointers
           s.setInt32(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT));
           atualizaVariavel(s.getInt32(t - 2*TAM_INT), s.getInt32(t - TAM_INT), ir.x);
           t -= 2*TAM_INT;
@@ -917,24 +890,6 @@ function interpreter(){
         var tx = t;
         for(var i = 1; i <= ir.y; i++){
           switch (ir.x) {
-            case"strings":
-            if (str_tab[s.getInt32(t-TAM_INT)].destruct){
-              var adr = alocaVetor();
-              var str = getString(str_tab[s.getInt32(t-TAM_INT)]);
-              str_tab[s.getInt32(t-TAM_INT)] = undefined;
-              alocaString(str, str_tab[adr], false)   //Aloca uma string fixa na lista
-              s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
-              t -= 2*TAM_INT;
-            }
-            else {
-              var adr = alocaVetor();
-              alocaString(getString(str_tab[s.getInt32(t-TAM_INT)]), str_tab[adr], false);
-              s.setInt32(s.getInt32(t-2*TAM_INT), adr);
-              atualizaVariavel(s.getInt32(t-2*TAM_INT), getString(str_tab[adr]), ir.x);
-              t -= 2*TAM_INT;
-            }
-            break;
             case "reals":
             s.setFloat64(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL));
             atualizaVariavel(s.getInt32(t-TAM_INT-TAM_REAL), s.getFloat64(t-TAM_REAL), ir.x);
@@ -971,16 +926,26 @@ function interpreter(){
           t -= TAM_CHAR;
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, result;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str1 == str2));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        if(StringLength(id1) != StringLength(id2))
+          result = false;
+        else {
+          var i = 0, len = StringLength(id1);
+          id1++;
+          id2++;
+          while(i < len){
+            if(s.getUint8(id1+i) != s.getUint8(id2+i))
+              break;
+            i++;
+          }
+          if(i == len)
+            result = true;
+          else
+            result = false;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         default:
@@ -1000,16 +965,26 @@ function interpreter(){
           t -= 7;   //Libera 7 bytes
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, result;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str1 != str2));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        if(StringLength(id1) != StringLength(id2))
+          result = true;
+        else {
+          var i = 0, len = StringLength(id1);
+          id1++;
+          id2++;
+          while(i < len){
+            if(s.getUint8(id1+i) != s.getUint8(id2+i))
+              break;
+            i++;
+          }
+          if(i == len)
+            result = false;
+          else
+            result = true;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         case "chars":
@@ -1034,16 +1009,23 @@ function interpreter(){
         t -= 7;   //Libera 7 bytes
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, len2, len2, result, i = 0;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str2 < str1));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        len1 = StringLength(id1);
+        len2 = StringLength(id2);
+        while (i < len1 || i < len2) {
+          if(s.getUint8(id2+1+i) < s.getUint8(id1+1+i)){
+            result = true;
+            break;
+          }
+          else if(s.getUint8(id2+1+i) > s.getUint8(id1+1+i)){
+            result = false;
+            break;
+          }
+          i++;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         case "chars":
@@ -1068,16 +1050,23 @@ function interpreter(){
         t -= 7;   //Libera 7 bytes
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, len2, len2, result, i = 0;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str2 <= str1));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        len1 = StringLength(id1);
+        len2 = StringLength(id2);
+        while (i < len1 || i < len2) {
+          if(s.getUint8(id2+1+i) <= s.getUint8(id1+1+i)){
+            result = true;
+            break;
+          }
+          else if(s.getUint8(id2+1+i) > s.getUint8(id1+1+i)){
+            result = false;
+            break;
+          }
+          i++;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         case "chars":
@@ -1102,16 +1091,23 @@ function interpreter(){
         t -= 7;   //Libera 7 bytes
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, len2, len2, result, i = 0;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str2 > str1));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        len1 = StringLength(id1);
+        len2 = StringLength(id2);
+        while (i < len1 && i < len2) {
+          if(s.getUint8(id2+1+i) > s.getUint8(id1+1+i)){
+            result = true;
+            break;
+          }
+          else if(s.getUint8(id2+1+i) < s.getUint8(id1+1+i)){
+            result = false;
+            break;
+          }
+          i++;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         case "chars":
@@ -1136,16 +1132,23 @@ function interpreter(){
         t -= 7;   //Libera 7 bytes
         break;
         case "strings":
-        var id1, id2, str2, str2;
+        var id1, id2, len2, len2, result, i = 0;
         id1 = s.getInt32(t-TAM_INT);
         id2 = s.getInt32(t-2*TAM_INT);
-        str1 = getString(str_tab[id1]);
-        str2 = getString(str_tab[id2]);
-        s.setUint8(t-2*TAM_INT, (str2 >= str1));
-        if (str_tab[id1].destruct)
-          str_tab[id1] = undefined;
-        if (str_tab[id2].destruct)
-          str_tab[id2] = undefined;
+        len1 = StringLength(id1);
+        len2 = StringLength(id2);
+        while (i < len1 || i < len2) {
+          if(s.getUint8(id2+1+i) >= s.getUint8(id1+1+i)){
+            result = true;
+            break;
+          }
+          else if(s.getUint8(id2+1+i) < s.getUint8(id1+1+i)){
+            result = false;
+            break;
+          }
+          i++;
+        }
+        s.setUint8(t-2*TAM_INT, result);
         t -= TAM_INT+3;
         break;
         case "chars":
@@ -1197,35 +1200,8 @@ function interpreter(){
           t -= TAM_INT;
         break;
         case "strings":
-          var str1, str2, id1, id2, adr;
-          id1 = s.getInt32(t-2*TAM_INT);
-          id2 = s.getInt32(t-TAM_INT);
-          str1 = getString(str_tab[id1]);
-          str2 = getString(str_tab[id2]);
-          adr = s.getInt32(s.getInt32(t-3*TAM_INT));
-          if (id1 == adr){
-            alocaString(str1+str2, str_tab[adr], false);
-            t -= TAM_INT;
-            if (str_tab[id2].destruct)
-              str_tab[id2] = undefined;
-          }
-          else if (id2 == adr){
-            alocaString(str1+str2, str_tab[adr], false);
-            s.setInt32(t-2*TAM_INT, adr);
-            t -= TAM_INT;
-            if (str_tab[id1].destruct)
-              str_tab[id1] = undefined;
-          }
-          else {
-            adr = alocaVetor();
-            alocaString(str1+str2, str_tab[adr], false);
-            s.setInt32(t-2*TAM_INT, adr);
-            if (str_tab[id1].destruct)
-              str_tab[id1] = undefined;
-            if (str_tab[id2].destruct)
-              str_tab[id2] = undefined;
-            t -= TAM_INT;
-          }
+          s.setInt32(t-2*TAM_INT, StringAlloc(getString(s.getInt32(t-2*TAM_INT))+getString(s.getInt32(t-TAM_INT))));
+          t -= TAM_INT;
         break;
       }
       break;
@@ -1311,12 +1287,14 @@ function interpreter(){
       break;
 
       case 61://seta uma substring em uma string
-        var str = getString(str_tab[s.getInt32(t-TAM_INT)]);
+        var adr = s.getInt32(t-TAM_INT);
+        var str = getString(s.getInt32(adr));
         t -= TAM_INT;
         var pos = s.getInt32(t-TAM_INT);
         t -= TAM_INT;
-        setStr(str_tab[s.getInt32(t-TAM_INT)], str, pos);
+        var new_adr = setStr(s.getInt32(t-TAM_INT), str, pos);
         t -= TAM_INT;
+        s.setInt32(adr, new_adr);
       break;
 
       case 62: //Pega caracter da posição de uma string
@@ -1326,18 +1304,17 @@ function interpreter(){
         t -= TAM_INT;
         var char;
         if (pos != 0){
-          if (pos < 0){
-            if ((-pos) <= lenString(str_tab[adr]))
-              char = getChar(str_tab[adr], pos);
+          var length = s.getUint8(adr);
+          if(pos > 0 && pos < length){
+            s.setUint8(t, getChar(adr, pos));
+            t += TAM_CHAR;
           }
-          else if(pos <= lenString(str_tab[adr]))
-            char = getChar(str_tab[adr], pos);
-          else{
-            atualizarConsole("ERRO! Posição não permitida");
-            return;
+          else if(pos < 0 && pos > -length){
+            s.setUint8(t, getChar(adr, pos+length+1));
+            t += TAM_CHAR;
           }
-          s.setUint8(t, char);
-          t += TAM_CHAR;
+          else
+            atualizarConsole("Posição de string não existe.");
         }
         else{
           atualizarConsole("Posição 0 não existe");
@@ -1351,11 +1328,13 @@ function interpreter(){
         t -= TAM_CHAR;
         var pos = s.getInt32(t-TAM_INT);
         t -= TAM_INT;
-        if (pos > 0 && pos < lenString(str_tab[adr]))
-          setChar(str_tab[adr], char, pos);
+        if (pos > 0 && pos < StringLength(adr))
+          setChar(adr, char, pos);
         else if(pos < 0){
-          if ((-pos) < lenString(str_tab[adr]))
-            setChar(str_tab[adr], char, pos);
+          if (pos > -StringLength(adr)){
+            pos = StringLength(adr)+pos+1;
+            setChar(adr, char, pos);
+          }
           else{
             atualizarConsole("ERRO! Posição não permitida");
             return;
@@ -1369,39 +1348,25 @@ function interpreter(){
         t += TAM_INT;
       break;
       case 64://Retorna tamanho de uma string
-        s.setInt32(t-TAM_INT, lenString(str_tab[s.getInt32(t-TAM_INT)]));
+        s.setInt32(t-TAM_INT, StringLength(s.getInt32(t-TAM_INT)));
       break;
       case 65:     //Pega endereço de referencia no topo da pilha e converte string para maiúsculo
-        var adr = s.getInt32(t-TAM_INT);
-        var str = getString(str_tab[adr]);
-        str = str.toUpperCase();
-        alocaString(str, str_tab[adr], false);
+        s.setInt32(t-TAM_INT, StringUpper(s.getInt32(t-TAM_INT)));
       break;
       case 66:     //Pega endereço de referência no topo da pilha e converte string para minúsculo
-        var adr = s.getInt32(t-TAM_INT);
-        var str = getString(str_tab[adr]);
-        str = str.toLowerCase();
-        alocaString(str, str_tab[adr], false);
+        s.setInt32(t-TAM_INT, StringLower(s.getInt32(t-TAM_INT)));
       break;
       case 67:    //busca um caracter ou string no topo da pilha em uma string em t-1
+        var adr1;
         if(ir.y == 1){
-          var adr1 = s.getInt32(t-TAM_INT);
+          adr1 = s.getInt32(t-TAM_INT);
           t -= TAM_INT;
-          var str1 = getString(str_tab[adr1]);
-          if (str_tab[adr1].destruct)
-            str_tab[adr1] = undefined;
         }
         else{
-          var str1 = String.fromCharCode(s.getUint8(t-TAM_CHAR));
+          adr1 = StringAlloc(String.fromCharCode(s.getUint8(t-TAM_CHAR)));
           t -= TAM_CHAR;
         }
-        var adr2 = s.getInt32(t-TAM_INT);
-        var str2 = getString(str_tab[adr2]);
-        if (str_tab[adr2].destruct)
-          str_tab[adr2] = undefined;
-        debugger;
-        var result = str1.indexOf(str2)+1;
-        s.setInt32(t-TAM_INT, result);
+        s.setInt32(t-TAM_INT, StringSearch(s.getInt32(t-TAM_INT), adr1));
       break;
       case 68:    //Avaliação curta do operador 'ou'
         if (s.getUint8(t-TAM_BOOL))
@@ -1412,22 +1377,15 @@ function interpreter(){
           pc = ir.y;
       break;
       case 70:  //Desalocação de memória
-        var address = s.getInt32(t-TAM_INT);
-        MemoryFree(address, ir.y);
+        MemoryFree(s.getInt32(t-TAM_INT), ir.y);
         t -= TAM_INT;
       break;
       case 71:    //Alocação de memória
-      debugger;
-      var address = MemoryAloc(s.getInt32(t-TAM_INT));
-      if(address == "undefined")
-        atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
-      else
-        s.setInt32(t-TAM_INT, address);
+        s.setInt32(t-TAM_INT, MemoryAloc(s.getInt32(t-TAM_INT)));
       break;
       }
-    }while (true);
+    }while(true);
 }
-
 function interpret(){
   if (call_read){
     call_read = false;
@@ -1461,7 +1419,7 @@ function interpret(){
     fld[2] = 22;
     fld[3] = 10;
     fld[4] = 1;
-    str_tab = [];
+    StringLiteral = [];
     SetAllMemoryFree();
     removerTodaPilhaVar();
     carregaVariaveis(btab[1].last+1);

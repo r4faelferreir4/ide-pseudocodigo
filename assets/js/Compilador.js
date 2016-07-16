@@ -1411,14 +1411,12 @@ function block(fsys, isfun, level){
                 insymbol();
                 if (v.typ != "arrays"){
                   if (v.typ == "strings"){
-                    x.typ = "chars";
+                    v.typ = "chars";
                     if (!assign)
                       emit1(linecount, 34, TAM_INT);
                     expression(fsys.concat(["comma", "rbrack"]), x);
                     if(x.typ != "ints")
                       Error(59);
-                    else
-                      v.ref = 1;
                   }
                   else
                     Error(28);
@@ -1449,9 +1447,8 @@ function block(fsys, isfun, level){
                 if(atab[a].eltyp != "pointers"){
                   Error(63);
                 }
-                else{
+                else
                   v.typ = atab[a].elxtyp;
-                }
               }
             }
           }while(isOk && ["lbrack", "lparent", "period"].indexOf(sy) != -1);
@@ -1859,7 +1856,7 @@ function block(fsys, isfun, level){
                                 ireference = true;
                                 x.typ = atab[x.ref].elxtyp;
                               }
-                            if (stantyps.indexOf(x.typ) != -1 && x.typ != "strings"){
+                            if (stantyps.indexOf(x.typ) != -1 && tab[i].typ != "strings"){
                               var ltyp;
                               switch (x.typ) {
                                 case "reals": ltyp = TAM_REAL; break;
@@ -1872,15 +1869,13 @@ function block(fsys, isfun, level){
                               else
                                 x.typ = "pointers";
                             }
-                            if (x.typ == "strings" && x.ref == 1){
+                            if (x.typ == "chars" && tab[i].typ == "strings"){
                               x.ref = 0;
-                              x.typ = "chars";
                               emit(linecount, 62);
                             }
-                            else{
+                            else
                               if (x.typ == "strings" && x.ref == 0)
                                 emit1(linecount, 34, TAM_INT);
-                            }
                           }
                           else {
                             if (stantyps.indexOf(x.typ) != -1)
@@ -2341,7 +2336,7 @@ function block(fsys, isfun, level){
           if (x.typ == y.typ)
             if (stantyps.indexOf(x.typ) != -1){
               if(x.typ == "strings" && x.ref == 1){
-                Error(46);
+                Error(46, x.typ, y.typ);
               }
               else{
                 if (tab[i].typ == "strings"){
@@ -2358,6 +2353,8 @@ function block(fsys, isfun, level){
                       else
                         f = 1;
                     emit2(ln, f, tab[i].lev, tab[i].adr, tab[i].typ);
+                    if(fstring)
+                      x.typ = tab[i].typ;
                     emit(ln, 63);
                   }
                 }
@@ -2367,7 +2364,6 @@ function block(fsys, isfun, level){
                   case "mult":emit1(ln, 57, x.typ); break;
                   case "div":emit1(ln, 58, x.typ); break;
                 }
-
                 emit2(ln, 38, x.typ, assign, i);
               }
             }
@@ -2385,7 +2381,7 @@ function block(fsys, isfun, level){
             }
             else
               if(x.typ == 'strings' || fstring){
-                if (x.ref == 1){
+                if (x.typ == 'chars' && fstring){
                   if (y.typ != "chars"){
                     Error(46, x.typ, y.typ);
                   }
@@ -2931,9 +2927,9 @@ function block(fsys, isfun, level){
                       x = new item();
                       x.typ = "strings";
                       if(tab[i].normal)
-                        f = 1;
+                        f = 0;
                       else
-                        f = 2;
+                        f = 1;
                       emit2(linecount, f, tab[i].lev, tab[i].adr, "strings");
                     }
                   }
@@ -2951,9 +2947,8 @@ function block(fsys, isfun, level){
                   if (x.typ == "strings"){
                     if (y.typ == "ints"){
                       if (z.typ == "strings" || z.typ == "chars"){
-                        if(z.typ == "chars"){
+                        if(z.typ == "chars")
                           emit1(linecount, 25, 1);
-                        }
                         emit(linecount, 61);
                         if(sy == "rparent")
                           insymbol();
@@ -3179,10 +3174,7 @@ function block(fsys, isfun, level){
     console.log(err);
   }
 }//block
-
-
 try{
-  //initArray();
   key[1] = 'e'; key[2] = 'arranjo';
   key[3] = 'inicio'; key[4] = 'caso';
   key[5] = 'const'; key[6] = 'div';
@@ -3194,7 +3186,6 @@ try{
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
   key[21] = 'repita'; key[22] = 'entao';
-  //key[23] = 'incrementa';
   key[24] = 'tipos';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
@@ -3324,6 +3315,7 @@ try{
   enter('escreva', "prozedure", "notyp", 3);
   enter('escrevaln', 'prozedure', 'notyp', 4);
   enter('', "prozedure", "notyp", 0);
+  //Inicialização de tabelas
   btab[1] = new Tbtab;
   kode[0] = new order;
   tab[0] = new Ttab;

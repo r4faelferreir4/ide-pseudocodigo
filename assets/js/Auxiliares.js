@@ -4,14 +4,17 @@ function MemoryAloc(length){
 	var i, start, nBlocks = Blocks.length;
 	if(length == 0){
 		atualizarConsole("\nERRO! Quantidade de bytes para alocação incorreta. Você está tentando alocar 0 bytes.");
-		return undefined;
+		return 0;
 	}
 	for(i = 0; i < nBlocks; i = i + 2)
 		if (Blocks[i].isAvailable && Blocks[i].size >= length)
 			break;
     else if(!Blocks[i].isAvailable)
       i--;
-
+	if(i >= nBlocks){
+		atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
+		return 0;
+	}
 	if(Blocks[i].size == length){
 		if(Blocks[i-1] instanceof MemoryBlock && !Blocks[i-1].isAvailable){
 			Blocks[i-1].size += length;
@@ -88,6 +91,7 @@ function MemoryFree(start, length){
     else
       right = half-1;
   }
+	if(right < 0)	right++;
   if(Blocks[right].start <= start && start < Blocks[right].start + Blocks[right].size)
     i = right;
   else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
@@ -278,93 +282,172 @@ function lista(next, c, destruct){
 	this.destruct = destruct;
 }
 
-function alocaString(str, head, destruct, end){//Aloca string reutilizando espaço já alocado
-	if (str !== undefined && head !== undefined){
-		head.c = str.charAt();   //Definindo o inicio da lista
-		head.destruct = destruct;
-		var i = 1;
-		var length = str.length;
-		while(i < length){
-			if (head.next === undefined)
-			head.next = new lista();
-			head = head.next;
-			head.c = str.charAt(i);
-			head.destruct = destruct;
-			i++;
-		}
-		head.next = end;
+function StringAlloc(str, sAddress, SelfDestruct){
+	var i, len = str.length+1, head, head0;
+	if(len > 256)
+		len = 255;
+	if(sAddress == undefined)
+		head = MemoryAloc(len);
+	else
+		head = sAddress;
+	head0 = head;
+	if(SelfDestruct)
+		StringLiteral.unshift(head0);
+	s.setUint8(head, len-1);
+	for(i = 0; i < len; i++){
+		head++;
+		s.setUint8(head, str.charCodeAt(i));
 	}
+	return head0;
 }
 
-function liberaString(head){//Retira as referências para que o coletor de lixo limpe esses dados
-	var Ohead;
-	while(head.next !== undefined){
-		Ohead = head.next;
-		head.next = undefined;
-		head = Ohead;
+function StringCopy(head){
+	if(head == 0)
+		return 0;
+	var len = s.getUint8(head);
+	var sAddress = MemoryAloc(len+1);
+	var i = 0;
+	while (i <= len) {
+		s.setUint8(sAddress+i, s.getUint8(head+i));
+		i++;
 	}
+	return sAddress;
 }
 
-function lenString(head){		//retorna o tamanho de uma string
-	var len = 1;
-	if (head.c === "" && head.next === undefined)
+function StringSearch(head0, head1){
+	var i=1, x=1, len0 = StringLength(head0), len1 = StringLength(head1);
+	if(StringLiteral.indexOf(head0) != -1){
+		StringFree(head0);
+		StringLiteral.splice(StringLiteral.indexOf(head0), 1);
+	}
+	if(StringLiteral.indexOf(head1) != -1){
+		StringFree(head1);
+		StringLiteral.splice(StringLiteral.indexOf(head0), 1);
+	}
+	if(len0 < len1 || len0 == 0 || len1 == 0)
+		return 0;
+	while (i <= len0) {
+		while(getChar(head0, i) == getChar(head1, x))
+			if(x >= len1)
+				return i-len1+1;
+			else{
+				i++;
+				x++;
+			}
+		x = 1;
+		i++;
+	}
 	return 0;
-	else {
-		while(head.next !== undefined){
-			head = head.next;
-			len++;
-		}
-		return len;
-	}
 }
 
-function getString(head){		//retorna uma string
-	var str= "", destruct, destroi;
-	if (head.destruct){
-		destroi = head;
-		destruct = true;
+function StringUpper(head){
+	if (head == 0)
+		return 0;
+	var sLiteral = StringLiteral.indexOf(head);
+	var len = s.getUint8(head);
+	var sAddress;
+	if(sLiteral != -1){
+		sAddress = head;
+		StringLiteral.splice(sLiteral,1);
 	}
-	if (typeof head == "object"){
-		str += head.c;
-		while (head.next !== undefined){
-			head = head.next;
-			str += head.c;
-		}
-		if (destruct)
-		liberaString(destroi);
-		return str;
+	else
+		sAddress = MemoryAloc(len+1);
+	var i = 0;
+	s.setUint8(sAddress, len);
+	sAddress++;
+	head++;
+	while (i < len) {
+		s.setUint8(sAddress+i, String.fromCharCode(s.getUint8(head+i)).toLocaleUpperCase().charCodeAt());
+		i++;
 	}
+	return sAddress-1;
 }
-/*function getString(head,length){
-	var str = "";
-	for(var i = head; i <= head+length; i++){
-		str += s.getUint8(i);
+
+function StringLower(head){
+	if (head == 0)
+		return 0;
+	var sLiteral = StringLiteral.indexOf(head);
+	var len = s.getUint8(head);
+	var sAddress;
+	if(sLiteral != -1){
+		sAddress = head;
+		StringLiteral.splice(sLiteral,1);
+	}
+	else
+		sAddress = MemoryAloc(len+1);
+	var i = 0;
+	s.setUint8(sAddress, len);
+	sAddress++;
+	head++;
+	while (i < len) {
+		s.setUint8(sAddress+i, String.fromCharCode(s.getUint8(head+i)).toLocaleLowerCase().charCodeAt());
+		i++;
+	}
+	return sAddress-1;
+}
+
+function StringFree(head){//Libera memória
+	MemoryFree(head, s.getUint8(head));
+}
+function StringLength(head){	//Retorna o tamanho da string
+	if(head == 0)
+		return 0;
+	return s.getUint8(head);
+}
+function getString(head){	//Retorna a string
+	if(head == 0)
+		return 0;
+	var str = "", len = s.getUint8(head);
+	if(StringLiteral.indexOf(head) != -1){
+		StringLiteral.splice(StringLiteral.indexOf(head), 1);
+		StringFree(head);
+	}
+	head++;
+	for(var i = head; i <= head+len; i++){
+		str += String.fromCharCode(s.getUint8(i));
 	}
 	return str;
-}*/
-
-function getChar(head, pos){		//busca uma caractere em uma posição de uma string
-	var str = "", i = 1, len;
-	if (typeof head == "object"){
-		if (pos < 0){
-			len = lenString(head);
-			pos = len + pos + 1;
-		}
-		while(head !== undefined){
-			if (i == pos)
-			return head.c.charCodeAt();
-			else
-			head = head.next;
-			i++;
-		}
-	}
+}
+function getChar(head,pos){//busca uma caractere em uma posição de uma string
+	if(head == 0 || pos == 0)
+		return 0;
+	return s.getUint8(head+pos);
 }
 
-/*function getChar(head,pos){
-	return s.getUint8(head+pos);
-}*/
-
-
+function setChar(head, char, pos){	//Seta um caractere em uma posição de uma string
+	if(head == 0 || pos == 0)
+		return 0;
+	s.setUint8(head+pos, char);
+}
+function setStr(head, str, pos){		//Seta uma string em outra string
+	var len = str.length + s.getUint8(head);
+	var len0 = s.getUint8(head);
+	var len1 = str.length;
+	var i = 1;
+	if(len >= 256)
+		len = 255;
+	if(pos == 0)
+		return 0;
+	if (pos < 0)
+		pos = pos + 1 + len0;
+	head0 = MemoryAloc(len+1);
+	s.setUint8(head0, len);
+	while (i < pos){
+		s.setUint8(head0+i, s.getUint8(head+i));
+		i++;
+	}
+	var x = 0;
+	while (x < len1){
+		s.setUint8(head0+i, str.charCodeAt(x));
+		i++;x++;
+	}
+	while (pos <= len0) {
+		s.setUint8(head0+i, s.getUint8(head+pos))
+		i++;pos++;
+	}
+	MemoryFree(head, s.getUint8(head));
+	return head0;
+}
 
 function isLetter(char){
 	var a = "a".charCodeAt();
@@ -382,66 +465,9 @@ function isNumber(n){
 	return n >= _0 && n <= _9;
 }
 
-function alocaVetor(){		//aloca uma posição no vetor de strings
-	var i = 0;
-	while(str_tab[i] != undefined)
-		i++;
-	str_tab[i] = new lista();
-	return i;
-}
-
-function setChar(head, char, pos){		//seta um caractere em uma string
-	var i = 1, len;
-	char = String.fromCharCode(char);
-	if (typeof head == "object"){
-		if (pos < 0){
-			len = lenString(head);
-			pos = len + pos + 1;
-		}
-		while(head !== undefined){
-			if (i == pos){
-				head.c = char;
-				return true;
-			}
-			else
-			head = head.next;
-			i++;
-		}
-		return false;
-	}
-}
-
-/*function setChar(head, char, pos){
-	s.setUint8(head+pos, char);
-}*/
-
-function setStr(head, str, pos){
-	var i = 1, len, nhead, nxt;
-	if (head instanceof lista){
-		if (pos < 0){
-			len = lenString(head);
-			pos = len + pos + 1;
-		}
-		while(head !== undefined){
-			if (i == pos){
-				nhead = new lista();
-				nxt = head.next;
-				head.next = nhead;
-				alocaString(str, nhead, false, nxt);
-				return true;
-			}
-			else
-			head = head.next;
-			i++;
-		}
-		return false;
-	}
-}
-
-
 function mostrarModalOutput(){
 	$('#modalOutput').modal('show');
-	document.getElementById('scriptBox').focus();
+	$('#scriptBox').focus();
 }
 
 function esconderModalOutput(){
@@ -504,7 +530,7 @@ function removerTodaPilhaFuncoes(){
 //array de objetos
 var arrayObjetoTabela = [];
 //Carregar variáveis no depurador
-function carregaVariaveis(start){
+function carregaVariaveis(start){//str_tab
 	var value;
 	do {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
@@ -519,8 +545,8 @@ function carregaVariaveis(start){
 				value = (s.getUint8(display[tab[start].lev]+tab[start].adr) == 0)?"falso":"verdadeiro";
 				break;
 				case "strings":
-				if (str_tab[s.getInt32(display[tab[start].lev]+tab[start].adr)] != undefined)
-				value = getString(str_tab[s.getInt32(display[tab[start].lev]+tab[start].adr)]);
+				if (s.getInt32(display[tab[start].lev]+tab[start].adr) != 0)
+				value = getString(s.getInt32(display[tab[start].lev]+tab[start].adr));
 				else
 				value = "";
 				break;
@@ -650,14 +676,14 @@ function removerTodaPilhaVar(){
 	$("#tab_var tr:gt(1)").remove();
 	arrayObjetoTabela = [];
 }
-//funcao para salvar as variaveis editadas
+//funcao para salvar as variaveis editadasstr_tab
 function eachObjetoTabela(objeto){
 	var input = document.getElementById(objeto.idtab);
 	if(input != null){
 		switch (tab[objeto.idtab].typ) {
 			case "strings":
 			var adr = s.getInt32(objeto.adr);
-			alocaString(input.value, str_tab[adr], false);
+			StringAlloc(input.value);
 			break;
 			case "reals":
 			number = Number(input.value);

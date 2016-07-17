@@ -7,10 +7,10 @@ function MemoryAloc(length){
 		return 0;
 	}
 	for(i = 0; i < nBlocks; i = i + 2)
-		if (Blocks[i].isAvailable && Blocks[i].size >= length)
-			break;
-    else if(!Blocks[i].isAvailable)
-      i--;
+	if (Blocks[i].isAvailable && Blocks[i].size >= length)
+	break;
+	else if(!Blocks[i].isAvailable)
+	i--;
 	if(i >= nBlocks){
 		atualizarConsole("Erro na alocação de memória. Estouro de pilha.");
 		return 0;
@@ -56,7 +56,7 @@ function MemoryAloc(length){
 		if(Blocks[i+1] instanceof MemoryBlock && !Blocks[i+1].isAvailable){
 			Blocks[i+1].start -= length;
 			Blocks[i+1].size += length;
-		  start = Blocks[i+1].start;
+			start = Blocks[i+1].start;
 			Blocks.splice(i,1);
 		}
 		else{
@@ -82,29 +82,29 @@ function MemoryFree(start, length){
 		console.log("Posição de memória não existe.");
 		return;
 	}
-  left = 0;
-  right = Blocks.length-1;
+	left = 0;
+	right = Blocks.length-1;
 	while(left <= right){
-    half = left+right >> 1;
+		half = left+right >> 1;
 		if(start > Blocks[half].start)
-      left = half+1;
-    else
-      right = half-1;
-  }
+		left = half+1;
+		else
+		right = half-1;
+	}
 	if(right < 0)	right++;
-  if(Blocks[right].start <= start && start < Blocks[right].start + Blocks[right].size)
-    i = right;
-  else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
-    i = right+1;
-  else{
-    console.log("Não foi encontrado");
-    debugger;
-    return;
-  }
+	if(Blocks[right].start <= start && start < Blocks[right].start + Blocks[right].size)
+	i = right;
+	else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
+	i = right+1;
+	else{
+		console.log("Não foi encontrado");
+		debugger;
+		return;
+	}
 
 	if(start+length <= Blocks[i].start+Blocks[i].size){
 		if(Blocks[i].isAvailable)
-			return;
+		return;
 		if(Blocks[i].start < start){
 			var size = Blocks[i].size;
 			Blocks[i].size = start - Blocks[i].start;
@@ -131,22 +131,22 @@ function MemoryFree(start, length){
 					Blocks.splice(i,1);
 				}
 				else
-					i++;
+				i++;
 				if(Blocks[i] instanceof MemoryBlock && Blocks[i].isAvailable){
 					Blocks[i-1].size += Blocks[i].size;
 					Blocks[i-1].isAvailable = true;
 					Blocks.splice(i,1);
 				}
 				else
-					Blocks[i-1].isAvailable = true;
+				Blocks[i-1].isAvailable = true;
 			}
 			else{
 				Blocks[i].start += length;
 				Blocks[i].size -= length;
 				if(Blocks[i-1] instanceof MemoryBlock && Blocks[i-1].isAvailable)
-					Blocks[i-1].size += length;
+				Blocks[i-1].size += length;
 				else
-					Blocks.splice(i, 0, new MemoryBlock(Blocks[i].start-length, length, true));
+				Blocks.splice(i, 0, new MemoryBlock(Blocks[i].start-length, length, true));
 			}
 		}
 	}
@@ -160,43 +160,43 @@ function MemoryFree(start, length){
 
 //Testar gerenciador de memória
 function testBlocks(){
-  var nBlocks = Blocks.length;
-  var i;
-  for (i = 0; i < nBlocks-1; i++){
-    if(Blocks[i].isAvailable && Blocks[i+1].isAvailable)
-      console.log("Índice "+i+" não juntou");
-    if(!Blocks[i].isAvailable && !Blocks[i+1].isAvailable)
-      console.log("Índice "+i+" não juntou");
-    if(Blocks[i].size <= 0)
-      console.log("Índice "+i+" de tamanho inválido.");
-  }
+	var nBlocks = Blocks.length;
+	var i;
+	for (i = 0; i < nBlocks-1; i++){
+		if(Blocks[i].isAvailable && Blocks[i+1].isAvailable)
+		console.log("Índice "+i+" não juntou");
+		if(!Blocks[i].isAvailable && !Blocks[i+1].isAvailable)
+		console.log("Índice "+i+" não juntou");
+		if(Blocks[i].size <= 0)
+		console.log("Índice "+i+" de tamanho inválido.");
+	}
 }
 
 function testAloc(n){
-  var i;
-  var date = new Date;
-  var time = date.getTime();
-  for(i = 0; i < n; i++){
-    if(Math.random() < 0.5)
-      MemoryAloc(Math.random() * 10|1);
-    else
-      MemoryFree(stacksize*Math.random()|1, Math.random() * 10|1);
-  }
-  date = new Date;
-  console.log('Tempo: '+(date.getTime()-time));
+	var i;
+	var date = new Date;
+	var time = date.getTime();
+	for(i = 0; i < n; i++){
+		if(Math.random() < 0.5)
+		MemoryAloc(Math.random() * 10|1);
+		else
+		MemoryFree(stacksize*Math.random()|1, Math.random() * 10|1);
+	}
+	date = new Date;
+	console.log('Tempo: '+(date.getTime()-time));
 }
 
 //Função para gerar uma hash do código fonte compilado.
 function GetHashCode(str) {
 	debugger;
-  var hash = 0, i;
-  if (str.length == 0)
-		return hash;
-  for (i in str) {
-    hash  = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
+	var hash = 0, i;
+	if (str.length == 0)
+	return hash;
+	for (i in str) {
+		hash  = ((hash << 5) - hash) + str.charCodeAt(i);
+		hash |= 0; // Convert to 32bit integer
+	}
+	return hash;
 }
 
 
@@ -258,7 +258,7 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 			return str.substring(index+1);
 		}
 		else
-			index1 = index;
+		index1 = index;
 	} while (true);
 }
 
@@ -285,14 +285,14 @@ function lista(next, c, destruct){
 function StringAlloc(str, sAddress, SelfDestruct){
 	var i, len = str.length+1, head, head0;
 	if(len > 256)
-		len = 255;
+	len = 255;
 	if(sAddress == undefined)
-		head = MemoryAloc(len);
+	head = MemoryAloc(len);
 	else
-		head = sAddress;
+	head = sAddress;
 	head0 = head;
 	if(SelfDestruct)
-		StringLiteral.unshift(head0);
+	StringLiteral.unshift(head0);
 	s.setUint8(head, len-1);
 	for(i = 0; i < len; i++){
 		head++;
@@ -303,7 +303,7 @@ function StringAlloc(str, sAddress, SelfDestruct){
 
 function StringCopy(head){
 	if(head == 0)
-		return 0;
+	return 0;
 	var len = s.getUint8(head);
 	var sAddress = MemoryAloc(len+1);
 	var i = 0;
@@ -325,15 +325,15 @@ function StringSearch(head0, head1){
 		StringLiteral.splice(StringLiteral.indexOf(head0), 1);
 	}
 	if(len0 < len1 || len0 == 0 || len1 == 0)
-		return 0;
+	return 0;
 	while (i <= len0) {
 		while(getChar(head0, i) == getChar(head1, x))
-			if(x >= len1)
-				return i-len1+1;
-			else{
-				i++;
-				x++;
-			}
+		if(x >= len1)
+		return i-len1+1;
+		else{
+			i++;
+			x++;
+		}
 		x = 1;
 		i++;
 	}
@@ -342,7 +342,7 @@ function StringSearch(head0, head1){
 
 function StringUpper(head){
 	if (head == 0)
-		return 0;
+	return 0;
 	var sLiteral = StringLiteral.indexOf(head);
 	var len = s.getUint8(head);
 	var sAddress;
@@ -351,7 +351,7 @@ function StringUpper(head){
 		StringLiteral.splice(sLiteral,1);
 	}
 	else
-		sAddress = MemoryAloc(len+1);
+	sAddress = MemoryAloc(len+1);
 	var i = 0;
 	s.setUint8(sAddress, len);
 	sAddress++;
@@ -365,7 +365,7 @@ function StringUpper(head){
 
 function StringLower(head){
 	if (head == 0)
-		return 0;
+	return 0;
 	var sLiteral = StringLiteral.indexOf(head);
 	var len = s.getUint8(head);
 	var sAddress;
@@ -374,7 +374,7 @@ function StringLower(head){
 		StringLiteral.splice(sLiteral,1);
 	}
 	else
-		sAddress = MemoryAloc(len+1);
+	sAddress = MemoryAloc(len+1);
 	var i = 0;
 	s.setUint8(sAddress, len);
 	sAddress++;
@@ -391,12 +391,12 @@ function StringFree(head){//Libera memória
 }
 function StringLength(head){	//Retorna o tamanho da string
 	if(head == 0)
-		return 0;
+	return 0;
 	return s.getUint8(head);
 }
 function getString(head){	//Retorna a string
 	if(head == 0)
-		return 0;
+	return 0;
 	var str = "", len = s.getUint8(head);
 	if(StringLiteral.indexOf(head) != -1){
 		StringLiteral.splice(StringLiteral.indexOf(head), 1);
@@ -410,13 +410,13 @@ function getString(head){	//Retorna a string
 }
 function getChar(head,pos){//busca uma caractere em uma posição de uma string
 	if(head == 0 || pos == 0)
-		return 0;
+	return 0;
 	return s.getUint8(head+pos);
 }
 
 function setChar(head, char, pos){	//Seta um caractere em uma posição de uma string
 	if(head == 0 || pos == 0)
-		return 0;
+	return 0;
 	s.setUint8(head+pos, char);
 }
 function setStr(head, str, pos){		//Seta uma string em outra string
@@ -425,11 +425,11 @@ function setStr(head, str, pos){		//Seta uma string em outra string
 	var len1 = str.length;
 	var i = 1;
 	if(len >= 256)
-		len = 255;
+	len = 255;
 	if(pos == 0)
-		return 0;
+	return 0;
 	if (pos < 0)
-		pos = pos + 1 + len0;
+	pos = pos + 1 + len0;
 	head0 = MemoryAloc(len+1);
 	s.setUint8(head0, len);
 	while (i < pos){
@@ -530,8 +530,10 @@ function removerTodaPilhaFuncoes(){
 //array de objetos
 var arrayObjetoTabela = [];
 //Carregar variáveis no depurador
+
 function carregaVariaveis(start){//str_tab
 	var value;
+	console.log("inicio");
 	do {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
 			switch (tab[start].typ) {
@@ -554,16 +556,33 @@ function carregaVariaveis(start){//str_tab
 				value = s.getInt32(display[tab[start].lev]+tab[start].adr);
 			}
 			if(tab[start].typ == "records"){
-				var lv = tab[start].lev;
-				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
-				do {
-					start++;
-					adicionarObjetoFilho(tab[start].name, value, start, tab[start].lev, tab[start].adr);
-				} while (tab[start].lev > lv);
-				continue;
+				// var lv = tab[start].lev;
+				// adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+				// do {
+				// 	start++;
+				// 	adicionarObjetoFilho(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+				// } while (tab[start].lev > lv);
+				// continue;
+				if (tab[start].obj == "variable") {
+					var ref = tab[start].ref;
+					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+					if (ref !== undefined && ref !== 0) {
+						var prox = (btab[ref].last);
+						if (prox !== undefined && prox !== 0) {
+							do {
+								start++;
+								adicionarObjetoFilho(tab[prox].name, value, prox, tab[prox].lev, tab[prox].adr);
+								prox = tab[prox].link;
+							} while (prox !== 0);
+						}
+					}
+				}
+
 			}
-			if(tab[start].obj == "variable" || tab[start].obj == "konstant")
-			adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+			if((tab[start].obj == "variable" || tab[start].obj == "konstant")){
+				console.log(tab[start]);
+				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+			}
 			start++;
 		}
 	} while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
@@ -602,15 +621,15 @@ function atualizaVariavel(adr, value, typ){
 			if (input !== null) {
 				if(typ == "bools"){
 					if(value != 0)
-						input.value = "verdadeiro";
+					input.value = "verdadeiro";
 					else
-						input.value = "falso";
+					input.value = "falso";
 				}
 				else if(typ == "chars"){
 					input.value = String.fromCharCode(input.value);
 				}
 				else
-					input.value = value;
+				input.value = value;
 			}
 		}
 	}
@@ -648,7 +667,7 @@ function adicionarTabelaVar(objeto) {
 
 function adicionaFilhos(objeto){
 	var table = document.getElementById("tab_var");
-	var row = table.insertRow();
+	var row = table.insertRow(3);
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
 
@@ -720,20 +739,20 @@ function eachObjetoTabela(objeto){
 }
 
 function salvar(){
-		arrayObjetoTabela.forEach(eachObjetoTabela);
-		/*
-		for (var i = 0; i < arrayObjetoTabela.length; i++) {
-		var objeto = arrayObjetoTabela[i];
-		var input = document.getElementById(objeto.idinput);
-		if (input !== null && input !== undefined) {
-		objeto.novoValor = input.value;
-		if (s[objeto.posValor] !== objeto.novoValor) {
-		s[objeto.posValor] = objeto.novoValor;
-		}
-		}
-		}
-		*/
-		desativarTabelaVar();
+	arrayObjetoTabela.forEach(eachObjetoTabela);
+	/*
+	for (var i = 0; i < arrayObjetoTabela.length; i++) {
+	var objeto = arrayObjetoTabela[i];
+	var input = document.getElementById(objeto.idinput);
+	if (input !== null && input !== undefined) {
+	objeto.novoValor = input.value;
+	if (s[objeto.posValor] !== objeto.novoValor) {
+	s[objeto.posValor] = objeto.novoValor;
+}
+}
+}
+*/
+desativarTabelaVar();
 }
 //funcao para atualizar todas as variaveis
 function atualizarTodasVar(){
@@ -1253,11 +1272,11 @@ function mostraItensDepuracao(bool){
 
 
 function mostraBtExecucarNovamente(bool){
-		if (bool) {
-			document.getElementById("btNovamente").style.visibility = "visible";
-		}else{
-			document.getElementById("btNovamente").style.visibility = "hidden";
-		}
+	if (bool) {
+		document.getElementById("btNovamente").style.visibility = "visible";
+	}else{
+		document.getElementById("btNovamente").style.visibility = "hidden";
+	}
 }
 
 mostraItensDepuracao(false);

@@ -217,6 +217,15 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
   mode: "text/x-pascal",
   gutters: ["CodeMirror-linenumbers", "breakpoints"]
 });
+editor.on("change", function(){
+    codeChanged = true;
+});
+
+editor.on("gutterClick", function(cm, n) {
+  var info = cm.lineInfo(n);
+  cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : fazerPontoParada());
+});
+
 
 </script>
 <script async>

@@ -146,7 +146,7 @@ function byRoutine(){
 			interpret();
 		}
 		else
-			inRoutine();
+		inRoutine();
 	}
 
 
@@ -255,3 +255,20 @@ function limparCodeBox(){
 $(document).ready(function() {
 	$("body").tooltip({ selector: '[data-toggle=tooltip]' });
 });
+
+//criar um marquer para ponto de parada
+function fazerPontoParada() {
+	var marker = document.createElement("div");
+	marker.style.color = "#822";
+	marker.innerHTML = "●";
+	return marker;
+}
+//verifica se tem ponto parada
+function temPontoParada(n){
+	var info = editor.lineInfo(n);
+	if (info.gutterMarkers !== undefined){
+		return true;
+	}else{
+		return false;
+	}
+}

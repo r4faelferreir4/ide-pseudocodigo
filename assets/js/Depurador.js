@@ -272,3 +272,14 @@ function temPontoParada(n){
 		return false;
 	}
 }
+
+//retorna todas as linhas com ponto de parada
+function getLinhasPontoParada(){
+	var linhas = [];
+	for (var i = 0; i < editor.lineCount(); i++) {
+		if (temPontoParada(i)) {
+			linhas.push(i);
+		}
+	}
+	return linhas;
+}

@@ -534,7 +534,7 @@ var arrayObjetoTabela = [];
 function carregaVariaveis(start){//str_tab
 	var value;
 	console.log("inicio");
-	do {
+	while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "") {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
 			switch (tab[start].typ) {
 				case "reals":
@@ -585,7 +585,7 @@ function carregaVariaveis(start){//str_tab
 			}
 			start++;
 		}
-	} while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "");
+	}
 }
 
 //objeto auxiliar

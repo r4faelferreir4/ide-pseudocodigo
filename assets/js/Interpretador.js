@@ -129,14 +129,14 @@ function interpreter(){
           t -= 3; //Alocação de um valor inteiro de 4 bytes em um de 1 byte, libera 3 bytes
         break;
         case 6:
-          s.setInt32(t-TAM_CHAR, s.getInt8(t-TAM_CHAR));
+          s.setInt32(t-TAM_CHAR, s.getUint8(t-TAM_CHAR));
           t += 3;   //Converção de caratere para inteiro, alocação de mais 3 bytes
         break;
         case 7:
-          s.setUint8(t-TAM_CHAR, (s.getInt8(t-TAM_CHAR)+1));
+          s.setUint8(t-TAM_CHAR, (s.getUint8(t-TAM_CHAR)+1));
         break;
         case 8:
-          s.setUint8(t-TAM_CHAR, (s.getInt8(t-TAM_CHAR)-1));
+          s.setUint8(t-TAM_CHAR, (s.getUint8(t-TAM_CHAR)-1));
         break;
         case 9:
           s.setInt32(t-TAM_REAL, Math.round(s.getFloat64(t-TAM_REAL)));
@@ -179,7 +179,7 @@ function interpreter(){
       }
       break;
       case 11:    //pulo condicional
-      if (!s.getInt8(t-TAM_BOOL)){
+      if (!s.getUint8(t-TAM_BOOL)){
         pc = ir.y;
         if(indebug){
           stopln = kode[pc].line-1;
@@ -687,7 +687,7 @@ function interpreter(){
         break;
         case 3:
           var str = "";
-          str += (s.getInt8(t - TAM_BOOL) == 0)?'falso':'verdadeiro';
+          str += (s.getUint8(t - TAM_BOOL) == 0)?'falso':'verdadeiro';
           atualizarConsole(str);
           t -= TAM_BOOL;
         break;
@@ -738,7 +738,7 @@ function interpreter(){
           t -= TAM_INT;
           for (var p = 0; p < len; p++)
           str += " ";
-          str += s.getInt8(t - TAM_BOOL);
+          str += s.getUint8(t - TAM_BOOL);
           atualizarConsole(str);
           t -= TAM_BOOL;
         break;

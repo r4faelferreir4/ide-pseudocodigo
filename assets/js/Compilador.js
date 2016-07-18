@@ -35,7 +35,7 @@ function compiladorPascalS(){
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
   function ErrorMsg(code){
-    var k, Msg = [];//variável
+    var k, Msg = [];//função
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
     Msg[4] = "Está faltando o delimitador \')\'."; Msg[5] = "Está faltando o caractere \':\'.";
@@ -76,6 +76,7 @@ function compiladorPascalS(){
     Msg[68] = "Você não pode utilizar o operador \'@\' e \'^\' ao mesmo tempo.";
     Msg[69] = "Programa incompleto";
     Msg[70] = "Os rótulos devem ser informados antes do senão na estrutura caso.";
+    Msg[71] = "Você está tentando acessar um valor de retorno de um identificador que não é uma função.";
     return Msg[code];
   }
 
@@ -1305,11 +1306,6 @@ function block(fsys, isfun, level){
             tab[t0].lev = level;
             tab[t0].adr = dx;
             tab[t0].normal = true;
-            /*if(xtype.tp.charAt() == "*"){
-              tab[t0].xtyp = xtype.tp.slice(1, xtype.tp.length);
-              tab[t0].typ = "pointers";
-              xtype.sz = TAM_INT;
-            }*/
             if(!pointer)
               dx += xtype.sz;
             else
@@ -1340,10 +1336,6 @@ function block(fsys, isfun, level){
         tx = t;
         insymbol();
         block(["semicolon"].concat(fsys), isfun, level+1);
-        /*if (sy == "semicolon")
-          insymbol();
-        else
-          Error(14);*/
         var bool = 0;
         len = 0;
         if(isfun){
@@ -1369,7 +1361,7 @@ function block(fsys, isfun, level){
       function selector(fsys, v, assign){
         var x, a, j;
         try{
-          x = new item("", 1);
+          x = new item("", 1);//v.ref
           do{
             if (sy == "period"){
               if (v.typ != "records")
@@ -1462,7 +1454,7 @@ function block(fsys, isfun, level){
       function call(fsys, i){
         var x, lastp, cp, k, line;
         try{
-          x = new item("", 1);
+          x = new item();
           if(changed)
             line = ilnx;
           else
@@ -1533,6 +1525,28 @@ function block(fsys, isfun, level){
           emit2(line, 19, tab[i].typ, btab[tab[i].ref].psize);
           if (tab[i].lev < level)
             emit2(line, 3, tab[i].lev, level);
+          x.typ = tab[i].typ;
+          x.ref = tab[i].ref;
+          while(sy == "lbrack" || sy == "period"){
+            if(tab[i].obj != "funktion"){
+              Error(71);
+              return;
+            }
+            selector(fsys, x, true);
+            if (stantyps.indexOf(x.typ) != -1 && !(x.typ == "chars" && tab[i].typ == "strings")){
+              var ltyp;
+              switch (x.typ) {
+                case "reals": ltyp = TAM_REAL; break;
+                case "chars":
+                case "bools": ltyp = TAM_CHAR; break;
+                default: ltyp = TAM_INT;
+              }
+              emit1(linecount, 34, ltyp);
+            }
+            if (x.typ == "chars" && tab[i].typ == "strings")
+              emit(linecount, 62);
+          }
+          return x.typ;
         }
         catch(err){
           return err;
@@ -1945,7 +1959,7 @@ function block(fsys, isfun, level){
                       case "funktion":
                         x.typ = tab[i].typ;
                         if (tab[i].lev !== 0)
-                          call(fsys,i);
+                          x.typ = call(fsys,i);
                         else
                           standfct(tab[i].adr);
                       break;

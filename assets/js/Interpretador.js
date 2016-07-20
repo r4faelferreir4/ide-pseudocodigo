@@ -703,6 +703,7 @@ function interpreter(){
           var str = "";
           str += (s.getInt32(t-TAM_INT) == 0)?'nulo':s.getInt32(t-TAM_INT);
           atualizarConsole(str);
+          t -= TAM_INT;
         break;
         default:
         var str = "";
@@ -1286,12 +1287,12 @@ function interpreter(){
       break;
 
       case 61://seta uma substring em uma string
-        var adr = s.getInt32(t-TAM_INT);
-        var str = getString(s.getInt32(adr));
+        var str = getString(s.getInt32(t-TAM_INT));
         t -= TAM_INT;
         var pos = s.getInt32(t-TAM_INT);
         t -= TAM_INT;
-        var new_adr = setStr(s.getInt32(t-TAM_INT), str, pos);
+        var adr = s.getInt32(t-TAM_INT);
+        var new_adr = setStr(s.getInt32(adr), str, pos);
         t -= TAM_INT;
         s.setInt32(adr, new_adr);
       break;
@@ -1303,7 +1304,7 @@ function interpreter(){
         t -= TAM_INT;
         var char;
         if (pos != 0){
-          var length = s.getUint8(adr);
+          var length = StringLength(adr);
           if(pos > 0 && pos < length){
             s.setUint8(t, getChar(adr, pos));
             t += TAM_CHAR;
@@ -1365,7 +1366,7 @@ function interpreter(){
           adr1 = StringAlloc(String.fromCharCode(s.getUint8(t-TAM_CHAR)));
           t -= TAM_CHAR;
         }
-        s.setInt32(t-TAM_INT, StringSearch(s.getInt32(t-TAM_INT), adr1));
+        s.setInt32(t-TAM_INT, StringSearch(adr1, s.getInt32(t-TAM_INT)));
       break;
       case 68:    //Avaliação curta do operador 'ou'
         if (s.getUint8(t-TAM_BOOL))

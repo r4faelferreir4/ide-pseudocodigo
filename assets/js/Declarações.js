@@ -101,6 +101,7 @@ function conrec(tp, i, r){
 }
 function xtp(tp, rf, sz){
   this.tp = tp;
+	this.xtyp = tp;
   this.rf = rf;
   this.sz = sz;
 }

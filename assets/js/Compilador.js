@@ -1,5 +1,4 @@
 
-//
 function initArray(){
   var j = 0;
   console.log("iniciando tab");
@@ -111,11 +110,11 @@ function compiladorPascalS(){
         }
     }
     catch(err){
-      return err;
+      console.log(err);
     }
   }
   //Função Error
-  function Error(code, errorName, ref){
+  function Error(code, errorName, ref, lnError){
     try{
       debugger;
       if (isOk){
@@ -124,6 +123,8 @@ function compiladorPascalS(){
         line = linecount;
         if(changed)
           line++;
+        if(lnError != undefined)
+          line = lnError;
         mostraErroNaLinha(line, strError);
         isOk = false;
         str = "";
@@ -268,7 +269,7 @@ function compiladorPascalS(){
       }
     }
     catch(err){
-      return err;
+      console.log(err);
     }
   }
 
@@ -283,7 +284,7 @@ function compiladorPascalS(){
       isOk = false;
     }
     catch(err){
-      return err;
+      console.log(err);
     }
   }
 
@@ -319,7 +320,7 @@ function compiladorPascalS(){
         e = s * sign + e;
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }
 
@@ -353,7 +354,7 @@ function compiladorPascalS(){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }
     try{
@@ -704,42 +705,6 @@ function emit2(line, fct, a, b, c){
   }
 }//emit2
 
-function printtables(){
-  var i;
-  var o = new order();
-  console.log("");
-  console.log("identificadores    link obj typ ref nrm lev adr");
-  for (i = btab[1].last+1; i < t; i++){
-    console.log(i+"       "+tab[i].name+"  "+tab[i].link+"      "+object1.indexOf(tab[i].obj)+"     "+types1.indexOf(tab[i].typ)+"     "+tab[i].ref+"     "+ tab[i].normal.toString()+"     "+tab[i].lev+"     " +tab[i].adr);
-  }
-  console.log("");
-  console.log("blocos       last  lpar  psze  vsze");
-  for(i = 1; i < b; i++)
-  console.log(i+"       "+btab[i].last+"     "+btab[i].lastpar+"     "+btab[i].psize+"     "+btab[i].vsize);
-  console.log("");
-  console.log("arranjos     xtyp  etyp  eref  low  high  elsz  size");
-  for(i = 1; i < a; i++)
-  console.log(i+"       "+types1.indexOf(atab[i].inxtyp)+"     "+types1.indexOf(atab[i].eltyp)+"     "+atab[i].elref+"     "+atab[i].low+"     "+atab[i].high+"     "+atab[i].elsize+"     "+ atab[i].size);
-  console.log("");
-  console.log("código: ");
-  for(i = 0; i < lc-1; i++){
-    if ((i % 5) === 0){
-      console.log("");
-      console.log("      "+i);
-    }
-    o = kode[i];
-    console.log("     " +o.f);
-    if (o.f < 31)
-    if(o.f < 4)
-    console.log("  "+o.x+"     "+o.y);
-    else
-    console.log("       "+o.y);
-    else
-    console.log("        ");
-    console.log(",");
-  }
-  console.log("");
-}
 
 function block(fsys, isfun, level){
     var dx;   //quatidade de bytes usado no procedimento ou função
@@ -760,7 +725,7 @@ function block(fsys, isfun, level){
 
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }
     function test(sx3 ,s1, s2, n){
@@ -770,7 +735,7 @@ function block(fsys, isfun, level){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }
     function TestSemicolon(){
@@ -785,7 +750,7 @@ function block(fsys, isfun, level){
         test("ident", ["ident"].concat(blockbegsys), fsys, 6);
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//TestSemicolon
     function enter(id, k){
@@ -797,27 +762,19 @@ function block(fsys, isfun, level){
           tab[0].name = id;
           j = btab[display[level]].last;
           l = j;
-          //console.log("id: "+id+" display: "+display[level]+" tab: "+tab[j].name+" level: "+level);
           while(isOk && tab[j].name != id)
             j = tab[j].link;
           if (j !== 0)
             Error(1, tab[j].name);
           else {
             t++;
-            tab[t] = new Ttab;
-            tab[t].name = id;
-            tab[t].link = l;
-            tab[t].obj = k;
-            tab[t].typ = "notyp";
-            tab[t].ref = 0;
-            tab[t].lev = level;
-            tab[t].adr = 0;
+            tab[t] = new Ttab(id, l, k, "notyp", "notyp", true, level, 0);
             btab[display[level]].last = t;
           }
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//enter
 
@@ -837,7 +794,7 @@ function block(fsys, isfun, level){
         return j;
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//loc
 
@@ -853,7 +810,7 @@ function block(fsys, isfun, level){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//entervariable
 
@@ -917,12 +874,12 @@ function block(fsys, isfun, level){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//constant
 
     function typ(fsys, xtype, pointer){
-      var x, eltp, elrf, elsz, offset, t0, t1;
+      var x, xtyp ,eltp, elrf, elsz, elxtyp, offset, t0, t1;
       function arraytyp(xtype){
         var eltp, low, high, elrf, elsz;
         try{
@@ -967,43 +924,33 @@ function block(fsys, isfun, level){
               Error(8);
             var xtype3 = new xtp(eltp, elrf, elsz);
             var pointer = false;
-            if(sy == "pointer"){
-              pointer = true;
-              insymbol();
-            }
-            if(sy == "ident"){
-              var ix = loc(id);
-              if(tab[ix].typ == "pointers")
-                pointer = true;
-            }
-            else
-              Error(0);
             typ(fsys, xtype3);
-            if(pointer){
-              eltp = "pointers";
-              elsz = TAM_INT;
-            }
-            else{
-              eltp = xtype3.tp;
-              elsz = xtype3.sz;
-            }
+            eltp = xtype3.tp;
+            elsz = xtype3.sz;
             elrf = xtype3.rf;
+            xtype.tp = "arrays";
+            xtype.xtyp = xtype3.tp;
           }
           xtype.sz = (atab[xtype.rf].high - atab[xtype.rf].low + 1)*elsz;
           atab[xtype.rf].size = xtype.sz;
           atab[xtype.rf].eltyp = eltp;
-          atab[xtype.rf].elxtyp = xtype3.tp;
+          atab[xtype.rf].elxtyp = xtype3.xtyp;
           atab[xtype.rf].elref = elrf;
           atab[xtype.rf].elsize = elsz;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//arraytyp
       try{
         xtype.tp = "notyp";
+        xtype.xtyp = "notyp";
         xtype.rf = 0;
         xtype.sz = 0;
+        if(sy == "pointer"){
+          pointer = true;
+          insymbol();
+        }
         test([], typebegsys, fsys, 10);
         if (typebegsys.indexOf(sy) != -1){
           if (sy == "ident"){
@@ -1012,12 +959,23 @@ function block(fsys, isfun, level){
               if (tab[x].obj != "type1")
                 Error(29);
               else {
-                if(tab[x].typ == "pointers")
-                  xtype.tp = tab[x].xtyp;
+                if(tab[x].typ == "pointers"){
+                  xtype.tp = tab[x].typ;
+                  xtype.xtyp = tab[x].xtyp;
+                }
                 else
                   xtype.tp = tab[x].typ;
                 xtype.rf = tab[x].ref;
-                xtype.sz = tab[x].adr;
+                if(pointer){
+                  xtype.sz = TAM_INT;
+                  xtype.tp = "pointers";
+                  xtype.xtyp = tab[x].typ;
+                }
+                else{
+                  xtype.sz = tab[x].adr;
+                  xtype.tp = tab[x].typ;
+                  xtype.xtyp = tab[x].xtyp;
+                }
                 if(xtype.tp == "notyp")
                   Error(30);
               }
@@ -1035,6 +993,10 @@ function block(fsys, isfun, level){
             }
             xtype.tp = "arrays";
             arraytyp(xtype);
+            if(pointer){
+              xtype.xtyp = xtype.tp;
+              xtype.tp = "pointers";
+            }
           }
           else{
             if (sy == "recordsy"){
@@ -1042,6 +1004,8 @@ function block(fsys, isfun, level){
               EnterBlock();
               xtype.tp = "records";
               xtype.rf = b;
+              tab[t].typ = xtype.tp;
+              tab[t].ref = xtype.rf;
               if (level == lmax)
                 fatal(5);
               level++;
@@ -1063,27 +1027,21 @@ function block(fsys, isfun, level){
                   var xtype2 = new xtp(eltp, elrf, elsz);
                   typ(fsys.concat(["semicolon", "endsy", "comma", "ident"]), xtype2, pointer);
                   eltp = xtype2.tp;
+                  elxtyp = xtype2.xtyp;
                   elrf = xtype2.rf;
                   elsz = xtype2.sz;
                   while(isOk && t0 < t1){
                     t0++;
-                    if(eltp.charAt() != "*")
-                      tab[t0].typ = eltp;
-                    else {
-                      tab[t0].typ = "pointers";
-                      tab[t0].xtyp = eltp.slice(1,eltp.length);
-                    }
+                    tab[t0].typ = eltp;
+                    tab[t0].xtyp = elxtyp;
                     tab[t0].ref = elrf;
                     tab[t0].normal = true;
                     tab[t0].adr = offset;
                     offset += elsz;
                   }
-                  //if (sy == "semicolon")
-                    //insymbol();
                 }
                 else {
-                  if(isOk)
-                    Error(2);
+                  Error(2);
                   return;
                 }
               }
@@ -1098,7 +1056,7 @@ function block(fsys, isfun, level){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//typ
 
@@ -1183,7 +1141,7 @@ function block(fsys, isfun, level){
           Error(4);
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }
 
@@ -1211,11 +1169,10 @@ function block(fsys, isfun, level){
           }
           else
           tab[t].adr = c.i;
-          //TestSemicolon();
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//constantdeclaration
 
@@ -1236,17 +1193,7 @@ function block(fsys, isfun, level){
               insymbol();
           }
           var xtype = new xtp(tp, rf, sz);
-          if(sy == "pointer"){
-            insymbol();
-            pointer = true;
-            tab[t1].typ = "pointers";
-            if(sy == "recordsy")
-              tab[t1].xtyp = "records";
-            else if (sy == "arraysy")
-              tab[t1].xtyp = "arrays";
-            tab[t1].adr = TAM_INT;
-          }
-          typ(["semicolon", "comma", "ident"].concat(fsys), xtype);
+          typ(["semicolon", "comma", "ident"].concat(fsys), xtype, pointer);
           if(pointer){
             tab[t1].typ = "pointers";
             tab[t1].adr = TAM_INT;
@@ -1256,12 +1203,19 @@ function block(fsys, isfun, level){
             tab[t1].adr = xtype.sz;
           }
           tab[t1].ref = xtype.rf;
-          tab[t1].xtyp = xtype.tp;
+          tab[t1].xtyp = xtype.xtyp;
+          if(tab[t1].typ == "records"){
+            var t2 = btab[tab[t1].ref].last;
+            if(tab[t2].typ == "pointers" && tab[t2].xtyp == undefined){
+              tab[t2].xtyp = "records"
+              tab[t2].ref = tab[t1].ref;
+            }
+          }
           pointer = false;
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//typedeclaration
 
@@ -1288,20 +1242,12 @@ function block(fsys, isfun, level){
             if(tab[x].typ == "pointers")
               pointer = true;
           }
-          if(sy == "pointer"){
-            insymbol();
-            pointer = true;
-          }
           var xtype = new xtp(tp, rf, sz);
-          typ(["semicolon", "comma", "ident"].concat(fsys), xtype);
+          typ(["semicolon", "comma", "ident"].concat(fsys), xtype, pointer);
           while(isOk && t0 < t1){
             t0++;
-            if(!pointer)
-              tab[t0].typ = xtype.tp;
-            else{
-              tab[t0].typ = "pointers";
-              tab[t0].xtyp = xtype.tp;
-            }
+            tab[t0].typ = xtype.tp;
+            tab[t0].xtyp = xtype.xtyp;
             tab[t0].ref = xtype.rf;
             tab[t0].lev = level;
             tab[t0].adr = dx;
@@ -1315,7 +1261,7 @@ function block(fsys, isfun, level){
         }
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//variabledeclaration
 
@@ -1351,7 +1297,7 @@ function block(fsys, isfun, level){
         emit1(linecount-1, 32 + bool, len);
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//procdeclaration
 
@@ -1439,15 +1385,32 @@ function block(fsys, isfun, level){
                 if(atab[a].eltyp != "pointers"){
                   Error(63);
                 }
-                else
+                else{
                   v.typ = atab[a].elxtyp;
+                  v.xtyp = "pointers";
+                  if(v.typ != "strings" || !assign){
+                    var ltyp;
+                    switch (v.typ) {
+                      case "reals":
+                        ltyp = TAM_REAL;
+                      break;
+                      case "chars":
+                      case "bools":
+                        ltyp = TAM_CHAR;
+                      break;
+                      default:
+                        ltyp = TAM_INT;
+                    }
+                    emit1(linecount, 34, ltyp);
+                  }
+                }
               }
             }
           }while(isOk && ["lbrack", "lparent", "period"].indexOf(sy) != -1);
           test(["ident", "plus", "minus", "times", "rdiv", "idiv"], fsys.concat("ident", "plus", "minus", "rdiv", "times", "idiv"), "", 6);
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//Selector
 
@@ -1527,7 +1490,7 @@ function block(fsys, isfun, level){
             emit2(line, 3, tab[i].lev, level);
           x.typ = tab[i].typ;
           x.ref = tab[i].ref;
-          while(sy == "lbrack" || sy == "period"){
+          while(sy == "lbrack"){
             if(tab[i].obj != "funktion"){
               Error(71);
               return;
@@ -1549,7 +1512,7 @@ function block(fsys, isfun, level){
           return x.typ;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//call
 
@@ -1585,7 +1548,7 @@ function block(fsys, isfun, level){
             return result;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//resulttype
 
@@ -1810,7 +1773,7 @@ function block(fsys, isfun, level){
                     Error(4);
                 }
                 catch(err){
-                  return err;
+                  console.log(err);
                 }
               }//standfct
               try{
@@ -1863,14 +1826,7 @@ function block(fsys, isfun, level){
                               f = 1;
                             emit2(linecount, f, tab[i].lev, tab[i].adr, tab[i].typ);
                             selector(fsys, x, false);
-                            if(sy == "pointer")
-                              if(atab[x.ref].eltyp != "pointers")
-                                Error(63);
-                              else{
-                                ireference = true;
-                                x.typ = atab[x.ref].elxtyp;
-                              }
-                            if (stantyps.indexOf(x.typ) != -1 && tab[i].typ != "strings"){
+                            if (stantyps.indexOf(x.typ) != -1 && tab[i].typ != "strings" && x.typ != "strings"){
                               var ltyp;
                               switch (x.typ) {
                                 case "reals": ltyp = TAM_REAL; break;
@@ -1883,12 +1839,9 @@ function block(fsys, isfun, level){
                               else
                                 x.typ = "pointers";
                             }
-                            if (x.typ == "chars" && tab[i].typ == "strings"){
-                              x.ref = 0;
+                            if (x.typ == "chars" && tab[i].typ == "strings")
                               emit(linecount, 62);
-                            }
-                            else
-                              if (x.typ == "strings" && x.ref == 0)
+                            else if (x.typ == "strings" && x.xtyp != "pointers")
                                 emit1(linecount, 34, TAM_INT);
                           }
                           else {
@@ -1937,7 +1890,7 @@ function block(fsys, isfun, level){
                               x.typ = "chars";
                             }
                             selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, false);
-                            if (stantyps.indexOf(x.typ) != -1 /*&& x.typ != "strings"*/){
+                            if (stantyps.indexOf(x.typ) != -1  && tab[i].typ != "strings" && x.typ != "strings"){
                               var ltyp;
                               switch (x.typ) {
                                 case "reals": ltyp = TAM_REAL;break;
@@ -1949,6 +1902,10 @@ function block(fsys, isfun, level){
                               }
                               emit1(linecount, 34, ltyp);
                             }
+                            if (x.typ == "chars" && tab[i].typ == "strings")
+                              emit(linecount, 62);
+                            else if (x.typ == "strings" && x.xtyp != "pointers")
+                                emit1(linecount, 34, TAM_INT);
                           }
                         }
                       break;
@@ -2019,7 +1976,7 @@ function block(fsys, isfun, level){
                 }
               }
               catch(err){
-                return err;
+                console.log(err);
               }
             } //factor
             try{
@@ -2083,7 +2040,7 @@ function block(fsys, isfun, level){
               }
             }
             catch(err){
-              return err;
+              console.log(err);
             }
           }//term
           try{
@@ -2158,7 +2115,7 @@ function block(fsys, isfun, level){
             }
           }
           catch(err){
-            return err;
+            console.log(err);
           }
         }//simpleexpression
         try{
@@ -2216,7 +2173,7 @@ function block(fsys, isfun, level){
           }
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//expression
       function assignment(lv, ad){
@@ -2231,11 +2188,6 @@ function block(fsys, isfun, level){
           else
             f = 1;
           emit2(ln, f, lv, ad, "ints");
-          if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
-            if (x.typ == "strings")
-              fstring = true;
-            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
-          }
           if(sy == "pointer"){
             insymbol();
             if(x.typ == "pointers"){
@@ -2255,7 +2207,12 @@ function block(fsys, isfun, level){
               emit1(ln, 34, ltyp);
             }
             else
-              Error(63, x.typ);
+              Error(63, x.typ, undefined, ln);
+          }
+          if (["lbrack", "lparent", "period"].indexOf(sy) != -1){
+            if (x.typ == "strings")
+              fstring = true;
+            selector(["becomes", "eql", "plus", "minus", "rdiv", "times"].concat(fsys), x, true);
           }
           ln = linecount;
           if (sy == "becomes")
@@ -2271,7 +2228,7 @@ function block(fsys, isfun, level){
                 i[xx] = p;
                 xx++;
                 if (p == 0)
-                  Error(0);
+                  Error(0, undefined, undefined, ln);
                 if (tab[p].typ == tab[i].typ){
                   if (tab[p].normal)
                     f = 0;
@@ -2281,12 +2238,12 @@ function block(fsys, isfun, level){
                   assign++;
                 }
                 else {
-                  Error(46);
+                  Error(46, undefined, undefined, ln);
                   break;
                 }
                 insymbol();
                 if (["lbrack", "lparent", "period"].indexOf(sy))
-                  Error(61);
+                  Error(61, undefined, undefined, ln);
               }
               if(sy == "becomes")
                 insymbol();
@@ -2312,7 +2269,7 @@ function block(fsys, isfun, level){
                   if (sy == "eql")
                     insymbol();
                   else
-                    Error(16);
+                    Error(16, undefined, undefined, ln);
                 break;
                 case "minus":
                   op = "minus";
@@ -2320,7 +2277,7 @@ function block(fsys, isfun, level){
                   if (sy == "eql")
                     insymbol();
                   else
-                    Error(16);
+                    Error(16, undefined, undefined, ln);
                 break;
                 case "times":
                   op = "mult";
@@ -2328,7 +2285,7 @@ function block(fsys, isfun, level){
                   if (sy == "eql")
                     insymbol();
                   else
-                    Error(16);
+                    Error(16, undefined, undefined, ln);
                 break;
                 case "rdiv":
                   op = "div";
@@ -2336,10 +2293,10 @@ function block(fsys, isfun, level){
                   if (sy == "eql")
                     insymbol();
                   else
-                    Error(16);
+                    Error(16, undefined, undefined, ln);
                 break;
                 default:
-                  Error(51);
+                  Error(51, undefined, undefined, ln);
                   if (sy == "eql")
                     insymbol();
 
@@ -2350,7 +2307,7 @@ function block(fsys, isfun, level){
           if (x.typ == y.typ)
             if (stantyps.indexOf(x.typ) != -1){
               if(x.typ == "strings" && x.ref == 1){
-                Error(46, x.typ, y.typ);
+                Error(46, x.typ, y.typ, ln);
               }
               else{
                 if (tab[i].typ == "strings"){
@@ -2383,7 +2340,7 @@ function block(fsys, isfun, level){
             }
             else
               if(x.ref != y.ref)
-                Error(46, x.typ, y.typ);
+                Error(46, x.typ, y.typ, ln);
               else
                 if (x.typ == "arrays")
                   emit1(ln, 23, atab[x.ref].size);
@@ -2391,13 +2348,13 @@ function block(fsys, isfun, level){
                   emit1(ln, 23, btab[x.ref].vsize);
           else{
             if(x.typ == "pointers" || y.typ == "pointers"){
-              Error(46, x.typ, y.typ)
+              Error(46, x.typ, y.typ, ln)
             }
             else
               if(x.typ == 'strings' || fstring){
                 if (x.typ == 'chars' && fstring){
                   if (y.typ != "chars"){
-                    Error(46, x.typ, y.typ);
+                    Error(46, x.typ, y.typ, ln);
                   }
                   else {
                     if (tab[i].typ != "arrays")
@@ -2438,18 +2395,18 @@ function block(fsys, isfun, level){
                 }
                 else if(x.typ == "ints"){
                   if(y.typ == "reals")
-                    Error(46, x.typ, y.typ);
+                    Error(46, x.typ, y.typ, ln);
                 }
                 else
                   if (x.typ != "notyp" && y.typ != "notyp" || x.typ == "pointers")
                     emit2(ln, 38, x.typ, assign, i);
                   else
-                    Error(46, x.typ, y.typ);
+                    Error(46, x.typ, y.typ, ln);
               }
           }
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//assignment
 
@@ -2476,7 +2433,7 @@ function block(fsys, isfun, level){
               Error(57);
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//compoundstatement
 
@@ -2510,7 +2467,7 @@ function block(fsys, isfun, level){
             kode[lc1].y = lc;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//ifstatement
 
@@ -2547,7 +2504,7 @@ function block(fsys, isfun, level){
             }
           }
           catch(err){
-            return err;
+            console.log(err);
           }
         }//fim caselabel
 
@@ -2579,7 +2536,7 @@ function block(fsys, isfun, level){
             }
           }
           catch(err){
-            return err;
+            console.log(err);
           }
         }//fim onecase
         try{
@@ -2629,7 +2586,7 @@ function block(fsys, isfun, level){
             Error(57);
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//casestatement
 
@@ -2663,7 +2620,7 @@ function block(fsys, isfun, level){
             Error(53);
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//repeatstatement
 
@@ -2692,7 +2649,7 @@ function block(fsys, isfun, level){
           kode[lc2].y = lc;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }
 
@@ -2813,7 +2770,7 @@ function block(fsys, isfun, level){
           kode[lc1].y = lc;
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }//forstatement
 
@@ -3033,7 +2990,7 @@ function block(fsys, isfun, level){
           }
         }
         catch(err){
-          return err;
+          console.log(err);
         }
       }
       try{
@@ -3091,7 +3048,7 @@ function block(fsys, isfun, level){
         test(["ident", "realcon", "intcon", "charcon", "bools"], fsys.concat(["ident", "realcon", "intcon", "stringsy", "charcon", "bools"]), [""], 6);
       }
       catch(err){
-        return err;
+        console.log(err);
       }
     }//statement
   try{
@@ -3099,7 +3056,6 @@ function block(fsys, isfun, level){
     prt = t;
     if (level > lmax)
     fatal(5);
-    //test(["lparent", "colon", "semicolon"], fsys, 7);
     EnterBlock();
     display[level] = b;
     prb = b;
@@ -3202,7 +3158,7 @@ try{
   key[17] = 'ou'; key[18] = 'procedimento';
   key[19] = 'programa'; key[20] = 'registro';
   key[21] = 'repita'; key[22] = 'entao';
-  key[24] = 'tipos';
+  key[24] = 'tipo';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
   key[29] = "passo";

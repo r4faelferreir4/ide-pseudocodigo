@@ -283,17 +283,17 @@ function lista(next, c, destruct){
 }
 
 function StringAlloc(str, sAddress, SelfDestruct){
-	var i, len = str.length+1, head, head0;
+	var i, len = str.length, head, head0;
 	if(len > 256)
 	len = 255;
 	if(sAddress == undefined)
-	head = MemoryAloc(len);
+		head = MemoryAloc(len+1);
 	else
-	head = sAddress;
+		head = sAddress;
 	head0 = head;
 	if(SelfDestruct)
 	StringLiteral.unshift(head0);
-	s.setUint8(head, len-1);
+	s.setUint8(head, len);
 	for(i = 0; i < len; i++){
 		head++;
 		s.setUint8(head, str.charCodeAt(i));
@@ -403,7 +403,7 @@ function getString(head){	//Retorna a string
 		StringFree(head);
 	}
 	head++;
-	for(var i = head; i <= head+len; i++){
+	for(var i = head; i < head+len; i++){
 		str += String.fromCharCode(s.getUint8(i));
 	}
 	return str;

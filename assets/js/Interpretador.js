@@ -667,6 +667,10 @@ function interpreter(){
       t -= TAM_INT;
       chrcnt = chrcnt + h1;
       atualizarConsole(stab.slice(h2, h2+h1).join(""));
+      pc++;
+      ocnt++;
+      call_read = true;
+      return;
       break;
 
       case 29:
@@ -708,6 +712,10 @@ function interpreter(){
           atualizarConsole(str);
           t -= TAM_INT;
       }
+      pc++;
+      ocnt++;
+      call_read = true;
+      return;
       break;
 
       case 30:
@@ -1416,6 +1424,9 @@ function interpret(){
     fld[3] = 10;
     fld[4] = 1;
     StringLiteral = [];
+    intervalExecution = setInterval(function () {
+      interpret();
+    }, 1);
     SetAllMemoryFree();
     removerTodaPilhaVar();
     carregaVariaveis(btab[1].last+1);
@@ -1478,6 +1489,7 @@ function interpret(){
         h1 = s[h1 + 3];
       } while (h1 < 0);
     }
+    clearInterval(intervalExecution);
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();
     removerTodaPilhaFuncoes();

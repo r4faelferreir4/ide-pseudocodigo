@@ -625,11 +625,13 @@ function atualizaVariavel(adr, value, typ){
 					else
 					input.value = "falso";
 				}
-				else if(typ == "chars"){
+				else if(typ == chars){
 					input.value = String.fromCharCode(input.value);
 				}
+				else if(typ == strings)
+					input.value = getString(value);
 				else
-				input.value = value;
+					input.value = value;
 			}
 		}
 	}

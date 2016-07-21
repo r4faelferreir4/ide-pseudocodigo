@@ -66,23 +66,6 @@ function MemoryBlock(start, size, isAvailable){   //Objeto para gerenciamento de
 var Blocks = [];   //Vetor de blocos de gerenciamento de memória.
 
 //TIPOS DEFINIDOS
-
-var symbol;// = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
-//"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
-//"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-var symbol1 =  ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
-"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
-"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-//var index = [xmax*2];    //Intervalo entre -xmax e +xmax
-//var alfa = [alng+1];
-var object2;// = ["konstant", "variable", "type1", "prozedure", "funktion"];
-var object1 = ["konstant", "variable", "type1", "prozedure", "funktion"];
-var types = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records", "strings", "pointers"];
-var types1 = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records","strings", "pointers"];
-var symset = ["intcon", "realcon", "charcon", "stringsy", "notsy", "plus", "minus", "times", "idiv", "rdiv", "imod", "andsy", "orsy", "eql", "neq", "gtr", "geq", "lss", "leq",
-"lparent", "rparent", "lbrack", "rbrack", "comma", "semicolon", "period", "colon", "becomes", "contsy", "typesy", "varsy", "funcionsy", "proceduresy", "arraysy", "recordsy", "programsy", "ident", "beginsy", "ifsy",
-"casesy", "repeatsy", "whilesy", "forsy", "endsy", "elsesy", "untilsy", "ofsy", "dosy", "tosy", "downtosy", "thensy"];
-var typeset = ["notyp", "ints", "reals", "bools", "chars", "arrays", "records", "strings"];
 function item(typ, ref){
   this.typ = typ;
   this.ref = ref;
@@ -105,11 +88,67 @@ function xtp(tp, rf, sz){
   this.rf = rf;
   this.sz = sz;
 }
+function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
+  this.name = name;
+  this.link = link;
+  this.obj = obj;
+  this.typ = typ;
+  this.xtyp = xtyp;
+  this.ref = ref;
+  this.normal = normal;
+  this.lev = lev;
+  this.adr = adr;
+}
+function Tatab(inxtyp, eltyp, elxtyp, elref, low, high, elsize, size){
+  this.inxtyp = inxtyp;
+  this.eltyp = eltyp;
+	this.elxtyp = elxtyp;
+  this.elref = elref;
+  this.low = low;
+  this.high = high;
+  this.elsize = elsize;
+  this.size = size;
+}
+function Tbtab(last, lastpar, psize, vsize){
+  this.last = last;
+  this.lastpar = lastpar;
+  this.psize = psize;
+  this.vsize = vsize;
+}
+function ENUM(obj){
+  this.add = function(obj){
+		if(typeof obj == "string")
+			this[obj] = obj;
+		else
+	    for(var i in obj)
+				if(typeof obj[i] == "string")
+	    		this[obj[i]] = obj[i];
+  }
+  this.del = function(obj){
+		if(obj in this)
+      delete this[obj];
+  }
+	this.copy = function(obj){
+		var enums = new ENUM;
+		if(obj != undefined){
+			if(typeof obj == "string")
+				enums[obj] = obj;
+			else
+				for(let i in obj)
+					if(typeof obj[i] == "string")
+						enums[obj[i]] = obj[i];
+		}
+		for(let i in this)
+			if(typeof this[i] == "string")
+				enums[this[i]] = this[i];
+		return enums;
+	}
+	if(obj != undefined)
+		this.add(obj);
+}
 
 
-//record
 //DECLARAÇÃO DE VARIÁVEIS COMPILADOR
-
 var InputFile;    //Variável que irá armazenar o código, cada linha será armazenada em uma posição do vetor de strig
 var sy="";  //Ultimo simbolo lido por insymbol
 var id;    //Identificador de insymbol
@@ -159,31 +198,35 @@ var MsgErro = ""; //Mensagem de erro para o usuário.
 var debug;  //flag para ponto de parada da palavra "depurar"
 var time;   //Tempo de compilação/execução
 var lastCompiledCode = 0;	//Hash com o último código fonte compilado.
-function Ttab(name, link, obj, typ, xtyp, ref, normal, lev, adr){
-  this.name = name;
-  this.link = link;
-  this.obj = obj;
-  this.typ = typ;
-  this.xtyp = xtyp;
-  this.ref = ref;
-  this.normal = normal;
-  this.lev = lev;
-  this.adr = adr;
-}
-function Tatab(inxtyp, eltyp, elxtyp, elref, low, high, elsize, size){
-  this.inxtyp = inxtyp;
-  this.eltyp = eltyp;
-	this.elxtyp = elxtyp;
-  this.elref = elref;
-  this.low = low;
-  this.high = high;
-  this.elsize = elsize;
-  this.size = size;
-}
+var types = {"notyp":0, "ints":1, "reals":2, "bools":3, "chars":4, "arrays":5, "records":6, "strings":7, "pointers":8};
 
-function Tbtab(last, lastpar, psize, vsize){
-  this.last = last;
-  this.lastpar = lastpar;
-  this.psize = psize;
-  this.vsize = vsize;
-}
+//DECLARAÇÕES TOKENS DO COMPILADOR
+//Tipos
+const notyp = "notyp", ints = "ints", reals = "reals", bools = "bools",
+chars = "chars", strings = "strings", pointers = "pointers", arrays = "arrays", records = "records";
+
+//Objetos
+const type1 = "type1", funktion = "funktion", prozedure = "prozedure", variable = "variable", konstant = "konstant";
+
+//Fatores
+const intcon = "intcon", realcon = "realcon", charcon = "charcon", stringsy = "stringsy", ident = "ident";
+
+//Operadores
+const plus = "plus", minus = "minus", times = "times", rdiv = "rdiv",
+idiv = "idiv", orsy = "orsy", andsy = "andsy", eql = "eql",
+neq = "neq", lss = "lss", leq = "leq", gtr = "gtr", geq = "geq", notsy = "notsy", imod = "imod", address = "address",
+ptr = "ptr", addr = "addr", becomes = "becomes";
+
+//Delimitadores
+const comma = "comma", semicolon = "semicolon", rbrack = "rbrack", lbrack = "lbrack",
+rparent = "rparent", lparent = "lparent", period = "period", colon = "colon";
+
+//Palavras reservadas
+const constsy = "constsy", typesy = "typesy", varsy = "varsy", proceduresy = "proceduresy",
+functionsy = "functionsy", beginsy = "beginsy", endsy = "endsy",
+casesy = "casesy", ofsy = "ofsy", dosy = "dosy", tosy = "tosy",
+elsesy = "elsesy", ifsy = "ifsy", untilsy = "untilsy", whilesy =  "whilesy", thensy = "thensy",
+programsy = "programsy", stepsy = "stepsy",  downtosy = "downtosy", refsy = "refsy",
+recordsy = "recordsy", arraysy = "arraysy",
+repeatsy = "repeatsy", forsy = "forsy";
+//FIM DECLARAÇÕES DE TOKENS

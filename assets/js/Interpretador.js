@@ -650,6 +650,7 @@ function interpreter(){
                   MemoryFree(adr+InputFile.length+1, len - InputFile.length);
                 }
               read_ok = false;
+              atualizaVariavel(s.getInt32(t-TAM_INT), s.getInt32(s.getInt32(t-TAM_INT)), strings);
             }
             else{
               call_read = true;

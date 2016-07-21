@@ -264,7 +264,7 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 
 //Imprime informações no console de saída
 function atualizarConsole(string){
-	document.getElementById("output").value = StringFilter(document.getElementById("output").value.concat(string));
+	outputConsole.value = StringFilter(outputConsole.value.concat(string));
 	scrollOutput();
 }
 

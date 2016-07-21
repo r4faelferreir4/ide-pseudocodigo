@@ -400,9 +400,9 @@ function interpreter(){
           t = t + TAM_INT * 4;
         else
           switch (tab[ir.y].typ) {
-            case "reals": t += 4 * TAM_INT + TAM_REAL;  break;
-            case "bools":
-            case "chars": t += 4 * TAM_INT + TAM_CHAR;
+            case reals: t += 4 * TAM_INT + TAM_REAL;  break;
+            case bools:
+            case chars: t += 4 * TAM_INT + TAM_CHAR;
             default:  t += 5 * TAM_INT;
           }
         s.setInt32(t- TAM_INT * 2, h1);
@@ -414,10 +414,10 @@ function interpreter(){
       h1 = t - ir.y; //bytes até a base
       var hx = h1;    //Posição de inicio da pilha do procedimento ou função
       switch (ir.x) {//espaço para o retorno da função
-        case "reals": h1 += TAM_REAL; break;
-        case "bools":
-        case "chars": h1 += TAM_CHAR; break;
-        case "notyp": h1 = h1; break; //Procedimento não tem retorno, não precisa alocar espaço
+        case reals: h1 += TAM_REAL; break;
+        case bools:
+        case chars: h1 += TAM_CHAR; break;
+        case notyp: h1 = h1; break; //Procedimento não tem retorno, não precisa alocar espaço
         default:  h1 += TAM_INT;
       }
       h2 = s.getInt32(h1 + 3*TAM_INT); //{h2 points to tab}
@@ -662,7 +662,6 @@ function interpreter(){
       break;
 
       case 28:    //Impressão string literal
-      debugger;
       h1 = s.getInt32(t-TAM_INT);
       h2 = ir.y;
       t -= TAM_INT;
@@ -671,7 +670,6 @@ function interpreter(){
       break;
 
       case 29:
-      debugger;
       chrcnt = chrcnt + fld[ir.y];
       switch (ir.y) {
         case 1:
@@ -701,9 +699,7 @@ function interpreter(){
           t -= TAM_INT;
         break;
         case 8:
-          var str = "";
-          str += (s.getInt32(t-TAM_INT) == 0)?'nulo':s.getInt32(t-TAM_INT);
-          atualizarConsole(str);
+          atualizarConsole((s.getInt32(t-TAM_INT) == 0)?'nulo':s.getInt32(t-TAM_INT));
           t -= TAM_INT;
         break;
         default:
@@ -773,7 +769,6 @@ function interpreter(){
 
       case 32:    //Saída de função/procedimento
       case 33:
-      debugger;
       if (ir.f == 32)   //Procedimento
         t = b;
       else{
@@ -791,7 +786,6 @@ function interpreter(){
           break;
       }
       if(indebug){
-        debugger;
         limpaLinhaDepurador();
         mostraLinhaDepurador(kode[pc].line);
         stopln = kode[pc].line-1;
@@ -1405,6 +1399,7 @@ function interpret(){
     display = [];
     display[1] = 0;
     t = btab[2].vsize;
+    outputConsole = document.getElementById("output");
     StartAddressMemory = stacksize*0.75;
     ttx = StartAddressMemory;
     pc = tab[s.getInt32(12)].adr;

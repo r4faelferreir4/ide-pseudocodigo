@@ -88,7 +88,8 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 .cm-s-default .cm-quote {color: #090;}
 .cm-s-default .cm-hr {color: #999;}
 .cm-s-default .cm-link {color: #00c;}
-.cm-identificadores { color: purple; }
+.cm-constantes { color: red; }
+.cm-reservadas { font-weight: bold; }
 
 .cm-negative {color: #d44;}
 .cm-positive {color: #292;}

@@ -68,15 +68,15 @@
             <span class="glyphicon glyphicon-arrow-down"></span>
           </button>
 
-          <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função" onclick ="byRoutine();">
+          <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função - F8" onclick ="byRoutine();">
             <span class="glyphicon glyphicon-share-alt"></span>
           </button>
 
-          <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções" onclick="inRoutine();">
+          <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções - F7" onclick="inRoutine();">
             <span class="glyphicon glyphicon-resize-small"></span>
           </button>
 
-          <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções" onclick="outRoutine();">
+          <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções - Ctrl+F8" onclick="outRoutine();">
             <span class="glyphicon glyphicon-resize-full"></span>
           </button>
 
@@ -92,7 +92,7 @@
 
           <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
 
-          <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden"onclick="download('arquivo.pse', 'application/octet-stream')">
+          <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden" onclick="download('arquivo.pse', 'application/octet-stream')">
             <span class="glyphicon glyphicon-floppy-disk"></span>
           </button>
 
@@ -100,15 +100,15 @@
             <span class="glyphicon glyphicon-list-alt"></span>
           </button>
 
-          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar" onclick="depurar();">
+          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar - F6" onclick="depurar();">
             <span class="glyphicon glyphicon-sort"></span>
           </button>
 
-          <button id="btCompilar" type="button" class="btn btn-default" title="Compilar" onclick="compiler();">
+          <button id="btCompilar" type="button" class="btn btn-default" title="Compilar - F9" onclick="compiler();">
             <span class="glyphicon glyphicon-cog"></span>
           </button>
 
-          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar" onclick="getCode();">
+          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar - F10" onclick="getCode();">
             <span class="glyphicon glyphicon-play"></span>
           </button>
 
@@ -133,7 +133,7 @@
             <h4 class="modal-title">Saída</h4>
           </div>
           <div id="modalBody" class="modal-body">
-            <textarea id="output" disabled="true" onfocus="changeOutput()"></textarea>
+            <textarea id="output" disabled="true" onfocus="changeOutput()" onchange="console.log('oi')"></textarea>
             <input id="scriptBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
           </div>
           <div id="modalFooter" class="modal-footer">

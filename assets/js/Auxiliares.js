@@ -265,6 +265,10 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 //Imprime informações no console de saída
 function atualizarConsole(string){
 	outputConsole.value = StringFilter(outputConsole.value.concat(string));
+	var num_linhas = outputConsole.value.split("\n").length;
+	if (num_linhas > 200) {
+		outputConsole.value.split("\n").slice((outputConsole.value.split("\n").length-200), outputConsole.value.split("\n").length);
+	}
 	scrollOutput();
 }
 
@@ -287,9 +291,9 @@ function StringAlloc(str, sAddress, SelfDestruct){
 	if(len > 256)
 	len = 255;
 	if(sAddress == undefined)
-		head = MemoryAloc(len+1);
+	head = MemoryAloc(len+1);
 	else
-		head = sAddress;
+	head = sAddress;
 	head0 = head;
 	if(SelfDestruct)
 	StringLiteral.unshift(head0);
@@ -629,9 +633,9 @@ function atualizaVariavel(adr, value, typ){
 					input.value = String.fromCharCode(input.value);
 				}
 				else if(typ == strings)
-					input.value = getString(value);
+				input.value = getString(value);
 				else
-					input.value = value;
+				input.value = value;
 			}
 		}
 	}

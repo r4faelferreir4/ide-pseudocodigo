@@ -21,7 +21,7 @@ function depurar(){
 		mostraErro();
 	}
 }
-//shortcut.add("F6",function() {	depurar();});
+shortcut.add("F6",function() {	depurar();});
 
 
 //para compilar

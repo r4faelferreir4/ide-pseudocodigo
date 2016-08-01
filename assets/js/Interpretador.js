@@ -1493,7 +1493,7 @@ function interpret(){
       } while (h1 < 0);
     }
     time += (new Date).getTime() - startTime;
-    atualizarConsole("\nTempo de execução: "+time+" ms.");
+    //atualizarConsole("\nTempo de execução: "+time+" ms.");
     clearInterval(intervalExecution);
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();

@@ -1,4 +1,4 @@
-//Funções de gerenciamento de memória
+//Funções de gerenciamento de memóriaatualizaConsole
 //Função para alocar memória no gerenciador de memória
 function MemoryAloc(length){
 	var i, start, nBlocks = Blocks.length;
@@ -264,17 +264,8 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 
 //Imprime informações no console de saída
 function atualizarConsole(string){
-<<<<<<< HEAD
-	outputConsole.value = outputConsole.value.concat(string);
-	outputConsole.scrollTop = outputConsole.scrollHeight;
-=======
-	outputConsole.value = StringFilter(outputConsole.value.concat(string));
-	var num_linhas = outputConsole.value.split("\n").length;
-	if (num_linhas > 200) {
-		outputConsole.value.split("\n").slice((outputConsole.value.split("\n").length-200), outputConsole.value.split("\n").length);
-	}
-	scrollOutput();
->>>>>>> origin/master
+		outputConsole.value = StringFilter(outputConsole.value+string);
+    outputConsole.scrollTop = outputConsole.scrollHeight;
 }
 
 //Imprime erros no console debug abaixo do editor

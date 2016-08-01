@@ -264,8 +264,8 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 
 //Imprime informações no console de saída
 function atualizarConsole(string){
-	outputConsole.value = StringFilter(outputConsole.value.concat(string));
-	scrollOutput();
+	outputConsole.value = outputConsole.value.concat(string);
+	outputConsole.scrollTop = outputConsole.scrollHeight;
 }
 
 //Imprime erros no console debug abaixo do editor
@@ -284,8 +284,8 @@ function lista(next, c, destruct){
 
 function StringAlloc(str, sAddress, SelfDestruct){
 	var i, len = str.length, head, head0;
-	if(len > 256)
-	len = 255;
+	if(len >= 256)
+	 len = 255;
 	if(sAddress == undefined)
 		head = MemoryAloc(len+1);
 	else
@@ -472,10 +472,6 @@ function mostrarModalOutput(){
 
 function esconderModalOutput(){
 	$('#modalOutput').modal('hide');
-}
-
-function scrollOutput(){
-	document.getElementById('output').scrollTop=document.getElementById('output').scrollHeight;
 }
 
 function renderInput(bool) {

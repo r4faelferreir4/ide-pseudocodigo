@@ -2894,10 +2894,8 @@ function block(fsys, isfun, level){
               else
               Error(4);
             }
-            if(n == 4){
+            if(n == 4)
               emit1(linecount, 45);
-              emit(linecount, 63);
-            }
             break;
             case 21:
               if(sy == lparent)

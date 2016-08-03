@@ -241,18 +241,6 @@
 
 
 </script>
-<<<<<<< HEAD
-<script type="text/javascript" async>
-  function getCode(){
-    time = new Date().getTime();
-    InputFile = editor.getValue();
-    isOk = true;
-    isDone = false;
-    compiladorPascalS();
-    document.getElementById("output").value = "";
-    time = new Date().getTime() - time;
-    if (isOk && isDone){
-=======
 <script async>
 function getCode(){
   time = new Date().getTime();
@@ -273,7 +261,6 @@ function getCode(){
   }
   else {
     if (isDone){
->>>>>>> origin/master
       mostraErro();
       mostrarModalOutput();
       debug_op = false;
@@ -290,6 +277,7 @@ function getCode(){
     }
     //alert(text);
   }
+}
 
 </script>
 

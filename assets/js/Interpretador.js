@@ -291,7 +291,7 @@ function interpreter(){
           }
         }
         else{
-          t -= TAM_INT * 3;
+          t -= TAM_INT * 4;
         }
       }
       else {
@@ -308,9 +308,8 @@ function interpreter(){
             stopln--;
           }
         }
-        else{
-          t -= TAM_REAL * 3;
-        }
+        else
+          t -= TAM_REAL * 4;
       }
       break;
 
@@ -367,7 +366,7 @@ function interpreter(){
           }
         }
         else{
-          t -= TAM_INT * 3;
+          t -= TAM_INT * 4;
         }
       }
       else {
@@ -384,7 +383,7 @@ function interpreter(){
           }
         }
         else{
-          t -= TAM_REAL * 3;
+          t -= TAM_REAL * 4;
         }
       }
       break;
@@ -1391,6 +1390,7 @@ function interpreter(){
 }
 function interpret(){
   if (call_read){
+    startTime = (new Date).getTime();
     call_read = false;
     interpreter();
   }
@@ -1403,11 +1403,13 @@ function interpret(){
     s.setInt32(4, 0);
     s.setInt32(8, -1);
     s.setInt32(12, btab[1].last);
+    startTime = (new Date).getTime();
+    time = 0;
     b = 0;
     display = [];
     display[1] = 0;
-    t = btab[2].vsize;
     outputConsole = document.getElementById("output");
+    t = btab[2].vsize;
     StartAddressMemory = stacksize*0.75;
     ttx = StartAddressMemory;
     pc = tab[s.getInt32(12)].adr;
@@ -1439,6 +1441,7 @@ function interpret(){
   if (call_read){
     pc--;
     ocnt--;
+    time += (new Date).getTime() - startTime;
     return; //Caso esteja em uma instrução de leitura, finaliza o interpretador.
   }
     if (ps != "fin"){
@@ -1489,6 +1492,8 @@ function interpret(){
         h1 = s[h1 + 3];
       } while (h1 < 0);
     }
+    time += (new Date).getTime() - startTime;
+    //atualizarConsole("\nTempo de execução: "+time+" ms.");
     clearInterval(intervalExecution);
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();

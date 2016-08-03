@@ -59,6 +59,7 @@ var lineLimit = 200;    //Limite de linhas do console de saída.
 var StringLiteral = [];	//Arranjo com os valores literais de string a serem auto liberados após uma operação
 var codeChanged = false; //variavel para controlar se o codigo foi alterado
 var outputConsole;			//Armazena referencia ao output console
+var startTime;					//Tempo de inicio da execução do algoritmo
 var intervalExecution;		//Armazena ID de setInterval
 function MemoryBlock(start, size, isAvailable){   //Objeto para gerenciamento de memória
 	this.start = start;

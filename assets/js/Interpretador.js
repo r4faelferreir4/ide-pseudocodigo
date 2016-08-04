@@ -1447,50 +1447,13 @@ function interpret(){
     if (ps != "fin"){
       removerTopoPilha();
       switch (ps) {
-        case 'caschk': console.log('undefined case');   break;
-        case 'divchk': console.log('division by 0');    break;
-        case 'inxchk': console.log('invalid index');    break;
-        case 'stkchk': console.log('storage overflow'); break;
-        case 'linchk': console.log('too much output');  break;
-        case 'lngchk': console.log('line too long');    break;
-        case 'redchk': console.log('reading past end of file'); break;
+        case 'caschk': console.log('Rótulo da estrutura caso indefinido');   break;
+        case 'divchk': console.log('Divisão por 0');    break;
+        case 'inxchk': console.log('Índice inválido');    break;
+        case 'stkchk': console.log('Estouro de pilha'); break;
+        case 'linchk': console.log('Saída muito grande');  break;
+        case 'lngchk': console.log('Linha muito longa');    break;
       }
-      h1 = b;
-      blkcnt = 10; //{post mortem dump}
-      do {
-        //writeln;
-        blkcnt--;
-        if(blkcnt === 0){
-          h1 = 0;
-          h2 = s[h1 + 4];
-        }
-        if (h1 !== 0) {
-          console.log(' '+ tab[h2].name+' called at '+"     "+s[h1 + 1]);
-        }
-        h2 = btab[tab[h2].ref].last;
-        while (h2 !== 0) {
-          //  with tab[h2] do
-          if (tab[h2].obj == 'variable'){
-            if (stantyps.indexOf(tab[h2].typ) != -1){
-              write('    ', name, ' = ');
-              if (tab[h2].normal){
-                h3 = h1 + adr;
-              }
-              else{
-                h3 = s[h1 + adr].i;
-              }
-              switch (tab[h2].typ) {
-                case 'ints': console.log("          "+s[h3]); break;
-                case 'reals': console.log(s[h3].r);break;
-                case 'bools': console.log("         "+s[h3]);break;
-                case 'chars': console.log("        "+s[h3]);break;
-              }
-            }
-          }
-          h2 = link;
-        }
-        h1 = s[h1 + 3];
-      } while (h1 < 0);
     }
     time += (new Date).getTime() - startTime;
     //atualizarConsole("\nTempo de execução: "+time+" ms.");

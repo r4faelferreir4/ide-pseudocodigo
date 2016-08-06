@@ -2,13 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Compilador</title>
-
   <!-- <script src="js/javascript.js"></script> -->
 
   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 
+  <style>
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }]
+  </style>
   <!-- importação codemirror -->
   <link rel="stylesheet" href="codemirror/lib/codemirror.css">
   <!-- <link rel="stylesheet" href="assets/css/codemirror.css" type="text/css"/> -->
@@ -27,191 +33,178 @@
   <script async src="assets/js/Compilador.js"></script>
   <script async src="assets/js/Interpretador.js"></script>
 
+
+
 </head>
 <body onload="SetTemplate();">
-  <div id="container">
-    <!-- Static navbar -->
-    <div class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Compilador de Pseudo-código</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <!--<li class="active"><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>-->
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div><!--/.container-fluid -->
-    </div>
 
-    <div id="containerCode">
-      <div id="codeDiv">
-        <form name="form">
-          <textarea id="codebox"></textarea>
-        </form>
+  <div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Compilador de Pseudo-código</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <!--<li class="active"><a href="#">Link</a></li>
+          <li><a href="#">Link</a></li>
+          <li><a href="#">Link</a></li>-->
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+  </div>
 
-        <div style="float:right;">
+  <div class="jumbotron escondeJumbotron" style="padding:5px !important;">
+    <div class="container-fluid">
+      <div class="row">
+        <div id="codDiv" class="col-md-8">
+          <form name="form">
+            <textarea id="codebox"></textarea>
+          </form>
 
-          <button  id="continuar" type="button" class="btn btn-default" title="Continuar Execução">
-            <span class="glyphicon glyphicon-step-forward"></span>
-          </button>
+          <div class="row">
+            <div class="col-md-12">
+              <div style="float:right;">
 
-          <button  id="exe_cursor" type="button" class="btn btn-default" title="Executar até o cursor">
-            <span class="glyphicon glyphicon-arrow-down"></span>
-          </button>
+                <button  id="continuar" type="button" class="btn btn-default" title="Continuar Execução">
+                  <span class="glyphicon glyphicon-step-forward"></span>
+                </button>
 
-          <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função - F8" onclick ="byRoutine();">
-            <span class="glyphicon glyphicon-share-alt"></span>
-          </button>
+                <button  id="exe_cursor" type="button" class="btn btn-default" title="Executar até o cursor">
+                  <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
 
-          <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções - F7" onclick="inRoutine();">
-            <span class="glyphicon glyphicon-resize-small"></span>
-          </button>
+                <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função - F8" onclick ="byRoutine();">
+                  <span class="glyphicon glyphicon-share-alt"></span>
+                </button>
 
-          <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções - Ctrl+F8" onclick="outRoutine();">
-            <span class="glyphicon glyphicon-resize-full"></span>
-          </button>
+                <button  id="exe_entrando" type="button" class="btn btn-default" title="Executar linha-a-linha entrando em funções - F7" onclick="inRoutine();">
+                  <span class="glyphicon glyphicon-resize-small"></span>
+                </button>
 
-
-          <input type="checkbox" name="checkbox" id="nao_parar" value="value">
-          <label id="lb_nao_parar" for="nao_parar">Não Parar</label>
-
+                <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções - Ctrl+F8" onclick="outRoutine();">
+                  <span class="glyphicon glyphicon-resize-full"></span>
+                </button>
 
 
-          <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
-            <span class="glyphicon glyphicon-upload"></span>
-          </button>
+                <input type="checkbox" name="checkbox" id="nao_parar" value="value">
+                <label id="lb_nao_parar" for="nao_parar">Não Parar</label>
 
-          <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
 
-          <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden" onclick="download('arquivo.pse', 'application/octet-stream')">
-            <span class="glyphicon glyphicon-floppy-disk"></span>
-          </button>
 
-          <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput();">
-            <span class="glyphicon glyphicon-list-alt"></span>
-          </button>
+                <button id="novo" type="button" class="btn btn-default" title="Carregar Arquivo de Instruções" onclick="openFile(event);">
+                  <span class="glyphicon glyphicon-upload"></span>
+                </button>
 
-          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar - F6" onclick="depurar();">
-            <span class="glyphicon glyphicon-sort"></span>
-          </button>
+                <input type="file" id="my_file" accept='text/plain' onchange='openFile(event)'>
 
-          <button id="btCompilar" type="button" class="btn btn-default" title="Compilar - F9" onclick="compiler();">
-            <span class="glyphicon glyphicon-cog"></span>
-          </button>
+                <button id="salvar" type="button" class="btn btn-default" title="Salvar Arquivo de Instruções" visibility="hidden" onclick="download('arquivo.pse', 'application/octet-stream')">
+                  <span class="glyphicon glyphicon-floppy-disk"></span>
+                </button>
 
-          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar - F10" onclick="getCode();">
-            <span class="glyphicon glyphicon-play"></span>
-          </button>
+                <button id="mostra_console" type="button" class="btn btn-default" title="Mostrar Console" onclick="mostrarModalOutput();">
+                  <span class="glyphicon glyphicon-list-alt"></span>
+                </button>
 
-        </div>
+                <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar - F6" onclick="depurar();">
+                  <span class="glyphicon glyphicon-sort"></span>
+                </button>
 
-        <!-- <button name="depurar" id="compilar" type="button" class="btn btn-default" onclick="mostraItensDepuracao(true)">
-        <span class="glyphicon glyphicon-floppy-disk">add</span>
-      </button> -->
+                <button id="btCompilar" type="button" class="btn btn-default" title="Compilar - F9" onclick="compiler();">
+                  <span class="glyphicon glyphicon-cog"></span>
+                </button>
 
-      <!-- <button name="depurar" id="compilar" type="button" class="btn btn-default" onclick="mostraItensDepuracao(false)">
-      <span class="glyphicon glyphicon-floppy-disk">att</span>
-    </button> -->
+                <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar - F10" onclick="getCode();">
+                  <span class="glyphicon glyphicon-play"></span>
+                </button>
 
-    <!-- Modal -->
-    <div class="modal fade" id="modalOutput" role="dialog">
-      <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Saída</h4>
+              </div>
+            </div>
           </div>
-          <div id="modalBody" class="modal-body">
-            <textarea id="output" disabled="true" rows="200"></textarea>
-            <input id="scriptBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
+        </div><!--fim primeira coluna -->
+        <div  id="coluna_direita" class="col-md-4"  style="background-color:white; max-height:340px">
+          <!-- <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" > -->
+          <div class="row" style="margin-top:5px;">
+            <div class="col-md-6" style="resize:both">
+              <div id="vars">
+                <div class="table-responsive" style="max-height:320px; overflow-y:auto; margin-bottom:5px;">
+                  <table id="tab_var" class="table table-bordered" style="margin-bottom:5px !important;">
+                    <thead>
+                      <tr >
+                        <th colspan="2">Variáveis</th>
+                      </tr>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- inserir linhas pilha variaveis-->
+                    </tbody>
+                  </table>
+                  <button type="button" class="btn btn-default" onclick="ativarTabelaVar()">Editar</button>
+                  <button type="button" class="btn btn-default" onclick="salvar()">Salvar</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div id="pilha" style="width:100%">
+                <div class="table-responsive" style="max-height:320px; overflow-y:auto;">
+                  <table class="table table-bordered" id="tab_logic">
+                    <thead>
+                      <tr >
+                        <th colspan="2">Pilha de execução</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- inserir linhas pilha execucao-->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="modalFooter" class="modal-footer">
-            <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
-            <button id="btNovamente" type="button" class="btn btn-default" onclick="reexecute();" >Executar Novamente</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Esconder</button>
+
+          <div class="row" style="margin-top:5px;">
+
           </div>
-        </div>
+
+
+
+          <!-- </div> -->
+
+        </div><!--fim coluna 2 -->
       </div>
     </div>
-    <!--  fim Modal -->
-
-
   </div>
 
-  <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" >
-    <div id="pilha" style="width:100%">
-      <table class="table table-bordered" id="tab_logic">
-        <thead>
-          <tr >
-            <th colspan="2">Pilha de execução</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- inserir linhas pilha execucao-->
-        </tbody>
-      </table>
+  <div style="clear:both;"/>
+  <br>
+
+  <div id="painelDebug" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
+    <div class="panel-heading">
+      <h3 class="panel-title">Debug</h3>
     </div>
 
-    <div id="vars">
-      <table id="tab_var" class="table table-bordered" style="margin-bottom:5px !important;">
-        <thead>
-          <tr >
-            <th colspan="2">Variáveis</th>
-          </tr>
-          <tr>
-            <th>Nome</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- inserir linhas pilha variaveis-->
-        </tbody>
-      </table>
-      <button type="button" class="btn btn-default" onclick="ativarTabelaVar()">Editar</button>
-      <button type="button" class="btn btn-default" onclick="salvar()">Salvar</button>
-    </div>
+    <table class="table table-bordered" id="panel-error">
+      <thead>
+        <tr >
+          <th colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- inserir linhas pilha execucao-->
+      </tbody>
+    </table>
+    <!-- <textarea id="panel-error" disabled="true"></textarea> -->
   </div>
 
-</div><!-- fim do jumbotron -->
-</div>
-<div style="clear:both;"/>
-<br>
-<!--Debug painel -->
-<div id="painelDebug" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
-  <div class="panel-heading">
-    <h3 class="panel-title">Debug</h3>
-  </div>
-
-  <table class="table table-bordered" id="panel-error">
-    <thead>
-      <tr >
-        <th colspan="2"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- inserir linhas pilha execucao-->
-    </tbody>
-  </table>
-  <!-- <textarea id="panel-error" disabled="true"></textarea> -->
-</div>
-</div>
-<!--fim debug painel -->
-</div>
-</body>
-
-
-<script>
+  <script>
 
   document.getElementById("painelDebug").style.visibility = "hidden";
 
@@ -236,49 +229,49 @@
     var B1 = editor.findWordAt({line: A1, ch: A2}).anchor.ch;
     var B2 = editor.findWordAt({line: A1, ch: A2}).head.ch;
 
-    console.log(editor.getRange({line: A1,ch: B1}, {line: A1,ch: B2}));
-});
+    console.log(procuraVar(editor.getRange({line: A1,ch: B1}, {line: A1,ch: B2})))
+  });
 
 
-</script>
-<script async>
-function getCode(){
-  time = new Date().getTime();
-  InputFile = editor.getValue();
-  isOk = true;
-  isDone = false;
-  compiladorPascalS();
-  document.getElementById("output").value = "";
-  time = new Date().getTime() - time;
-  if (isOk && isDone){
-    mostraErro();
-    mostrarModalOutput();
-    debug_op = false;
-    setTimeout(function(){
-      call_read = false;
-      interpret();
-    }, 300);
-  }
-  else {
-    if (isDone){
+  </script>
+  <script async>
+  function getCode(){
+    time = new Date().getTime();
+    InputFile = editor.getValue();
+    isOk = true;
+    isDone = false;
+    compiladorPascalS();
+    document.getElementById("output").value = "";
+    time = new Date().getTime() - time;
+    if (isOk && isDone){
       mostraErro();
       mostrarModalOutput();
       debug_op = false;
       setTimeout(function(){
         call_read = false;
         interpret();
-        scrollOutput();
       }, 300);
     }
     else {
       if (isDone){
         mostraErro();
+        mostrarModalOutput();
+        debug_op = false;
+        setTimeout(function(){
+          call_read = false;
+          interpret();
+          scrollOutput();
+        }, 300);
       }
+      else {
+        if (isDone){
+          mostraErro();
+        }
+      }
+      //alert(text);
     }
-    //alert(text);
   }
-}
 
-</script>
-
+  </script>
+</body>
 </html>

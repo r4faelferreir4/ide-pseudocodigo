@@ -264,8 +264,8 @@ function StringFilter(str){			//Retorna o final da string no tamanho máximo de 
 
 //Imprime informações no console de saída
 function atualizarConsole(string){
-		outputConsole.value = StringFilter(outputConsole.value+string);
-    outputConsole.scrollTop = outputConsole.scrollHeight;
+	outputConsole.value = StringFilter(outputConsole.value+string);
+	outputConsole.scrollTop = outputConsole.scrollHeight;
 }
 
 //Imprime erros no console debug abaixo do editor
@@ -285,7 +285,7 @@ function lista(next, c, destruct){
 function StringAlloc(str, sAddress, SelfDestruct){
 	var i, len = str.length, head, head0;
 	if(len >= 256)
-	 len = 255;
+	len = 255;
 	if(sAddress == undefined)
 	head = MemoryAloc(len+1);
 	else
@@ -576,13 +576,33 @@ function carregaVariaveis(start){//str_tab
 
 			}
 			if((tab[start].obj == "variable" || tab[start].obj == "konstant")){
-				console.log(tab[start]);
 				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
 			}
 			start++;
 		}
 	}
 }
+
+function procuraVar(id){
+	var start = 0;
+	for (var i = 0; i < tab.length; i++) {
+		if (tab[i].name === id) {
+			console.log('achou');
+			console.log();
+		}
+	}
+	// var i, j;//Loalizador de ID na tabela
+	// i = 0;
+	// tab[0].name = id;
+	// do{
+	// 	j = btab[display[i]].last;
+	// 	while(isOk && tab[j].name != id)
+	// 	j = tab[j].link;
+	// 	i--;
+	// }while(isOk && !((i < 0) || (j != 0)));
+	// if (j == 0)
+	// return j;
+}//loc
 
 //objeto auxiliar
 function objetoTabela(Nome,Valor, index, lv, adr){
@@ -1246,9 +1266,10 @@ function mostraItensDepuracao(bool){
 		document.getElementById("nao_parar").style.visibility = "visible";
 		document.getElementById("lb_nao_parar").style.visibility = "visible";
 		document.getElementById("coluna_direita").style.visibility = "visible";
-		document.getElementById("codeDiv").style.width = "76.5%";
 
-		document.getElementById("coluna_direita").style.width = "295pxpx;";
+
+		document.getElementById("codDiv").className = "col-md-6";
+		document.getElementById("coluna_direita").className = "col-md-6";
 		document.getElementById("coluna_direita").style.height = "400px";
 
 	} else {
@@ -1260,11 +1281,20 @@ function mostraItensDepuracao(bool){
 		document.getElementById("nao_parar").style.visibility = "hidden";
 		document.getElementById("lb_nao_parar").style.visibility = "hidden";
 		document.getElementById("coluna_direita").style.visibility = "hidden";
-		document.getElementById("codeDiv").style.width = "98%";
 
+		document.getElementById("codDiv").className = "col-md-12";
+		document.getElementById("coluna_direita").className = "";
 		document.getElementById("coluna_direita").style.width = "1px;";
 		document.getElementById("coluna_direita").style.height = "1px";
 
+	}
+}
+
+function mostraItensDepuracao2(bool){
+	if (bool) {
+		document.getElementById("colunaDepuracao").className = "col-md-4";
+	} else {
+		document.getElementById("colunaDepuracao").className = "col-md-0";
 	}
 }
 

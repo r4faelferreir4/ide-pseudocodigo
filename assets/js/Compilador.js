@@ -1799,10 +1799,12 @@ function block(fsys, isfun, level){
                     if (x.typ != notyp)
                       Error(48);
                   x.typ = tab[i].typ;
-                  if (sy == rparent)
-                    insymbol();
-                  else if (n != 23)
-                    Error(4);
+                  if(n != 23){
+                    if (sy == rparent)
+                      insymbol();
+                    else
+                      Error(4);
+                  }
                 }
                 catch(err){
                   isOk = false;

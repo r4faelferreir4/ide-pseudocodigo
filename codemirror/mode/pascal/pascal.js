@@ -15,7 +15,7 @@
       return obj;
     }
 
-    var keywords = words("alocamem enumerado fimenquanto xou retorne fimpara fimse " +
+    var keywords = words("aleatorio alocamem enumerado fimenquanto xou retorne fimpara fimse " +
     "depurar real caractere logico inteiro string ponteiro abs escrevaln escreva desaloca bytes "+
     "aloca sqr odd chr ord succ pred round trunc sin cos exp ln sqrt arctan strmax strmin leia "+
     "strtmo strbusca strinsere"

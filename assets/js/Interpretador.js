@@ -1385,6 +1385,14 @@ function interpreter(){
       case 71:    //Alocação de memória
         s.setInt32(t-TAM_INT, MemoryAloc(s.getInt32(t-TAM_INT)));
       break;
+      case 72:
+        if(ir.y == 0){
+          s.setFloat64(t, Math.random());
+          t += TAM_REAL;
+        }
+        else
+          s.setInt32(t-TAM_INT, Math.floor(Math.random()*s.getInt32(t-TAM_INT)));
+      break;
       }
     }while(true);
 }

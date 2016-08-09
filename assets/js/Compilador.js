@@ -32,7 +32,7 @@ function compiladorPascalS(){
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
   function ErrorMsg(code){
-    var k, Msg = [];//função
+    var k, Msg = [];//parametro
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
     Msg[4] = "Está faltando o delimitador \')\'."; Msg[5] = "Está faltando o caractere \':\'.";
@@ -1578,11 +1578,13 @@ function block(fsys, isfun, level){
               function standfct(n){
                 var ts = new ENUM, x = new item();
                 try{
-                  if (sy == lparent)
-                    insymbol();
-                  else
+                  if (sy == lparent){
+                    if(n != 23)//aleatorio permite 0 parametros
+                      insymbol();
+                  }
+                  else if(n != 23)
                     Error(9);
-                  if(n != 21)
+                  if(n != 21 && n != 23)
                     expression(fsys.copy([rparent, comma]), x);
                   switch (n) {
                     case 0:
@@ -1665,7 +1667,6 @@ function block(fsys, isfun, level){
                     }
                     break;
                     case 21:
-
                     if(sy == ident){
                       var l = loc(id);
                       var z = new item();
@@ -1768,6 +1769,29 @@ function block(fsys, isfun, level){
                       Error(36, x.typ, ints);
                     ts.add([ints, pointers]);
                     break;
+                    case 23:
+                      var RandomOp = 0;
+                      if(sy == lparent){
+                        insymbol();
+                        var p = new item;
+                        expression(fsys.copy([rparent]), p);
+                        if(p.typ != ints)
+                          Error(36, p.typ, ints);
+                        else{
+                          RandomOp = 1;
+                          tab[i].typ = ints;
+                          x.typ = ints;
+                        }
+                        if(sy == rparent)
+                          insymbol();
+                      }
+                      else{
+                        tab[i].typ = reals;
+                        x.typ = reals;
+                      }
+                      emit1(linecount, 72, RandomOp);
+                      ts.add([ints, reals]);
+                    break;
                   }
                   if (x.typ in ts)
                     emit1(linecount, 8, n);
@@ -1777,7 +1801,7 @@ function block(fsys, isfun, level){
                   x.typ = tab[i].typ;
                   if (sy == rparent)
                     insymbol();
-                  else
+                  else if (n != 23)
                     Error(4);
                 }
                 catch(err){
@@ -1922,11 +1946,11 @@ function block(fsys, isfun, level){
                         Error(44);
                       break;
                       case funktion:
-                        x.typ = tab[i].typ;
                         if (tab[i].lev != 0)
                           x.typ = call(fsys,i);
                         else
                           standfct(tab[i].adr);
+                        x.typ = tab[i].typ;
                       break;
                     }
                     if (sy == ident)
@@ -3302,6 +3326,7 @@ try{
   enter('desaloca', prozedure, notyp, 22);
   enter('escreva', prozedure, notyp, 3);
   enter('escrevaln', prozedure, notyp, 4);
+  enter('aleatorio', funktion, ints, 23);
   enter('', prozedure, notyp, 0);
   //Inicialização de tabelas
   btab[1] = new Tbtab;

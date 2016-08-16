@@ -1452,6 +1452,7 @@ function interpret(){
     fld[3] = 10;
     fld[4] = 1;
     StringLiteral = [];
+    clearInterval(intervalExecution);
     intervalExecution = setInterval(function () {
       interpret();
     }, 1);

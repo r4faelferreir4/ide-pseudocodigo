@@ -17,6 +17,7 @@ function interpreter(){
               indebug = false;
               limpaLinhaDepurador();
               mostraLinhaDepurador(ir.line);
+              clearInterval(intervalExecution);
               return;
             }
           }
@@ -27,6 +28,7 @@ function interpreter(){
               indebug = false;
               limpaLinhaDepurador();
               mostraLinhaDepurador(ir.line);
+              clearInterval(intervalExecution);
               return;
             }
           }
@@ -37,6 +39,7 @@ function interpreter(){
           CursorRun = false;
           limpaLinhaDepurador();
           mostraLinhaDepurador(ir.line);
+          clearInterval(intervalExecution);
           return;
         }
         if(bydebug && sNumber >= getNumberStacks()){
@@ -45,6 +48,7 @@ function interpreter(){
           call_read = true;
           limpaLinhaDepurador();
           mostraLinhaDepurador(ir.line);
+          clearInterval(intervalExecution);
           return;
         }
       }
@@ -606,6 +610,7 @@ function interpreter(){
           }
           else{
             call_read = true;
+            clearInterval(intervalExecution);
             return;
           }
           break;
@@ -617,6 +622,7 @@ function interpreter(){
           }
           else{
             call_read = true;
+            clearInterval(intervalExecution);
             return;
           }
           break;
@@ -628,6 +634,7 @@ function interpreter(){
           }
           else{
             call_read = true;
+            clearInterval(intervalExecution);
             return;
           }
           break;
@@ -653,6 +660,7 @@ function interpreter(){
             }
             else{
               call_read = true;
+              clearInterval(intervalExecution);
               return;
             }
           break;
@@ -811,6 +819,7 @@ function interpreter(){
         outdebug = false;
         pc++;
         ocnt++;
+        clearInterval(intervalExecution);
         return;
       }
       break;
@@ -1256,6 +1265,7 @@ function interpreter(){
       if (check == 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
+        clearInterval(intervalExecution);
         return;
       }
       else{
@@ -1276,6 +1286,7 @@ function interpreter(){
       if(s.getInt32(t-TAM_INT) == 0){
         ps = 'divchk';
         atualizarConsole("ERRO! Divisão por 0");
+        clearInterval(intervalExecution);
         return;
       }
       else{
@@ -1320,6 +1331,7 @@ function interpreter(){
         }
         else{
           atualizarConsole("Posição 0 não existe");
+          clearInterval(intervalExecution);
           return;
         }
       break;
@@ -1339,11 +1351,13 @@ function interpreter(){
           }
           else{
             atualizarConsole("\nERRO! Posição não permitida");
+            clearInterval(intervalExecution);
             return;
           }
         }
         else {
           atualizarConsole("\nERRO! Posição não permitida");
+          clearInterval(intervalExecution);
           return;
         }
         s.setInt32(t, adr);
@@ -1400,6 +1414,10 @@ function interpret(){
   if (call_read){
     startTime = (new Date).getTime();
     call_read = false;
+    clearInterval(intervalExecution);
+    intervalExecution = setInterval(function () {
+      interpret();
+    }, 1);
     interpreter();
   }
   else{

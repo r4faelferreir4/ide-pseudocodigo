@@ -276,12 +276,6 @@ function mostraErro(){
 
 
 //Armazenamento e operações com string
-function lista(next, c, destruct){
-	this.next = next;
-	this.c = c;
-	this.destruct = destruct;
-}
-
 function StringAlloc(str, sAddress, SelfDestruct){
 	var i, len = str.length, head, head0;
 	if(len >= 256)
@@ -447,6 +441,34 @@ function setStr(head, str, pos){		//Seta uma string em outra string
 	}
 	MemoryFree(head, s.getUint8(head));
 	return head0;
+}
+
+function getValue(i){
+	if(tab[i] instanceof Ttab && (tab[i].obj == variable || tab[i].obj == konstant)){
+		switch (tab[i].typ) {
+			case reals:
+				return s.getFloat64(display[tab[i].lev]+tab[i].adr);
+			break;
+			case ints:
+				return s.getInt32(display[tab[i].lev]+tab[i].adr);
+			break;
+
+			case bools:
+				return (s.getUint8(display[tab[i].lev]+tab[i].adr) == 0)?'falso':'verdadeiro';
+			break;
+
+			case chars:
+				return String.fromCharCode(s.getUint8(display[tab[i].lev]+tab[i].adr));
+			break;
+
+			case pointers:
+				return (s.getInt32(display[tab[i].lev]+tab[i].adr) == 0)?'nulo':s.getInt32(display[tab[i].lev]+tab[i].adr);
+			break;
+			case strings:
+				return getString(s.getInt32(display[tab[i].lev]+tab[i].adr));
+			break;
+		}
+	}
 }
 
 function isLetter(char){

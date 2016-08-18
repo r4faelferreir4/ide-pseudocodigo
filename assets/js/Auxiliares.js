@@ -204,9 +204,9 @@ function GetHashCode(str) {
 
 
 //ao clicar no botao abre janela para selecionar arquivo
-document.getElementById('novo').onclick = function() {
+/*document.getElementById('novo').onclick = function() {
 	document.getElementById('my_file').click();
-};
+};*/
 
 //seta template no editor de texto
 function SetTemplate(){
@@ -1285,8 +1285,8 @@ function mostraItensDepuracao(bool){
 		document.getElementById("prox_funcao").style.visibility = "visible";
 		document.getElementById("exe_entrando").style.visibility = "visible";
 		document.getElementById("exe_saindo").style.visibility = "visible";
-		document.getElementById("nao_parar").style.visibility = "visible";
-		document.getElementById("lb_nao_parar").style.visibility = "visible";
+		//document.getElementById("nao_parar").style.visibility = "visible";
+		//document.getElementById("lb_nao_parar").style.visibility = "visible";
 		document.getElementById("coluna_direita").style.visibility = "visible";
 
 
@@ -1300,8 +1300,8 @@ function mostraItensDepuracao(bool){
 		document.getElementById("prox_funcao").style.visibility = "hidden";
 		document.getElementById("exe_entrando").style.visibility = "hidden";
 		document.getElementById("exe_saindo").style.visibility = "hidden";
-		document.getElementById("nao_parar").style.visibility = "hidden";
-		document.getElementById("lb_nao_parar").style.visibility = "hidden";
+		//document.getElementById("nao_parar").style.visibility = "hidden";
+		//document.getElementById("lb_nao_parar").style.visibility = "hidden";
 		document.getElementById("coluna_direita").style.visibility = "hidden";
 
 		document.getElementById("codDiv").className = "col-md-12";

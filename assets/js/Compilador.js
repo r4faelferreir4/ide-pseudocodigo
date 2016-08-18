@@ -968,10 +968,11 @@ function block(fsys, isfun, level){
                 if(pointer){
                   xtype.sz = TAM_INT;
                   xtype.tp = pointers;
+                  pointer = false;
                   xtype.xtyp = tab[x].typ;
                 }
                 else{
-                  xtype.sz = tab[x].adr;
+                  xtype.sz = (tab[x].typ != pointers)?tab[x].adr:4;
                   xtype.tp = tab[x].typ;
                   xtype.xtyp = tab[x].xtyp;
                 }
@@ -990,10 +991,10 @@ function block(fsys, isfun, level){
               if (sy == lparent)
                 insymbol();
             }
-            xtype.tp = arrays;
             arraytyp(xtype);
             if(pointer){
               xtype.xtyp = xtype.tp;
+              pointer = false;
               xtype.tp = pointers;
             }
           }
@@ -1001,9 +1002,18 @@ function block(fsys, isfun, level){
             if (sy == recordsy){
               insymbol();
               EnterBlock();
-              xtype.tp = records;
-              xtype.rf = b;
+              if(pointer){
+                pointer = false;
+                xtype.tp = pointers;
+                xtype.xtyp = records;
+                xtype.rf = b;
+              }
+              else{
+                xtype.tp = records;
+                xtype.rf = b;
+              }
               tab[t].typ = xtype.tp;
+              tab[t].xtyp = xtype.xtyp;
               tab[t].ref = xtype.rf;
               if (level == lmax)
                 fatal(5);
@@ -1096,8 +1106,10 @@ function block(fsys, isfun, level){
                 if (tab[x].obj != type1)
                   Error(29);
                 else {
-                  if(pointer)
+                  if(pointer){
                     tp = pointers;
+                    pointer = false;
+                  }
                   else
                     tp = tab[x].typ;
                   rf = tab[x].ref;
@@ -1198,6 +1210,7 @@ function block(fsys, isfun, level){
           typ(fsys.copy([semicolon, comma, ident]), xtype, pointer);
           if(pointer){
             tab[t1].typ = pointers;
+            pointer = false;
             tab[t1].adr = TAM_INT;
           }
           else{
@@ -1246,7 +1259,7 @@ function block(fsys, isfun, level){
               pointer = true;
           }
           var xtype = new xtp(tp, rf, sz);
-          typ(fsys.copy([semicolon, comma, ident]), xtype, pointer);
+          typ(fsys.copy([semicolon, comma, ident]), xtype, false);
           while(isOk && t0 < t1){
             t0++;
             tab[t0].typ = xtype.tp;
@@ -1337,6 +1350,15 @@ function block(fsys, isfun, level){
                     emit1(linecount, 9, a);
                 }
                 insymbol();
+                if(sy == ptr){
+                  if(tab[j].typ == pointers){
+                    v.typ = tab[j].xtyp;
+                    emit1(linecount, 34, (v.typ == reals)?TAM_REAL: (v.typ == bools || v.typ == chars)?TAM_CHAR:TAM_INT);
+                  }
+                  else
+                    Error(63);
+                  insymbol();
+                }
                 if (sy == lbrack && v.typ == strings){
                     if (v.typ == strings || v.typ == arrays)
                       selector(fsys, v, assign);
@@ -1725,10 +1747,16 @@ function block(fsys, isfun, level){
                         case type1:
                           if(z.typ in new ENUM([ints, reals, bools, chars, strings]))
                             emit1(linecount, 24, tab[l].adr, ints);
-                          else if(tab[l].typ == arrays)
-                            emit1(linecount, 24, atab[tab[l].ref].size, ints);
-                          else if(tab[l].typ == records)
-                            emit1(linecount, 24, btab[tab[l].ref].vsize, ints);
+                          else if (z.typ == pointers){
+                            if(tab[l].typ == arrays)
+                              emit1(linecount, 24, atab[tab[l].ref].size, ints);
+                            else if(tab[l].typ == records)
+                              emit1(linecount, 24, btab[tab[l].ref].vsize, ints);
+                          }
+                          else if(z.typ == records)
+                            emit1(linecount, 24, btab[z.ref].vsize, ints)
+                          else if(z.typ == arrays)
+                            emit1(linecount, 24, atab[z.ref].size, ints)
                           else
                             Error(48);
                         break;
@@ -3031,6 +3059,14 @@ function block(fsys, isfun, level){
               }
               else
                 Error(9, x.typ, ints);
+            break;
+            case 23:
+              if(sy == lparent){
+
+              }
+              else {
+                Error(9, undefined, undefined, linecount);
+              }
             break;
           }
         }

@@ -1,3 +1,15 @@
+
+var tooltipX = 0;
+var tooltipY = 0;
+
+function getCoordenada(event) {
+	tooltipX = event.clientX;
+	tooltipY = event.clientY;
+	// console.log(tooltipX);
+	// console.log(tooltipY);
+}
+/* fim teste tooltip */
+
 //Funções de gerenciamento de memóriaatualizaConsole
 //Função para alocar memória no gerenciador de memória
 function MemoryAloc(length){
@@ -205,7 +217,7 @@ function GetHashCode(str) {
 
 //ao clicar no botao abre janela para selecionar arquivo
 /*document.getElementById('novo').onclick = function() {
-	document.getElementById('my_file').click();
+document.getElementById('my_file').click();
 };*/
 
 //seta template no editor de texto
@@ -447,25 +459,25 @@ function getValue(i){
 	if(tab[i] instanceof Ttab && (tab[i].obj == variable || tab[i].obj == konstant)){
 		switch (tab[i].typ) {
 			case reals:
-				return s.getFloat64(display[tab[i].lev]+tab[i].adr);
+			return s.getFloat64(display[tab[i].lev]+tab[i].adr);
 			break;
 			case ints:
-				return s.getInt32(display[tab[i].lev]+tab[i].adr);
+			return s.getInt32(display[tab[i].lev]+tab[i].adr);
 			break;
 
 			case bools:
-				return (s.getUint8(display[tab[i].lev]+tab[i].adr) == 0)?'falso':'verdadeiro';
+			return (s.getUint8(display[tab[i].lev]+tab[i].adr) == 0)?'falso':'verdadeiro';
 			break;
 
 			case chars:
-				return String.fromCharCode(s.getUint8(display[tab[i].lev]+tab[i].adr));
+			return String.fromCharCode(s.getUint8(display[tab[i].lev]+tab[i].adr));
 			break;
 
 			case pointers:
-				return (s.getInt32(display[tab[i].lev]+tab[i].adr) == 0)?'nulo':s.getInt32(display[tab[i].lev]+tab[i].adr);
+			return (s.getInt32(display[tab[i].lev]+tab[i].adr) == 0)?'nulo':s.getInt32(display[tab[i].lev]+tab[i].adr);
 			break;
 			case strings:
-				return getString(s.getInt32(display[tab[i].lev]+tab[i].adr));
+			return getString(s.getInt32(display[tab[i].lev]+tab[i].adr));
 			break;
 		}
 	}
@@ -606,25 +618,14 @@ function carregaVariaveis(start){//str_tab
 }
 
 function procuraVar(id){
-	var start = 0;
+	var valor;
 	for (var i = 0; i < tab.length; i++) {
-		if (tab[i].name === id) {
-			console.log('achou');
-			console.log();
+		if (tab[i].name == id) {
+			valor =  getValue(i);
 		}
 	}
-	// var i, j;//Loalizador de ID na tabela
-	// i = 0;
-	// tab[0].name = id;
-	// do{
-	// 	j = btab[display[i]].last;
-	// 	while(isOk && tab[j].name != id)
-	// 	j = tab[j].link;
-	// 	i--;
-	// }while(isOk && !((i < 0) || (j != 0)));
-	// if (j == 0)
-	// return j;
-}//loc
+	return valor;
+}
 
 //objeto auxiliar
 function objetoTabela(Nome,Valor, index, lv, adr){

@@ -94,3 +94,31 @@ table .collapse.in {
   background-color: black;
   font-size: 14px;
 }
+
+/*
+teste tooltip
+*/
+
+.tooltipVar {
+  position: absolute;
+  /*display: inline-block;*/
+  border-bottom: 1px dotted black;
+}
+
+.tooltipVar .tooltiptextVar {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  /*display: block;*/
+  /* Position the tooltip */
+  position: fixed;
+  z-index: 1000;
+}
+
+.tooltipVar:hover .tooltiptextVar {
+  visibility: visible;
+}

@@ -1,14 +1,21 @@
-
-var tooltipX = 0;
-var tooltipY = 0;
-
-function getCoordenada(event) {
-	tooltipX = event.clientX;
-	tooltipY = event.clientY;
-	// console.log(tooltipX);
-	// console.log(tooltipY);
-}
-/* fim teste tooltip */
+$(document).ready(function() {
+	$('body').delegate('.cm-variable','mouseover',function(e){
+		var nome = e.currentTarget.innerText;
+		var valorVar = procuraVar(nome);
+		if(valorVar !== undefined){
+			var x = e.clientX, y = e.clientY;
+			var tooltipSpan = document.getElementById('tpVar');
+			tooltipSpan.innerHTML = nome + ' := ' +valorVar;
+			tooltipSpan.style.visibility = 'visible';
+			tooltipSpan.style.top = (y + 10) + 'px';
+			tooltipSpan.style.left = (x + 10) + 'px';
+		}
+	});
+	$('body').delegate('.cm-variable','mouseout',function(e){
+		var tooltipSpan = document.getElementById('tpVar');
+		tooltipSpan.style.visibility = 'hidden';
+	});
+});
 
 //Funções de gerenciamento de memóriaatualizaConsole
 //Função para alocar memória no gerenciador de memória

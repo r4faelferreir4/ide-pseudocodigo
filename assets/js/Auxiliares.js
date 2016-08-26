@@ -1,4 +1,41 @@
+function rand(x){
+		var rnd = 314159269 * seed + 453806245;
+		rnd = rnd & 2147483647;
+		seed++;
+    return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
+}
 
+function setTimeInStack(){
+	IndexTimeStack++;
+	TimeStack[IndexTimeStack] = new Date().getTime();
+	return IndexTimeStack;
+}
+
+function getTimeInStack(RefTime){
+	if(RefTime < TimeStack.length){
+		return Date.now() - TimeStack[RefTime];
+	}
+	else
+		return 0;
+}
+
+function testRANDOM(x){
+	var time = new Date().getTime();
+	var r;
+	for(var i = 0; i < x; i++){
+		r = rand(1);
+		console.log(r);
+	}
+
+	console.log(new Date().getTime() - time);
+	time = new Date().getTime();
+	for(var i = 0; i < x; i++){
+		r = Math.random();
+		console.log(r);
+	}
+
+	console.log(new Date().getTime() - time)
+}
 var tooltipX = 0;
 var tooltipY = 0;
 
@@ -192,7 +229,7 @@ function testAloc(n){
 		if(Math.random() < 0.5)
 		MemoryAloc(Math.random() * 10|1);
 		else
-		MemoryFree(stacksize*Math.random()|1, Math.random() * 10|1);
+		MemoryFree(stacksize*.75+Math.random()|1, Math.random() * 10|1);
 	}
 	date = new Date;
 	console.log('Tempo: '+(date.getTime()-time));

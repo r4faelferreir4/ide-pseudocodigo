@@ -1399,13 +1399,26 @@ function interpreter(){
       case 71:    //Alocação de memória
         s.setInt32(t-TAM_INT, MemoryAloc(s.getInt32(t-TAM_INT)));
       break;
-      case 72:
+      case 72:    //Aleatório
         if(ir.y == 0){
-          s.setFloat64(t, Math.random());
+          s.setFloat64(t, rand(1));
           t += TAM_REAL;
         }
         else
-          s.setInt32(t-TAM_INT, Math.floor(Math.random()*s.getInt32(t-TAM_INT)));
+          s.setInt32(t-TAM_INT, rand(s.getInt32(t-TAM_INT)));
+
+      break;
+      case 73:
+        seed = s.getInt32(t-TAM_INT);
+        t -= TAM_INT;
+      break;
+      case 74:
+        if(ir.y)
+          s.setInt32(t-TAM_INT, getTimeInStack(s.getInt32(t-TAM_INT)));
+        else {
+          s.setInt32(t, setTimeInStack());
+          t += TAM_INT;
+        }
       break;
       }
     }while(true);
@@ -1429,10 +1442,13 @@ function interpret(){
     s.setInt32(4, 0);
     s.setInt32(8, -1);
     s.setInt32(12, btab[1].last);
-    startTime = (new Date).getTime();
+    startTime = new Date().getTime();
     time = 0;
     b = 0;
+    seed = 1;
     display = [];
+    TimeStack = [];
+    IndexTimeStack = 0;
     display[1] = 0;
     outputConsole = document.getElementById("output");
     t = btab[2].vsize;

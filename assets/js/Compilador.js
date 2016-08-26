@@ -1601,12 +1601,12 @@ function block(fsys, isfun, level){
                 var ts = new ENUM, x = new item();
                 try{
                   if (sy == lparent){
-                    if(n != 23)//aleatorio permite 0 parametros
+                    if(n < 23)//aleatorio permite 0 parametros
                       insymbol();
                   }
-                  else if(n != 23)
+                  else if(n < 23)
                     Error(9);
-                  if(n != 21 && n != 23)
+                  if(n < 21)
                     expression(fsys.copy([rparent, comma]), x);
                   switch (n) {
                     case 0:
@@ -1791,6 +1791,36 @@ function block(fsys, isfun, level){
                     ts.add([ints, strings, reals, records, arrays, bools, chars, pointers]);
                     break;
                     case 22:
+                    if(sy != ident || id == "bytes"){
+                      expression(fsys.copy([rparent]), x);
+                      if(x.typ != ints){
+                        Error(36, xt.typ, ints);
+                      }
+                    }
+                    else {
+                      var indexID = loc(id);
+                      var length = 0;
+                      switch (tab[indexID].obj) {
+                        case konstant:
+                        case type1:
+                        case variable:
+                        switch (tab[indexID].typ) {
+                          case reals:
+                            length = 8;
+                          break;
+                          chars:
+                          bools:
+                            length = 1;
+                          break;
+                          default:
+                            length = 4;
+                        }
+                        break;
+                      }
+                      x.typ = ints;
+                      insymbol();
+                      emit1(linecount, 24, length);
+                    }
                     if(x.typ == ints)
                       emit(linecount, 71);
                     else
@@ -1820,14 +1850,30 @@ function block(fsys, isfun, level){
                       emit1(linecount, 72, RandomOp);
                       ts.add([ints, reals]);
                     break;
+                    case 24:
+                      if(sy == lparent){
+                        expression(fsys.copy([rparent]), x);
+                        if(x.typ == ints){
+                          emit1(linecount, 74, true)
+                        }
+                        else
+                          Error(36, x.typ, ints);
+                      }
+                      else
+                        emit1(linecount, 74, false);
+                      x.typ = ints;
+                      ts.add([ints]);
+                    break;
                   }
-                  if (x.typ in ts)
-                    emit1(linecount, 8, n);
+                  if (x.typ in ts){
+                    if(n <= 16)
+                      emit1(linecount, 8, n);
+                  }
                   else
                     if (x.typ != notyp)
                       Error(48);
                   x.typ = tab[i].typ;
-                  if(n != 23){
+                  if(n < 23){
                     if (sy == rparent)
                       insymbol();
                     else
@@ -2258,7 +2304,7 @@ function block(fsys, isfun, level){
             insymbol();
             if(x.typ == pointers){
               x.typ = tab[i].xtyp;
-              var ltyp;
+              /*var ltyp;
               switch (x.typ) {
                 case reals:
                   ltyp = TAM_REAL;
@@ -2269,8 +2315,8 @@ function block(fsys, isfun, level){
                 break;
                 default:
                   ltyp = TAM_INT;
-              }
-              emit1(ln, 34, ltyp);
+              }*/
+              emit1(ln, 34, 4);
             }
             else
               Error(63, x.typ, undefined, ln);
@@ -2853,8 +2899,8 @@ function block(fsys, isfun, level){
         try{
           var i, f;
           var x, y;
-          x = new item("", 1);
-          y = new item("", 1);
+          x = new item();
+          y = new item();
           switch (n) {
             case 1:
             case 2:
@@ -3061,12 +3107,13 @@ function block(fsys, isfun, level){
                 Error(9, x.typ, ints);
             break;
             case 23:
-              if(sy == lparent){
-
-              }
-              else {
-                Error(9, undefined, undefined, linecount);
-              }
+              expression(fsys.copy([rparent]), x);
+              if(x.typ == ints)
+                emit(linecount, 73);
+              else
+                Error(36, x.typ, ints);
+              if(sy == rparent)
+                insymbol();
             break;
           }
         }
@@ -3365,6 +3412,8 @@ try{
   enter('escreva', prozedure, notyp, 3);
   enter('escrevaln', prozedure, notyp, 4);
   enter('aleatorio', funktion, ints, 23);
+  enter('semente', prozedure, notyp, 23)
+  enter('tempo', funktion, ints, 24);
   enter('', prozedure, notyp, 0);
   //Inicialização de tabelas
   btab[1] = new Tbtab;

@@ -1420,6 +1420,9 @@ function interpreter(){
           t += TAM_INT;
         }
       break;
+      case 75:
+        
+      break;
       }
     }while(true);
 }
@@ -1428,10 +1431,12 @@ function interpret(){
     startTime = (new Date).getTime();
     call_read = false;
     clearInterval(intervalExecution);
-    intervalExecution = setInterval(function () {
-      interpret();
-    }, 1);
-    interpreter();
+    if(isRunning){
+        intervalExecution = setInterval(function () {
+        interpret();
+      }, 1);
+      interpreter();
+    }
   }
   else{
     mostraBtExecucarNovamente(false);
@@ -1448,6 +1453,7 @@ function interpret(){
     seed = 1;
     display = [];
     TimeStack = [];
+    isRunning = true;
     IndexTimeStack = 0;
     display[1] = 0;
     outputConsole = document.getElementById("output");
@@ -1501,6 +1507,7 @@ function interpret(){
     time += (new Date).getTime() - startTime;
     //atualizarConsole("\nTempo de execução: "+time+" ms.");
     clearInterval(intervalExecution);
+    isRunning = false;
     console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();
     removerTodaPilhaFuncoes();

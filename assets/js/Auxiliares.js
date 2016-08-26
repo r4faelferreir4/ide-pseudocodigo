@@ -19,23 +19,6 @@ function getTimeInStack(RefTime){
 		return 0;
 }
 
-function testRANDOM(x){
-	var time = new Date().getTime();
-	var r;
-	for(var i = 0; i < x; i++){
-		r = rand(1);
-		console.log(r);
-	}
-
-	console.log(new Date().getTime() - time);
-	time = new Date().getTime();
-	for(var i = 0; i < x; i++){
-		r = Math.random();
-		console.log(r);
-	}
-
-	console.log(new Date().getTime() - time)
-}
 var tooltipX = 0;
 var tooltipY = 0;
 
@@ -360,6 +343,23 @@ function StringAlloc(str, sAddress, SelfDestruct){
 		s.setUint8(head, str.charCodeAt(i));
 	}
 	return head0;
+}
+
+function StringDel(str, i, n){
+	len = StringLength(str);
+	str++;
+	str_end = str+len;
+	if(i+n > len)		//Evita extrapolar o tamanho da string
+		n -= (i+n-len);
+	i += str;
+	s.setUint8(str, len-n);
+	MemoryFree(str+len-n+1, n);
+	n += i;
+	while(n <= str_end){
+		s.setUint8(i, s.getUint8(n));
+		n++;
+		i++;
+	}
 }
 
 function StringCopy(head){

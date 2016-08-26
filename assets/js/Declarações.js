@@ -64,6 +64,7 @@ var intervalExecution;		//Armazena ID de setInterval
 var seed;							//Semente do gerador de números pseudo-aleatórios
 var TimeStack;				//Pilha para inicio da contagem de tempo.
 var IndexTimeStack;		//Índice da pilha de contagem de tempo.
+var isRunning;				//Flag que aponta se o interpretador está executando algum código.
 function MemoryBlock(start, size, isAvailable){   //Objeto para gerenciamento de memória
 	this.start = start;
 	this.size = size;

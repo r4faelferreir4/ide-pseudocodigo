@@ -907,6 +907,8 @@ function block(fsys, isfun, level){
             arraytyp(xtype2);
             elrf = xtype2.rf;
             elsz = xtype2.sz;
+            xtype3 = new xtp(xtype2.tp, xtype2.rf, xtype2.sz);
+            xtype3.xtyp = xtype2.xtyp;
           }
           else {
             if (sy == rbrack)
@@ -930,6 +932,7 @@ function block(fsys, isfun, level){
             xtype.xtyp = xtype3.tp;
           }
           xtype.sz = (atab[xtype.rf].high - atab[xtype.rf].low + 1)*elsz;
+          xtype.tp = eltp;
           atab[xtype.rf].size = xtype.sz;
           atab[xtype.rf].eltyp = eltp;
           atab[xtype.rf].elxtyp = xtype3.xtyp;
@@ -992,6 +995,8 @@ function block(fsys, isfun, level){
                 insymbol();
             }
             arraytyp(xtype);
+            xtype.xtyp = xtype.tp;
+            xtype.tp = arrays;
             if(pointer){
               xtype.xtyp = xtype.tp;
               pointer = false;
@@ -3115,6 +3120,46 @@ function block(fsys, isfun, level){
               if(sy == rparent)
                 insymbol();
             break;
+            case 24:
+              if(sy == lparent){
+                insymbol();
+                if(sy == ident){
+                  if(tab[loc(id)].obj != variable)
+                    Error(37);
+                  var str_xtp = new xtp;
+                  expression(fsys.copy([comma]), xtr_xtp);
+                  if(str_xtp.tp != strings)
+                    Error(36, str_xtp.tp, strings);
+                  else {
+                    if(sy == comma)
+                      insymbol
+                    var i_xtp = new xtp;
+                    expression(fsys.copy([comma]), i_xtp);
+                    if(i_xtp.tp != ints)
+                      Error(36, i_xtp.tp, ints);
+                    else {
+                      if(sy == comma)
+                        insymbol();
+                      var n_xtp = new xtp;
+                      expression(fsys.copy([rparent]), n_xtp);
+                      if(n_xtp.tp != ints)
+                        Error(36, n_xtp.tp, ints);
+                      else
+                        emit(linecount, 75);
+                    }
+
+                  }
+                }
+                else
+                  Error(2);
+                if(sy == rparent)
+                  insymbol();
+                else
+                  Error(4);
+              }
+              else
+                Error(9);
+            break;
           }
         }
         catch(err){
@@ -3414,6 +3459,7 @@ try{
   enter('aleatorio', funktion, ints, 23);
   enter('semente', prozedure, notyp, 23)
   enter('tempo', funktion, ints, 24);
+  enter('strdel', prozedure, notyp, 24);
   enter('', prozedure, notyp, 0);
   //Inicialização de tabelas
   btab[1] = new Tbtab;

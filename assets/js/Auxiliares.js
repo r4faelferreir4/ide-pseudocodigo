@@ -1,3 +1,22 @@
+var codDiv = document.getElementById('codDiv');
+
+function aumentarTamanho(){
+	var style = window.getComputedStyle(codDiv, null).getPropertyValue('font-size');
+	var fontSize = parseFloat(style);
+	if (fontSize < 30) {
+		codDiv.style.fontSize = (fontSize + 2) + 'px';
+	}
+}
+
+function diminuirTamanho(){
+	var style = window.getComputedStyle(codDiv, null).getPropertyValue('font-size');
+	var fontSize = parseFloat(style);
+	if (fontSize > 12) {
+		codDiv.style.fontSize = (fontSize - 2) + 'px';
+	}
+}
+
+
 function rand(x){
 	var rnd = 314159269 * seed + 453806245;
 	rnd = rnd & 2147483647;

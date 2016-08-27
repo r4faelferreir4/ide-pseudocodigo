@@ -1,8 +1,8 @@
 function rand(x){
-		var rnd = 314159269 * seed + 453806245;
-		rnd = rnd & 2147483647;
-		seed++;
-    return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
+	var rnd = 314159269 * seed + 453806245;
+	rnd = rnd & 2147483647;
+	seed++;
+	return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
 }
 
 function setTimeInStack(){
@@ -16,30 +16,22 @@ function getTimeInStack(RefTime){
 		return Date.now() - TimeStack[RefTime];
 	}
 	else
-		return 0;
-}
-
-var tooltipX = 0;
-var tooltipY = 0;
-
-function getCoordenada(event) {
-	tooltipX = event.clientX;
-	tooltipY = event.clientY;
-	// console.log(tooltipX);
-	// console.log(tooltipY);
+	return 0;
 }
 /* fim teste tooltip */
 $(document).ready(function() {
 	$('body').delegate('.cm-variable','mouseover',function(e){
-		var nome = e.currentTarget.innerText;
-		var valorVar = procuraVar(nome);
-		if(valorVar !== undefined){
-			var x = e.clientX, y = e.clientY;
-			var tooltipSpan = document.getElementById('tpVar');
-			tooltipSpan.innerHTML = nome + ' := ' +valorVar;
-			tooltipSpan.style.visibility = 'visible';
-			tooltipSpan.style.top = (y + 10) + 'px';
-			tooltipSpan.style.left = (x + 10) + 'px';
+		if (isRunning) {
+			var nome = e.currentTarget.innerText;
+			var valorVar = procuraVar(nome);
+			if(valorVar !== undefined){
+				var x = e.clientX, y = e.clientY;
+				var tooltipSpan = document.getElementById('tpVar');
+				tooltipSpan.innerHTML = nome + ' := ' +valorVar;
+				tooltipSpan.style.visibility = 'visible';
+				tooltipSpan.style.top = (y + 10) + 'px';
+				tooltipSpan.style.left = (x + 10) + 'px';
+			}
 		}
 	});
 	$('body').delegate('.cm-variable','mouseout',function(e){
@@ -129,7 +121,7 @@ function SetAllMemoryFree(){
 function MemoryFree(start, length){
 	var i, half, left, right;
 	if(start+length > Blocks[Blocks.length-1].start + Blocks[Blocks.length-1].size){
-		console.log("Posição de memória não existe.");
+		// console.log("Posição de memória não existe.");
 		return;
 	}
 	left = 0;
@@ -147,7 +139,7 @@ function MemoryFree(start, length){
 	else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
 	i = right+1;
 	else{
-		console.log("Não foi encontrado");
+		// console.log("Não foi encontrado");
 		debugger;
 		return;
 	}
@@ -233,7 +225,7 @@ function testAloc(n){
 		MemoryFree(stacksize*.75+Math.random()|1, Math.random() * 10|1);
 	}
 	date = new Date;
-	console.log('Tempo: '+(date.getTime()-time));
+	// console.log('Tempo: '+(date.getTime()-time));
 }
 
 //Função para gerar uma hash do código fonte compilado.
@@ -350,7 +342,7 @@ function StringDel(str, i, n){
 	str++;
 	str_end = str+len;
 	if(i+n > len)		//Evita extrapolar o tamanho da string
-		n -= (i+n-len);
+	n -= (i+n-len);
 	i += str;
 	s.setUint8(str, len-n);
 	MemoryFree(str+len-n+1, n);
@@ -618,7 +610,7 @@ var arrayObjetoTabela = [];
 
 function carregaVariaveis(start){//str_tab
 	var value;
-	console.log("inicio");
+	// console.log("inicio");
 	while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "") {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
 			switch (tab[start].typ) {
@@ -885,7 +877,7 @@ function toBinary(i, len){
 		}while(temp !== 0);
 	}
 	else if (temp < 0) {
-		console.log("Numero de bits informado não comporta o valor convertido.");
+		// console.log("Numero de bits informado não comporta o valor convertido.");
 		return -1;
 	}
 	if (op == -1)
@@ -917,12 +909,12 @@ function toTab(strTOTAL){
 		aux = toInt(strTOTAL.slice(x, x += 8));
 		name = "";
 		for(i = 0; i < aux; i++){
-			console.log(strTOTAL.slice(x, x + 8));
+			// console.log(strTOTAL.slice(x, x + 8));
 			name += String.fromCharCode(toInt(strTOTAL.slice(x, x += 8)));
 		}
-		console.log(strTOTAL.slice(x, x + 32));
+		// console.log(strTOTAL.slice(x, x + 32));
 		link = toInt(strTOTAL.slice(x, x += 32));
-		console.log(strTOTAL.slice(x, x + 32));
+		// console.log(strTOTAL.slice(x, x + 32));
 		obj = toInt("0"+strTOTAL.slice(x, x += 3));
 		switch (obj) {
 			case 1:
@@ -982,11 +974,11 @@ function toTab(strTOTAL){
 	var ix = 0;
 	while(ix < iTab){
 		if (tab[ix].f != tab1[ix].f)
-		console.log("Diferença em "+ ix + " na função f.");
+		// console.log("Diferença em "+ ix + " na função f.");
 		if (tab[ix].x != tab1[ix].x)
-		console.log("Diferença em " + ix + " em x.");
+		// console.log("Diferença em " + ix + " em x.");
 		if (tab[ix].y != tab1[ix].y)
-		console.log("Diferença em " + ix + " em y.");
+		// console.log("Diferença em " + ix + " em y.");
 		ix++;
 	}
 	debugger;
@@ -1276,15 +1268,15 @@ function saveFile(){
 
 	}
 	ikode = p;
-	console.log(ikode, itab,iatab, ibtab, istab);
+	// console.log(ikode, itab,iatab, ibtab, istab);
 	str += toBinary(ikode, 64);
 	str += toBinary(itab, 64);
 	str += toBinary(iatab, 64);
 	str += toBinary(ibtab, 64);
 	str += toBinary(istab, 64);
 	strTOTAL = str+strtab+stratab+strstab+strbtab+strkode;
-	console.log(lenBinary);
-	console.log(strTOTAL.length);
+	// console.log(lenBinary);
+	// console.log(strTOTAL.length);
 	return strTOTAL;
 
 }
@@ -1339,7 +1331,7 @@ function mostraItensDepuracao(bool){
 		document.getElementById("continuar").style.visibility = "visible";
 		document.getElementById("exe_cursor").style.visibility = "visible";
 		document.getElementById("prox_funcao").style.visibility = "visible";
-		document.getElementById("exe_entrando").style.visibility = "visible";
+		// document.getElementById("exe_entrando").style.visibility = "visible";
 		document.getElementById("exe_saindo").style.visibility = "visible";
 		//document.getElementById("nao_parar").style.visibility = "visible";
 		//document.getElementById("lb_nao_parar").style.visibility = "visible";
@@ -1354,7 +1346,7 @@ function mostraItensDepuracao(bool){
 		document.getElementById("continuar").style.visibility = "hidden";
 		document.getElementById("exe_cursor").style.visibility = "hidden";
 		document.getElementById("prox_funcao").style.visibility = "hidden";
-		document.getElementById("exe_entrando").style.visibility = "hidden";
+		// document.getElementById("exe_entrando").style.visibility = "hidden";
 		document.getElementById("exe_saindo").style.visibility = "hidden";
 		//document.getElementById("nao_parar").style.visibility = "hidden";
 		//document.getElementById("lb_nao_parar").style.visibility = "hidden";

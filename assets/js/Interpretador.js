@@ -1421,7 +1421,7 @@ function interpreter(){
         }
       break;
       case 75:
-        
+
       break;
       }
     }while(true);
@@ -1508,7 +1508,7 @@ function interpret(){
     //atualizarConsole("\nTempo de execução: "+time+" ms.");
     clearInterval(intervalExecution);
     isRunning = false;
-    console.log("          " + ocnt + " steps");
+    // console.log("          " + ocnt + " steps");
     removerTodaPilhaVar();
     removerTodaPilhaFuncoes();
     debug_op = false;

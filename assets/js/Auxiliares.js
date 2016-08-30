@@ -23,19 +23,8 @@ function rand(x){
 	seed++;
 	return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
 }
-
-function setTimeInStack(){
-	IndexTimeStack++;
-	TimeStack[IndexTimeStack] = new Date().getTime();
-	return IndexTimeStack;
-}
-
-function getTimeInStack(RefTime){
-	if(RefTime < TimeStack.length){
-		return Date.now() - TimeStack[RefTime];
-	}
-	else
-	return 0;
+function time32() {
+   return new Date().getTime() & 0x7fffffff; // getTime() % (2^31) = getTime() % (2^31-1=0x7fffffff)
 }
 /* fim teste tooltip */
 $(document).ready(function() {
@@ -358,10 +347,9 @@ function StringAlloc(str, sAddress, SelfDestruct){
 
 function StringDel(str, i, n){
 	len = StringLength(str);
-	str++;
 	str_end = str+len;
 	if(i+n > len)		//Evita extrapolar o tamanho da string
-	n -= (i+n-len);
+		n = len-i+1;
 	i += str;
 	s.setUint8(str, len-n);
 	MemoryFree(str+len-n+1, n);

@@ -1408,20 +1408,23 @@ function interpreter(){
           s.setInt32(t-TAM_INT, rand(s.getInt32(t-TAM_INT)));
 
       break;
-      case 73:
+      case 73:    //Setar semente da função aleatório
         seed = s.getInt32(t-TAM_INT);
         t -= TAM_INT;
       break;
-      case 74:
-        if(ir.y)
+      case 74:    //Pegar tempo
+        /*if(ir.y)
           s.setInt32(t-TAM_INT, getTimeInStack(s.getInt32(t-TAM_INT)));
         else {
           s.setInt32(t, setTimeInStack());
           t += TAM_INT;
-        }
+        }*/
+        s.setInt32(t, time32());
+        t += TAM_INT;
       break;
-      case 75:
-
+      case 75:    //deletar um número de caracteres de uma string
+        StringDel(s.getInt32(t-3*TAM_INT), s.getInt32(t-2*TAM_INT), s.getInt32(t-TAM_INT));
+        t -= 3*TAM_INT;
       break;
       }
     }while(true);

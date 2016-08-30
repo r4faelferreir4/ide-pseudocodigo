@@ -32,7 +32,7 @@ function compiladorPascalS(){
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
   function ErrorMsg(code){
-    var k, Msg = [];//parametro
+    var k, Msg = [];
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
     Msg[4] = "Está faltando o delimitador \')\'."; Msg[5] = "Está faltando o caractere \':\'.";
@@ -62,7 +62,7 @@ function compiladorPascalS(){
     Msg[52] = "Entao      "; Msg[53] = "Está faltando a palavra reservada \'ate\'.";
     Msg[54] = "Está faltando a palavra reservada \'faca\'."; Msg[55] = "";
     Msg[56] = ""; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
-    Msg[58] = "É esperado a declaração de variáveis na declaração do procediment/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
+    Msg[58] = "É esperado a declaração de variáveis na declaração do procedimento/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
     Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
@@ -1663,7 +1663,7 @@ function block(fsys, isfun, level){
                       }
                     break;
                     case 19:
-                      ts.add(ints, strings);
+                    ts.add([ints, strings]);
                     if (x.typ == strings){
                       emit(linecount, 64);
                     }
@@ -1857,15 +1857,13 @@ function block(fsys, isfun, level){
                     break;
                     case 24:
                       if(sy == lparent){
-                        expression(fsys.copy([rparent]), x);
-                        if(x.typ == ints){
-                          emit1(linecount, 74, true)
-                        }
+                        insymbol();
+                        if(sy == rparent)
+                          insymbol();
                         else
-                          Error(36, x.typ, ints);
+                          Error(4);
                       }
-                      else
-                        emit1(linecount, 74, false);
+                      emit1(linecount, 74, false);
                       x.typ = ints;
                       ts.add([ints]);
                     break;
@@ -3124,26 +3122,26 @@ function block(fsys, isfun, level){
               if(sy == lparent){
                 insymbol();
                 if(sy == ident){
-                  if(tab[loc(id)].obj != variable)
+                  if(tab[loc(id)].obj != variable && loc(id) != 0)
                     Error(37);
-                  var str_xtp = new xtp;
-                  expression(fsys.copy([comma]), xtr_xtp);
-                  if(str_xtp.tp != strings)
-                    Error(36, str_xtp.tp, strings);
+                  var str_xtp = new item;
+                  expression(fsys.copy(comma), str_xtp);
+                  if(str_xtp.typ != strings)
+                    Error(36, str_xtp.typ, strings);
                   else {
                     if(sy == comma)
-                      insymbol
-                    var i_xtp = new xtp;
-                    expression(fsys.copy([comma]), i_xtp);
-                    if(i_xtp.tp != ints)
-                      Error(36, i_xtp.tp, ints);
+                      insymbol()
+                    var i_xtp = new item;
+                    expression(fsys.copy(comma), i_xtp);
+                    if(i_xtp.typ != ints)
+                      Error(36, i_xtp.typ, ints);
                     else {
                       if(sy == comma)
                         insymbol();
-                      var n_xtp = new xtp;
-                      expression(fsys.copy([rparent]), n_xtp);
-                      if(n_xtp.tp != ints)
-                        Error(36, n_xtp.tp, ints);
+                      var n_xtp = new item;
+                      expression(fsys.copy(rparent), n_xtp);
+                      if(n_xtp.typ != ints)
+                        Error(36, n_xtp.typ, ints);
                       else
                         emit(linecount, 75);
                     }

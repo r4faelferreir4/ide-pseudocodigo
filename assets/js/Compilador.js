@@ -2109,13 +2109,13 @@ function block(fsys, isfun, level){
                 }
                 else
                 if(op == rdiv){
-                  if (x.typ == ints){
-                    emit1(linecount, 26,TAM_REAL);
-                    x.typ = reals;
-                  }
                   if(y.typ == ints){
                     emit1(linecount, 26,TAM_INT);
                     y.typ = reals;
+                  }
+                  if (x.typ == ints){
+                    emit1(linecount, 26,TAM_REAL);
+                    x.typ = reals;
                   }
                   if (x.typ == reals && y.typ == reals)
                     emit1(linecount, 58, reals);

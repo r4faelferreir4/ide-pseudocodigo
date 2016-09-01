@@ -1322,7 +1322,7 @@ function interpreter(){
             s.setUint8(t, getChar(adr, pos));
             t += TAM_CHAR;
           }
-          else if(pos < 0 && pos > -length){
+          else if(pos < 0 && pos >= -length){
             s.setUint8(t, getChar(adr, pos+length+1));
             t += TAM_CHAR;
           }
@@ -1345,7 +1345,7 @@ function interpreter(){
         if (pos > 0 && pos < StringLength(adr))
           setChar(adr, char, pos);
         else if(pos < 0){
-          if (pos > -StringLength(adr)){
+          if (pos >= -StringLength(adr)){
             pos = StringLength(adr)+pos+1;
             setChar(adr, char, pos);
           }

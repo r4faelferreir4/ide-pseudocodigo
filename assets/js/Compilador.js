@@ -61,7 +61,7 @@ function compiladorPascalS(){
     Msg[50] = "Constante  "; Msg[51] = "Está faltando o operador de atribuição \':=\'";
     Msg[52] = "Entao      "; Msg[53] = "Está faltando a palavra reservada \'ate\'.";
     Msg[54] = "Está faltando a palavra reservada \'faca\'."; Msg[55] = "";
-    Msg[56] = ""; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
+    Msg[56] = "Identificador não permitido nesta posição"; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
     Msg[58] = "É esperado a declaração de variáveis na declaração do procedimento/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
@@ -3435,12 +3435,12 @@ try{
   enter('ord', funktion, ints, 6);
   enter('succ', funktion, chars, 7);
   enter('pred', funktion, chars, 8);
-  enter('round', funktion, ints, 9);
-  enter('trunc', funktion, ints, 10);
-  enter('sin', funktion, reals, 11);
-  enter('cos', funktion, reals, 12);
+  enter('arred', funktion, ints, 9);
+  enter('trunca', funktion, ints, 10);
+  enter('seno', funktion, reals, 11);
+  enter('cosseno', funktion, reals, 12);
   enter('exp', funktion, reals, 13);
-  enter('ln', funktion, reals, 14);
+  enter('log', funktion, reals, 14);
   enter('sqrt', funktion, reals, 15);
   enter('arctan', funktion, reals, 16);
   enter('strmax', funktion, strings, 17);
@@ -3448,7 +3448,7 @@ try{
   enter('leia', prozedure, notyp, 1);
   enter('strtmo', funktion, ints, 19);
   enter('strbusca', funktion, ints, 20);
-  enter('strinsere', prozedure, strings, 21);
+  enter('strins', prozedure, strings, 21);
   enter('aloca', funktion, pointers, 22);
   enter('bytes', funktion, ints, 21);
   enter('desaloca', prozedure, notyp, 22);

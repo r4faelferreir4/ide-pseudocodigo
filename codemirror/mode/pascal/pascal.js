@@ -15,13 +15,13 @@
       return obj;
     }
 
-    var keywords = words("strdel tempo semente aleatorio alocamem enumerado fimenquanto xou retorne fimpara fimse " +
-    "depurar real caractere logico inteiro string ponteiro abs escrevaln escreva desaloca bytes "+
+    var keywords = words("strdel tempo semente aleatorio aloca" +
+    "real caractere logico inteiro string ponteiro abs escrevaln escreva desaloca bytes"+
     "aloca sqr odd chr ord succ pred round trunc sin cos exp ln sqrt arctan strmax strmin leia "+
-    "strtmo strbusca strinsere"
+    "strtmo strbusca strins"
   );
 
-  var reservadas = words("e arranjo inicio caso const div faca senao fim para funcao se mod " +
+  var reservadas = words("xou e retorna arranjo inicio caso const div faca senao fim para funcao se mod " +
   "nao de procedimento ou programa registro repita entao tipo ate enquanto var passo ref ");
 
 

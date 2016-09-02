@@ -16,6 +16,30 @@ function diminuirTamanho(){
 	}
 }
 
+function RandomGen(seed) {
+    this.seed = seed || 0;  //semente = zero, por padrão
+
+    this.random = function (n) {
+    //Entrada facultativa: n (número inteiro positivo)
+    //Saídas:  a) 0 <= valor < 1(se n for omitido); ou b) 0 <= valor < n
+    //O algoritmo abaixo é o mesmo usado pelo Delphi 7. (SANTOS, W.L.; FACET/UFGD; 2016)
+
+        n = n || 1;  //n = 1, por padrão: 0 <= valores < 1
+        this.seed = (Math.imul(134775813, this.seed) + 1) & 0xffffffff; //(x%2^32=x&(2^32-1))
+        if (n === 1) {
+            if (this.seed >= 0)
+               return this.seed / 4294967296;  //4294967296 = 2^32
+            else
+                return 1 + this.seed / 4294967296;
+        }
+        else {
+            if (this.seed >= 0)
+                return Math.floor(this.seed / 4294967296 * n);
+            else
+                return n + Math.floor(this.seed / 4294967296 * n);
+        }
+   }
+}
 
 function rand(x){
 	var rnd = 314159269 * seed + 453806245;
@@ -23,6 +47,28 @@ function rand(x){
 	seed++;
 	return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
 }
+
+function testRandom(n){
+	var i = 0, x;
+	var tempo = Date.now();
+	seed = 1;
+	for(i = 0; i < n; i++){
+		rand(1);
+		rand(x);
+	}
+	console.log(Date.now() - tempo);
+	tempo = Date.now();
+	var rr = new RandomGen(1);
+	for(i = 0; i < n; i++){
+		rr.random();
+		rr.random(i);
+	}
+	console.log(Date.now() - tempo)
+
+
+}
+
+
 function time32() {
    return new Date().getTime() & 0x7fffffff; // getTime() % (2^31) = getTime() % (2^31-1=0x7fffffff)
 }
@@ -347,6 +393,10 @@ function StringAlloc(str, sAddress, SelfDestruct){
 
 function StringDel(str, i, n){
 	len = StringLength(str);
+	if (i == 0)
+		return 0;
+	else if ( i < 0)
+		i = len + i + 1;
 	str_end = str+len;
 	if(i+n > len)		//Evita extrapolar o tamanho da string
 		n = len-i+1;

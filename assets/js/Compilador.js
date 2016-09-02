@@ -2646,8 +2646,11 @@ function block(fsys, isfun, level){
                 insymbol();
               else
                 Error(5);
-              if(else_sy)
+              if(else_sy){
                 elselc = lc;    //Marca inicio das instruções de senao
+                if (sy == colon)
+                  insymbol();
+              }
               statement(fsys.copy([semicolon, endsy]));
               j++;
               exittab[j] = lc;
@@ -2728,7 +2731,7 @@ function block(fsys, isfun, level){
           if (sy == untilsy){
             insymbol();
             expression(fsys, x);
-            if (!(sy in new ENUM([bools, notyp])))
+            if (!(x.typ in new ENUM([bools, notyp])))
               Error(17, x.typ);
             var line;
             line = linecount;

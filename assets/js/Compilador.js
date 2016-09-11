@@ -2815,8 +2815,7 @@ function block(fsys, isfun, level){
           var steptyp = TAM_INT;
           if (sy == untilsy){
             insymbol();
-            var p;
-            p = new item("", 1);
+            var p = new item;
             expression(fsys.copy([stepsy, dosy]), p);
             if (p.typ != cvt)
               Error(19, cvt);
@@ -2880,7 +2879,7 @@ function block(fsys, isfun, level){
           lc1 = lc;
           if (kode[lc-1].f == 36)
             f = 16;
-          emit2(linecount, f, steptyp, 0);
+          emit2(linecount, f, cvt, 0);
           if (sy == dosy)
             insymbol();
           else
@@ -2892,7 +2891,7 @@ function block(fsys, isfun, level){
           do {
             line--;
           } while(isOk && InputFile[line].length == 0);
-          emit2(line, f+1, steptyp, lc2);
+          emit2(line, f+1, cvt, lc2);
           kode[lc1].y = lc;
         }
         catch(err){

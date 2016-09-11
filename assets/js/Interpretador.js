@@ -245,64 +245,62 @@ function interpreter(){
 
       break;
       case 14:
-      if (ir.x == TAM_INT){
-        h1 = s.getInt32(t - TAM_INT*3);
-        if(h1 <= s.getInt32(t-TAM_INT*2)){
-          s.setInt32(s.getInt32(t - TAM_INT*4), h1);
-        }
-        else{
-          t -= TAM_INT*4;
-          pc = ir.y;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
+      switch (ir.x) {
+        case reals:
+          h1 = s.getFloat64(t-TAM_REAL*3);
+          if(h1 <= s.getFloat64(t-TAM_REAL*2))
+            s.setFloat64(s.getInt32(t-TAM_REAL*3-TAM_INT), h1);
+          else {
+            t -= TAM_REAL*3+TAM_INT;
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
           }
-        }
-      }
-      else {
-        h1 = s.getFloat64(t - TAM_REAL*3);
-        if(h1 <= s.getFloat64(t-TAM_REAL*2)){
-          s.setFloat64(s.getInt32(t - TAM_REAL*3-TAM_INT), h1);
-        }
-        else{
-          t -= TAM_REAL*3+TAM_INT;
-          pc = ir.y;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
+        break;
+        case ints:
+          h1 = s.getInt32(t-TAM_INT*3);
+          if(h1 <= s.getInt32(t-TAM_INT*2))
+            s.setInt32(s.getInt32(t-TAM_INT*4), h1);
+          else {
+            t -= 4*TAM_INT;
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
           }
-        }
+        break;
+        case chars:
+          h1 = s.getUint8(t-TAM_CHAR*3);
+          if(h1 <= s.getInt32(t-TAM_CHAR*2))
+            s.setInt32(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
+          else {
+            t -= TAM_INT+3*TAM_CHAR;
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
+          }
+        break;
       }
       break;
 
       case 15:
-      if(ir.x == TAM_INT){
-        h2 = s.getInt32(t - TAM_INT * 4);
-        h1 = s.getInt32(h2) + s.getInt32(t-TAM_INT);
-        if (h1 <= s.getInt32(t-TAM_INT * 2)){
-          s.setInt32(h2, h1);
-          pc = ir.y;
-          if(indebug){
-            stopln = kode[pc].line;
-            atualizaVariavel(h2, h1);
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
-          }
-        }
-        else{
-          t -= TAM_INT * 4;
-        }
-      }
-      else {
-        h2 = s.getInt32(t - TAM_REAL * 3 - TAM_INT);
-        h1 = s.getFloat64(h2) + s.getFloat64(t-TAM_REAL);
-        if (h1 <= s.getFloat64(t-TAM_REAL * 2)){
-          s.setFloat64(h2, h1);
+      switch (ir.x) {
+        case reals:
+        h2 = s.getInt32(t-TAM_INT-3*TAM_REAL);
+        h1 = s.getFloat64(h2)+s.getFloat64(t-TAM_REAL);
+        if(h1 <= s.getInt32(t-TAM_REAL*2)){
+          s.setFloat64(h2,h1);
           pc = ir.y;
           if(indebug){
             stopln = kode[pc].line;
@@ -313,83 +311,149 @@ function interpreter(){
           }
         }
         else
-          t -= TAM_REAL * 4;
+          t -= 3 * TAM_REAL + TAM_INT;
+        break;
+        case ints:
+          h2 = s.getInt32(t-TAM_INT*4);
+          h1 = s.getInt32(h2)+s.getInt32(t-TAM_INT);
+          if(h1 <= s.getInt32(t-TAM_INT*2)){
+            s.setInt32(h2,h1);
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              atualizaVariavel(h2, h1);
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
+          }
+          else
+            t -= 4 * TAM_INT;
+        break;
+        case chars:
+          h2 = s.getInt32(t-TAM_INT-TAM_CHAR*3);
+          h1 = s.getUint8(h2)+s.getUint8(t-TAM_CHAR);
+          if(h1 <= s.getInt32(t-TAM_CHAR*2)){
+            s.setUint8(h2,h1);
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              atualizaVariavel(h2, h1);
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
+          }
+          else
+            t -= 3 * TAM_CHAR + TAM_INT;
+        break;
       }
       break;
 
       case 16:
-      if(ir.x == TAM_INT){
-        h1 = s.getInt32(t- TAM_INT * 3);
-        if (h1 >= s.getInt32(t - TAM_INT * 2)){
-          s.setInt32(s.getInt32(t - TAM_INT * 4), h1);
+        switch (ir.x) {
+          case reals:
+            h1 = s.getFloat64(t-TAM_REAL*3);
+            if(h1 >= s.getFloat64(t-TAM_REAL*2))
+              s.setFloat64(s.getInt32(t-TAM_REAL*3-TAM_INT), h1);
+            else {
+              t -= TAM_REAL*3+TAM_INT;
+              pc = ir.y;
+              if(indebug){
+                stopln = kode[pc].line;
+                limpaLinhaDepurador();
+                mostraLinhaDepurador(stopln);
+                stopln--;
+              }
+            }
+          break;
+          case ints:
+            h1 = s.getInt32(t-TAM_INT*3);
+            if(h1 >= s.getInt32(t-TAM_INT*2))
+              s.setInt32(s.getInt32(t-TAM_INT*4), h1);
+            else {
+              t -= 4*TAM_INT;
+              pc = ir.y;
+              if(indebug){
+                stopln = kode[pc].line;
+                limpaLinhaDepurador();
+                mostraLinhaDepurador(stopln);
+                stopln--;
+              }
+            }
+          break;
+          case chars:
+            h1 = s.getUint8(t-TAM_CHAR*3);
+            if(h1 >= s.getInt32(t-TAM_CHAR*2))
+              s.setInt32(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
+            else {
+              t -= TAM_INT+3*TAM_CHAR;
+              pc = ir.y;
+              if(indebug){
+                stopln = kode[pc].line;
+                limpaLinhaDepurador();
+                mostraLinhaDepurador(stopln);
+                stopln--;
+              }
+            }
+          break;
         }
-        else{
-          pc = ir.y;
-          t -= TAM_INT * 4;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
-          }
-        }
-      }
-      else {
-        h1 = s.getFloat64(t- TAM_REAL * 3);
-        if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
-          s.setFloat64(s.getInt32(t - TAM_REAL * 3-TAM_INT), h1);
-          if(debug_op){
-            atualizaVariavel(s.getInt32(t - TAM_REAL * 3-TAM_INT), h1);
-          }
-        }
-        else{
-          pc = ir.y;
-          t -= TAM_REAL * 3 + TAM_INT;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
-          }
-        }
-      }
       break;
 
       case 17:
-      if(ir.x == TAM_INT){
-        h2 = s.getInt32(t - TAM_INT * 3 - TAM_INT);
-        h1 = s.getInt32(h2) + s.getInt32(t - TAM_INT);
-        if (h1 >= s.getInt32(t - TAM_INT * 2)){
-          s.setInt32(h2, h1);
-          pc = ir.y;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
+        switch (ir.x) {
+          case reals:
+          h2 = s.getInt32(t-TAM_INT-3*TAM_REAL);
+          h1 = s.getFloat64(h2)+s.getFloat64(t-TAM_REAL);
+          if(h1 >= s.getInt32(t-TAM_REAL*2)){
+            s.setFloat64(h2,h1);
+            pc = ir.y;
+            if(indebug){
+              stopln = kode[pc].line;
+              atualizaVariavel(h2, h1);
+              limpaLinhaDepurador();
+              mostraLinhaDepurador(stopln);
+              stopln--;
+            }
           }
+          else
+            t -= 3 * TAM_REAL + TAM_INT;
+          break;
+          case ints:
+            h2 = s.getInt32(t-TAM_INT*4);
+            h1 = s.getInt32(h2)+s.getInt32(t-TAM_INT);
+            if(h1 >= s.getInt32(t-TAM_INT*2)){
+              s.setInt32(h2,h1);
+              pc = ir.y;
+              if(indebug){
+                stopln = kode[pc].line;
+                atualizaVariavel(h2, h1);
+                limpaLinhaDepurador();
+                mostraLinhaDepurador(stopln);
+                stopln--;
+              }
+            }
+            else
+              t -= 4 * TAM_INT;
+          break;
+          case chars:
+            h2 = s.getInt32(t-TAM_INT-TAM_CHAR*3);
+            h1 = s.getUint8(h2)+s.getUint8(t-TAM_CHAR);
+            if(h1 >= s.getInt32(t-TAM_CHAR*2)){
+              s.setUint8(h2,h1);
+              pc = ir.y;
+              if(indebug){
+                stopln = kode[pc].line;
+                atualizaVariavel(h2, h1);
+                limpaLinhaDepurador();
+                mostraLinhaDepurador(stopln);
+                stopln--;
+              }
+            }
+            else
+              t -= 3 * TAM_CHAR + TAM_INT;
+          break;
         }
-        else{
-          t -= TAM_INT * 4;
-        }
-      }
-      else {
-        h2 = s.getInt32(t - TAM_REAL * 3 - TAM_INT);
-        h1 = s.getFloat64(h2) + s.getFloat64(t - TAM_REAL);
-        if (h1 >= s.getFloat64(t - TAM_REAL * 2)){
-          s.setFloat64(h2, h1);
-          pc = ir.y;
-          if(indebug){
-            stopln = kode[pc].line;
-            limpaLinhaDepurador();
-            mostraLinhaDepurador(stopln);
-            stopln--;
-          }
-        }
-        else{
-          t -= TAM_REAL * 4;
-        }
-      }
       break;
 
       case 18:

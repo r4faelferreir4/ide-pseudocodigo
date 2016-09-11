@@ -2492,21 +2492,30 @@ function block(fsys, isfun, level){
                   }
                 }
                 else {
-                  if(x.typ == strings && y.typ == chars)
-                    emit1(ln, 25, 1);
-                  emit2(ln, 38, x.typ, assign, i);
+                  if(x.typ == strings){
+                    if(y.typ == chars){
+                      emit1(ln, 25, 1);
+                      emit2(ln, 38, x.typ, assign, i);
+                    }
+                    else
+                      Error(46, x.typ, y.typ, ln);
+                  }
                 }
               }
               else{
-                if (x.typ == reals && y.typ == ints){
-                  emit1(ln, 26,TAM_INT);
-                  switch (op) {
-                    case plus: emit1(ln, 52, x.typ); break;
-                    case minus:emit1(ln, 53, x.typ); break;
-                    case times:emit1(ln, 57, x.typ); break;
-                    case rdiv: emit1(ln, 58, x.typ); break;
+                if (x.typ == reals){
+                  if(y.typ == ints){
+                    emit1(ln, 26, TAM_INT);
+                    switch (op) {
+                      case plus: emit1(ln, 52, x.typ); break;
+                      case minus:emit1(ln, 53, x.typ); break;
+                      case times:emit1(ln, 57, x.typ); break;
+                      case rdiv: emit1(ln, 58, x.typ); break;
+                    }
+                    emit2(ln, 38, x.typ, assign, i);
                   }
-                  emit2(ln, 38, x.typ, assign, i);
+                  else
+                    Error(46, x.typ, y.typ, ln);
                 }
                 else if(x.typ == ints){
                   if(y.typ == reals)

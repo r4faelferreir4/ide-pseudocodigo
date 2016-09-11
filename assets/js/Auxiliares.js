@@ -584,45 +584,45 @@ function getValue(i){
 			return getString(s.getInt32(display[tab[i].lev]+tab[i].adr));
 			break;
 			case arrays:
-				var len = Math.abs(atab[tab[i].ref].low) + Math.abs(atab[tab[i].ref].high) + 1;
-				var a = [];
-				var adr = display[tab[i].lev] + tab[i].adr;
-				switch (atab[tab[i].ref].eltyp) {
-					case ints:
-					case pointers:
-						len = adr + len * TAM_INT;
-						while(adr < len){
-							a.push(s.getInt32(adr));
-							adr += TAM_INT;
-						}
-					break;
-					case reals:
-						len = adr + len * TAM_REAL;
-						while(adr < len){
-							a.push(s.getFloat64(adr));
-							adr += TAM_REAL;
-						}
-					break;
-					case chars:
-					case bools:
-						len = adr + len * TAM_CHAR;
-						while(adr < len){
-							a.push(s.getUint8(adr));
-							adr += TAM_CHAR;
-						}
-					break;
-					case records:
-
-					break;
-					case strings:
-						len = adr + len * TAM_INT;
-						while(adr < len){
-							a.push(getString(s.getInt32(adr)));
-							adr += TAM_INT;
-						}
-					break;
+			var len = Math.abs(atab[tab[i].ref].low) + Math.abs(atab[tab[i].ref].high) + 1;
+			var a = [];
+			var adr = display[tab[i].lev] + tab[i].adr;
+			switch (atab[tab[i].ref].eltyp) {
+				case ints:
+				case pointers:
+				len = adr + len * TAM_INT;
+				while(adr < len){
+					a.push(s.getInt32(adr));
+					adr += TAM_INT;
 				}
-				return a;
+				break;
+				case reals:
+				len = adr + len * TAM_REAL;
+				while(adr < len){
+					a.push(s.getFloat64(adr));
+					adr += TAM_REAL;
+				}
+				break;
+				case chars:
+				case bools:
+				len = adr + len * TAM_CHAR;
+				while(adr < len){
+					a.push(s.getUint8(adr));
+					adr += TAM_CHAR;
+				}
+				break;
+				case records:
+
+				break;
+				case strings:
+				len = adr + len * TAM_INT;
+				while(adr < len){
+					a.push(getString(s.getInt32(adr)));
+					adr += TAM_INT;
+				}
+				break;
+			}
+			return a;
 			break;
 		}
 	}
@@ -784,10 +784,10 @@ function objetoTabela(Nome,Valor, index, lv, adr){
 }
 
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
-function adicionarObjetoVar(posNome,posValor, start, lv, adr, tabela){
+function adicionarObjetoVar(posNome,posValor, start, lv, adr){
 	adr += display[display.length-1];
 	objeto = new objetoTabela(posNome,posValor, start, lv, adr);
-	adicionarTabelaVar(objeto, tabela);
+	adicionarTabelaVar(objeto);
 	arrayObjetoTabela.push(objeto);
 }
 //adicionar objeto filho na tabela
@@ -823,17 +823,27 @@ function atualizaVariavel(adr, value, typ){
 }
 
 function mostraValoresArranjo(id){
-		// adicionarObjetoVar(id, id, 0, 0, 0, "tabelaArranjo");
+	$("#tabelaArranjo tr:gt(0)").remove();
+	var table = document.getElementById("tabelaArranjo");
+	var v = tab[id];
+	var valores = getValue(id);
+	if (v !== undefined && valores !== undefined) {
+		for (var i = (valores.length - 1); i >= 0; i--) {
+			var row = table.insertRow(1);
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(1);
+			cell1.innerHTML = v.name+"["+i+"]";
+			cell2.innerHTML = valores[i];
+		}
+	}
+
 }
 
 //var para pegar o id do pai
 var id_linha_pai = 0;
 
-function adicionarTabelaVar(objeto, tabela) {
-	if (tabela === undefined) {
-		tabela = "tab_var";
-	}
-	var table = document.getElementById(tabela);
+function adicionarTabelaVar(objeto) {
+	var table = document.getElementById("tab_var");
 	var row = table.insertRow(2);
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);

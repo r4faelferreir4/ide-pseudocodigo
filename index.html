@@ -48,10 +48,10 @@
 
       </div>
       <button type="button" class="btn btn-default pull-right" title="Diminuir fonte" onclick="diminuirTamanho()">
-         <span class="glyphicon glyphicon-zoom-out"></span>
+        <span class="glyphicon glyphicon-zoom-out"></span>
       </button>
       <button type="button" class="btn btn-default pull-right" title="Aumentar fonte" onclick="aumentarTamanho()">
-         <span class="glyphicon glyphicon-zoom-in"></span>
+        <span class="glyphicon glyphicon-zoom-in"></span>
       </button>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
@@ -229,60 +229,95 @@
   </div>
 </div>
 <!--  fim Modal -->
+
+
+<!-- Modal arranjo -->
+<div class="modal fade" id="modalArranjo" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Arranjo</h4>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <div class="table-responsive" style="max-height:300px; overflow:auto">
+          <table class="table table-striped" id="tabelaArranjo">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="modalFooter" class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Esconder</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  fim Modal -->
+
 <script>
-  document.getElementById("painelDebug").style.visibility = "hidden";
+document.getElementById("painelDebug").style.visibility = "hidden";
 
-  var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
-    lineNumbers: true,
-    mode: "text/x-pascal",
-    gutters: ["CodeMirror-linenumbers", "breakpoints"]
-  });
-  editor.on("change", function(){
-    codeChanged = true;
-  });
+var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
+  lineNumbers: true,
+  mode: "text/x-pascal",
+  gutters: ["CodeMirror-linenumbers", "breakpoints"]
+});
+editor.on("change", function(){
+  codeChanged = true;
+});
 
-  editor.on("gutterClick", function(cm, n) {
-    var info = cm.lineInfo(n);
-    cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : fazerPontoParada());
-  });
+editor.on("gutterClick", function(cm, n) {
+  var info = cm.lineInfo(n);
+  cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : fazerPontoParada());
+});
 </script>
 <script async>
-  function getCode(){
-    time = new Date().getTime();
-    InputFile = editor.getValue();
-    isOk = true;
-    isDone = false;
-    compiladorPascalS();
-    document.getElementById("output").value = "";
-    time = new Date().getTime() - time;
-    if (isOk && isDone){
+function getCode(){
+  time = new Date().getTime();
+  InputFile = editor.getValue();
+  isOk = true;
+  isDone = false;
+  compiladorPascalS();
+  document.getElementById("output").value = "";
+  time = new Date().getTime() - time;
+  if (isOk && isDone){
+    mostraErro();
+    mostrarModalOutput();
+    debug_op = false;
+    setTimeout(function(){
+      call_read = false;
+      interpret();
+    }, 300);
+  }
+  else {
+    if (isOk){
       mostraErro();
       mostrarModalOutput();
       debug_op = false;
       setTimeout(function(){
         call_read = false;
         interpret();
+        scrollOutput();
       }, 300);
     }
     else {
-      if (isOk){
+      if (isDone){
         mostraErro();
-        mostrarModalOutput();
-        debug_op = false;
-        setTimeout(function(){
-          call_read = false;
-          interpret();
-          scrollOutput();
-        }, 300);
       }
-      else {
-        if (isDone){
-          mostraErro();
-        }
-      }
-      //alert(text);
     }
+    //alert(text);
   }
+}
 
 </script>
 </body>

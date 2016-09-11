@@ -17,28 +17,28 @@ function diminuirTamanho(){
 }
 
 function RandomGen(seed) {
-    this.seed = seed || 0;  //semente = zero, por padrão
+	this.seed = seed || 0;  //semente = zero, por padrão
 
-    this.random = function (n) {
-    //Entrada facultativa: n (número inteiro positivo)
-    //Saídas:  a) 0 <= valor < 1(se n for omitido); ou b) 0 <= valor < n
-    //O algoritmo abaixo é o mesmo usado pelo Delphi 7. (SANTOS, W.L.; FACET/UFGD; 2016)
+	this.random = function (n) {
+		//Entrada facultativa: n (número inteiro positivo)
+		//Saídas:  a) 0 <= valor < 1(se n for omitido); ou b) 0 <= valor < n
+		//O algoritmo abaixo é o mesmo usado pelo Delphi 7. (SANTOS, W.L.; FACET/UFGD; 2016)
 
-        n = n || 1;  //n = 1, por padrão: 0 <= valores < 1
-        this.seed = (Math.imul(134775813, this.seed) + 1) & 0xffffffff; //(x%2^32=x&(2^32-1))
-        if (n === 1) {
-            if (this.seed >= 0)
-               return this.seed / 4294967296;  //4294967296 = 2^32
-            else
-                return 1 + this.seed / 4294967296;
-        }
-        else {
-            if (this.seed >= 0)
-                return Math.floor(this.seed / 4294967296 * n);
-            else
-                return n + Math.floor(this.seed / 4294967296 * n);
-        }
-   }
+		n = n || 1;  //n = 1, por padrão: 0 <= valores < 1
+		this.seed = (Math.imul(134775813, this.seed) + 1) & 0xffffffff; //(x%2^32=x&(2^32-1))
+		if (n === 1) {
+			if (this.seed >= 0)
+			return this.seed / 4294967296;  //4294967296 = 2^32
+			else
+			return 1 + this.seed / 4294967296;
+		}
+		else {
+			if (this.seed >= 0)
+			return Math.floor(this.seed / 4294967296 * n);
+			else
+			return n + Math.floor(this.seed / 4294967296 * n);
+		}
+	}
 }
 
 function rand(x){
@@ -70,7 +70,7 @@ function testRandom(n){
 
 
 function time32() {
-   return new Date().getTime() & 0x7fffffff; // getTime() % (2^31) = getTime() % (2^31-1=0x7fffffff)
+	return new Date().getTime() & 0x7fffffff; // getTime() % (2^31) = getTime() % (2^31-1=0x7fffffff)
 }
 /* fim teste tooltip */
 $(document).ready(function() {
@@ -394,12 +394,12 @@ function StringAlloc(str, sAddress, SelfDestruct){
 function StringDel(str, i, n){
 	len = StringLength(str);
 	if (i == 0)
-		return 0;
+	return 0;
 	else if ( i < 0)
-		i = len + i + 1;
+	i = len + i + 1;
 	str_end = str+len;
 	if(i+n > len)		//Evita extrapolar o tamanho da string
-		n = len-i+1;
+	n = len-i+1;
 	i += str;
 	s.setUint8(str, len-n);
 	MemoryFree(str+len-n+1, n);
@@ -731,13 +731,6 @@ function carregaVariaveis(start){//str_tab
 				value = s.getInt32(display[tab[start].lev]+tab[start].adr);
 			}
 			if(tab[start].typ == "records"){
-				// var lv = tab[start].lev;
-				// adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
-				// do {
-				// 	start++;
-				// 	adicionarObjetoFilho(tab[start].name, value, start, tab[start].lev, tab[start].adr);
-				// } while (tab[start].lev > lv);
-				// continue;
 				if (tab[start].obj == "variable") {
 					var ref = tab[start].ref;
 					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
@@ -752,10 +745,18 @@ function carregaVariaveis(start){//str_tab
 						}
 					}
 				}
-
 			}
+
 			if((tab[start].obj == "variable" || tab[start].obj == "konstant")){
-				adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+
+				if(tab[start].typ == "arrays") {
+					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+				}else{
+					adicionarObjetoVar(tab[start].name, value, start, tab[start].lev, tab[start].adr);
+					if (tab[start].lev < 2) {
+					}
+
+				}
 			}
 			start++;
 		}
@@ -783,10 +784,10 @@ function objetoTabela(Nome,Valor, index, lv, adr){
 }
 
 //cria objeto tabela e verifica se existe os valores para adicionar na tabela
-function adicionarObjetoVar(posNome,posValor, start, lv, adr){
+function adicionarObjetoVar(posNome,posValor, start, lv, adr, tabela){
 	adr += display[display.length-1];
 	objeto = new objetoTabela(posNome,posValor, start, lv, adr);
-	adicionarTabelaVar(objeto);
+	adicionarTabelaVar(objeto, tabela);
 	arrayObjetoTabela.push(objeto);
 }
 //adicionar objeto filho na tabela
@@ -821,11 +822,18 @@ function atualizaVariavel(adr, value, typ){
 	}
 }
 
+function mostraValoresArranjo(id){
+		// adicionarObjetoVar(id, id, 0, 0, 0, "tabelaArranjo");
+}
+
 //var para pegar o id do pai
 var id_linha_pai = 0;
 
-function adicionarTabelaVar(objeto) {
-	var table = document.getElementById("tab_var");
+function adicionarTabelaVar(objeto, tabela) {
+	if (tabela === undefined) {
+		tabela = "tab_var";
+	}
+	var table = document.getElementById(tabela);
 	var row = table.insertRow(2);
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
@@ -839,7 +847,14 @@ function adicionarTabelaVar(objeto) {
 		cell1.innerHTML = "<i class='glyphicon glyphicon-plus'></i>";
 		cell2.innerHTML = objeto.Nome;
 		id_linha_pai = objeto.idtab;
+		break;
 
+		case "arrays":
+		cell1.innerHTML = objeto.Nome;
+		cell2.innerHTML = "<button type='button' class='btn btn-default' data-toggle='modal' data-target='#modalArranjo'><span class='glyphicon glyphicon-eye-open'></span></button>";
+		cell2.addEventListener("click", function(){
+			mostraValoresArranjo(objeto.idtab);
+		});
 		break;
 
 		default:

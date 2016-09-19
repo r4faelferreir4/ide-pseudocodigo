@@ -62,9 +62,8 @@ var outputConsole;			//Armazena referencia ao output console
 var startTime;					//Tempo de inicio da execução do algoritmo
 var intervalExecution;		//Armazena ID de setInterval
 var seed;							//Semente do gerador de números pseudo-aleatórios
-var TimeStack;				//Pilha para inicio da contagem de tempo.
-var IndexTimeStack;		//Índice da pilha de contagem de tempo.
 var isRunning;				//Flag que aponta se o interpretador está executando algum código.
+var randGem;					//Função geradora de números aleatórios
 function MemoryBlock(start, size, isAvailable){   //Objeto para gerenciamento de memória
 	this.start = start;
 	this.size = size;
@@ -215,7 +214,7 @@ chars = "chars", strings = "strings", pointers = "pointers", arrays = "arrays", 
 //Objetos
 const type1 = "type1", funktion = "funktion", prozedure = "prozedure", variable = "variable", konstant = "konstant";
 
-//Fatores
+//Literais
 const intcon = "intcon", realcon = "realcon", charcon = "charcon", stringsy = "stringsy", ident = "ident";
 
 //Operadores
@@ -235,5 +234,5 @@ casesy = "casesy", ofsy = "ofsy", dosy = "dosy", tosy = "tosy",
 elsesy = "elsesy", ifsy = "ifsy", untilsy = "untilsy", whilesy =  "whilesy", thensy = "thensy",
 programsy = "programsy", stepsy = "stepsy",  downtosy = "downtosy", refsy = "refsy",
 recordsy = "recordsy", arraysy = "arraysy",
-repeatsy = "repeatsy", forsy = "forsy";
+repeatsy = "repeatsy", forsy = "forsy", returnsy = "returnsy";
 //FIM DECLARAÇÕES DE TOKENS

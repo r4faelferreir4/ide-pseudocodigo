@@ -278,8 +278,8 @@ function interpreter(){
         break;
         case chars:
           h1 = s.getUint8(t-TAM_CHAR*3);
-          if(h1 <= s.getInt32(t-TAM_CHAR*2))
-            s.setInt32(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
+          if(h1 <= s.getUint8(t-TAM_CHAR*2))
+            s.setUint8(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
           else {
             t -= TAM_INT+3*TAM_CHAR;
             pc = ir.y;
@@ -299,7 +299,7 @@ function interpreter(){
         case reals:
         h2 = s.getInt32(t-TAM_INT-3*TAM_REAL);
         h1 = s.getFloat64(h2)+s.getFloat64(t-TAM_REAL);
-        if(h1 <= s.getInt32(t-TAM_REAL*2)){
+        if(h1 <= s.getFloat64(t-TAM_REAL*2)){
           s.setFloat64(h2,h1);
           pc = ir.y;
           if(indebug){
@@ -333,7 +333,7 @@ function interpreter(){
         case chars:
           h2 = s.getInt32(t-TAM_INT-TAM_CHAR*3);
           h1 = s.getUint8(h2)+s.getUint8(t-TAM_CHAR);
-          if(h1 <= s.getInt32(t-TAM_CHAR*2)){
+          if(h1 <= s.getUint8(t-TAM_CHAR*2)){
             s.setUint8(h2,h1);
             pc = ir.y;
             if(indebug){
@@ -384,8 +384,8 @@ function interpreter(){
           break;
           case chars:
             h1 = s.getUint8(t-TAM_CHAR*3);
-            if(h1 >= s.getInt32(t-TAM_CHAR*2))
-              s.setInt32(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
+            if(h1 >= s.getUint8(t-TAM_CHAR*2))
+              s.setUint8(s.getInt32(t-TAM_CHAR*3-TAM_INT), h1);
             else {
               t -= TAM_INT+3*TAM_CHAR;
               pc = ir.y;
@@ -405,7 +405,7 @@ function interpreter(){
           case reals:
           h2 = s.getInt32(t-TAM_INT-3*TAM_REAL);
           h1 = s.getFloat64(h2)+s.getFloat64(t-TAM_REAL);
-          if(h1 >= s.getInt32(t-TAM_REAL*2)){
+          if(h1 >= s.getFloat64(t-TAM_REAL*2)){
             s.setFloat64(h2,h1);
             pc = ir.y;
             if(indebug){
@@ -439,7 +439,7 @@ function interpreter(){
           case chars:
             h2 = s.getInt32(t-TAM_INT-TAM_CHAR*3);
             h1 = s.getUint8(h2)+s.getUint8(t-TAM_CHAR);
-            if(h1 >= s.getInt32(t-TAM_CHAR*2)){
+            if(h1 >= s.getUint8(t-TAM_CHAR*2)){
               s.setUint8(h2,h1);
               pc = ir.y;
               if(indebug){
@@ -1465,15 +1465,15 @@ function interpreter(){
       break;
       case 72:    //Aleatório
         if(ir.y == 0){
-          s.setFloat64(t, rand(1));
+          s.setFloat64(t, randGem.random(1));
           t += TAM_REAL;
         }
         else
-          s.setInt32(t-TAM_INT, rand(s.getInt32(t-TAM_INT)));
+          s.setInt32(t-TAM_INT, randGem.random(s.getInt32(t-TAM_INT)));
 
       break;
       case 73:    //Setar semente da função aleatório
-        seed = s.getInt32(t-TAM_INT);
+        RandomGen.seed(s.getInt32(t-TAM_INT));
         t -= TAM_INT;
       break;
       case 74:    //Pegar tempo
@@ -1517,11 +1517,9 @@ function interpret(){
     startTime = new Date().getTime();
     time = 0;
     b = 0;
-    seed = 1;
+    randGem = new RandomGen();
     display = [];
-    TimeStack = [];
     isRunning = true;
-    IndexTimeStack = 0;
     display[1] = 0;
     outputConsole = document.getElementById("output");
     t = btab[2].vsize;

@@ -1,7 +1,7 @@
-programa test();
+programa test;
 const
 	name = 'Jacons de Souza Morais';
-    j = 34;
+  j = 34;
 tipos
 	din = real;
 var
@@ -35,7 +35,7 @@ inicio
 fim.
 
 //Sequência de Fibonacci
-programa fibonacci();
+programa fibonacci;
 var
 	a, b, aux, i, n:inteiro;
 inicio
@@ -71,7 +71,7 @@ inicio
 	escreva('\nO valor da sequência de fibonacci é ', aux);
 fim.
 //Calcular média
-programa media();
+programa media;
 var
 	p1, p2, total:real;
     nome:literal;

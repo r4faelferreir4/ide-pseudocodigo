@@ -115,7 +115,7 @@ shortcut.add("Ctrl+F7", function(){FinishIt();});
 function FinishIt(){
 	indebug = false;
 	bydebug = false;
-	runToCursor = false;
+	CursorRun = false;
 	outdebug = false;
 	interpret();
 }

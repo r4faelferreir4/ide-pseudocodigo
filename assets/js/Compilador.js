@@ -1,37 +1,9 @@
-function initArray(){
-  var j = 0;
-  console.log("iniciando tab");
-  do{
-    tab[j] =  new Ttab();
-    j++;
-  }while(isOk && j < tmax);
-  j = 0;
-  console.log("tab iniciada");
-  do{
-    atab[j] = {inxtyp: [""], eltyp: [""], elref: 1, low: 1, high: 1, elsize: 1, size: 1 };
-    j++;
-  }while(isOk && j < amax);
-  j = 0;
-  console.log("atab iniciada");
-  do{
-    btab[j] = {last: 0, lastpar: 0, psize: 0, vsize: 0};
-    j++;
-  }while(isOk && j < bmax);
-  j = 0;
-  console.log("btab iniciada");
-  do{
-    kode[j] = new order();
-    j++;
-  }while(isOk &&  j < cmax);
-  j = 0;
-  console.log("kode iniciada");
-}
 function compiladorPascalS(){
   if(lastCompiledCode == GetHashCode(InputFile) && isDone)  return;
   lastCompiledCode = GetHashCode(InputFile);
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
-  function ErrorMsg(code){
+  function ErrorMsg(code){//retorno
     var k, Msg = [];
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
@@ -74,6 +46,8 @@ function compiladorPascalS(){
     Msg[69] = "Programa incompleto";
     Msg[70] = "Os rótulos devem ser informados antes do senão na estrutura caso.";
     Msg[71] = "Você está tentando acessar um valor de retorno de um identificador que não é uma função.";
+    Msg[72] = "A instrução \'retorna\' só pode ser utilizada em funções.";
+    Msg[73] = "Tipo de retorno incompatível com a função.";
     return Msg[code];
   }
 
@@ -238,10 +212,6 @@ function compiladorPascalS(){
             str += "\nO tipo permitido para o índice deste arranjo é "+tp+".";
           break;
           case 46:
-            //line-=2;
-            //limparCodeBox();
-            //str = ErrorMsg(code);
-            //mostraErroNaLinha(line, str);
             var type1 = (errorName == ints)?"inteiro":(errorName == reals)?"real":(errorName == chars)?"caracter":(errorName == strings)?"string":(errorName == records)?"registro":(errorName ==notyp)?"sem tipo":(errorName == pointers)?"ponteiro":"";
             var type2 = (ref == ints)?"inteiro":(ref == reals)?"real":(ref == chars)?"caracter":(ref == strings)?"string":(ref == records)?"registro":(ref ==notyp)?"sem tipo":(ref == pointers)?"ponteiro":"";
             str += " Você está atribuindo um valor "+type2+" a uma variável "+type1+".";
@@ -261,6 +231,11 @@ function compiladorPascalS(){
             limparCodeBox();
             mostraErroNaLinha(linecount, strError);
             str = "Um erro foi encontrado na linha "+linecount+1+": "+strError;
+          break;
+          case 73:
+            var tp = (errorName == ints)?"inteiro":(errorName == reals)?"real":(errorName == bools)?"logico":(errorName == chars)?"caracter":(errorName == strings)?"string":(errorName == records)?"registro":(errorName ==notyp)?"sem tipo":(errorName == pointers)?"ponteiro":"";
+            var tpref  = (ref == ints)?"inteiro":(ref == reals)?"real":(ref == bools)?"logico":(ref == chars)?"caracter":(ref == strings)?"string":(ref == records)?"registro":(ref ==notyp)?"sem tipo":(ref == pointers)?"ponteiro":"";
+            str += "Espera-se um retorno do tipo "+tpref+" mas você está retornando um valor do tipo "+tp+".";
           break;
         }
 
@@ -1313,7 +1288,6 @@ function block(fsys, isfun, level){
             case chars:
             case bools: len = TAM_CHAR; break;
             default:  len = TAM_INT ;
-
           }
         }
         emit1(linecount-1, 32 + bool, len);
@@ -1809,16 +1783,29 @@ function block(fsys, isfun, level){
                         case konstant:
                         case type1:
                         case variable:
-                        switch (tab[indexID].typ) {
+                        var item_id = new item;
+                        item_id.typ = tab[indexID].typ;
+                        item_id.ref = tab[indexID].ref;
+                        if(item_id.typ == pointers)
+                          item_id.typ = tab[indexID].xtyp;
+                        switch (item_id.typ) {
                           case reals:
-                            length = 8;
+                            length = TAM_REAL;
                           break;
                           chars:
                           bools:
-                            length = 1;
+                            length = TAM_CHAR;
+                          break;
+                          case ints:
+                            length = TAM_INT;
                           break;
                           default:
-                            length = 4;
+                          if(item_id.typ == arrays)
+                            length = atab[item_id.ref].size;
+                          else if(item_id.typ == records)
+                            length = btab[item_id.ref].vsize;
+                          else
+                            Error(48);
                         }
                         break;
                       }
@@ -2167,7 +2154,7 @@ function block(fsys, isfun, level){
               }
               else
                 if (op == minus)
-                  emit1(linecount, 36, TAM_INT);
+                  emit1(linecount, 36, (x.typ == reals)? TAM_REAL : TAM_INT);
             }
             else
               term(fsys.copy([plus, minus, orsy]), x);
@@ -2829,7 +2816,7 @@ function block(fsys, isfun, level){
             if (p.typ != cvt)
               Error(19, cvt);
             else{
-              if (sy == stepsy){
+              if (sy == stepsy){/*
                 insymbol();
                 if (sy == minus){
                   insymbol();
@@ -2876,10 +2863,16 @@ function block(fsys, isfun, level){
                   Error(19, cvt);
                 }
                 insymbol();
+              */
+                insymbol();
+                var stepitem = new item;
+                expression(fsys.copy([dosy]), stepitem);
+                if(stepitem.typ != cvt)
+                  Error(19, cvt, stepitem.typ);
               }
-              else {
+              else
                 emit2(linecount, 24, cvt, 1);
-              }
+
             }
           }
           else {
@@ -2908,6 +2901,32 @@ function block(fsys, isfun, level){
           ErrorMsg = err;
         }
       }//forstatement
+
+      function returnstatement(){
+        if(isfun){
+          insymbol();
+          if(sy in constbegsys){
+            emit2(linecount, 0, level, 0);
+            var returnItem = new item;
+            expression(fsys, returnItem);
+            if(returnItem.typ == tab[prt].typ){
+              emit2(linecount, 38, tab[prt].typ, 1);
+              var len;
+              switch (tab[prt].typ) {
+                case reals: len = TAM_REAL; break;
+                case chars:
+                case bools: len = TAM_CHAR; break;
+                default:  len = TAM_INT ;
+              }
+              emit1(linecount, 33, len);
+            }
+            else
+              Error(73, returnItem.typ, tab[prt].typ, linecount);
+          }
+        }
+        else
+          Error(72);
+      }//returnstatement
 
       function standproc(n){
         try{
@@ -3223,6 +3242,9 @@ function block(fsys, isfun, level){
           case forsy:
           forstatement();
           break;
+          case returnsy:
+          returnstatement();
+          break;
         }
         if (sy == semicolon){
           Error(7);
@@ -3243,40 +3265,39 @@ function block(fsys, isfun, level){
     EnterBlock();
     display[level] = b;
     prb = b;
-    if (tab[prt].obj == funktion)
-      switch (tab[prt-1].typ) {
-        case reals: dx += TAM_REAL;  break;
-        case bools:
-        case chars: dx += TAM_CHAR;  break;
-        default:  dx += TAM_INT;
-
-      }
     tab[prt].typ = notyp;
     tab[prt].ref = prb;
     if (sy == lparent)
     parameterlist();
     btab[prb].lastpar = t;
-    btab[prb].psize = dx;
     if (isfun)
-    if (sy == colon){
-      insymbol();
-      if (sy == ident){
-        x = loc(id);
+      if (sy == colon){
         insymbol();
-        if (x != 0)
-        if (tab[x].obj != type1)
-        Error(29);
+        if (sy == ident){
+          x = loc(id);
+          insymbol();
+          if (x != 0)
+            if (tab[x].obj != type1)
+              Error(29);
+            else if (tab[x].typ in stantyps)
+              tab[prt].typ = tab[x].typ;
+            else
+              Error(15);
+          else
+              Error(0);
+          switch (tab[prt].typ) {
+            case reals: dx += TAM_REAL;  break;
+            case bools:
+            case chars: dx += TAM_CHAR;  break;
+            default:  dx += TAM_INT;
+          }
+        }
         else
-        if (tab[x].typ in stantyps)
-        tab[prt].typ = tab[x].typ;
-        else
-        Error(15);
+        skip(fsys.copy(semicolon), 2);
       }
       else
-      skip(fsys.copy(semicolon), 2);
-    }
-    else
-    Error(5);
+        Error(5);
+    btab[prb].psize = dx;
     do{
       if (sy == constsy)
         constantdeclaration();
@@ -3340,7 +3361,7 @@ try{
   key[24] = 'tipo';
   key[25] = 'ate'; key[26] = 'var';
   key[27] = 'enquanto'; key[28] = 'ref';
-  key[29] = "passo";
+  key[29] = "passo"; key[30] = 'retorne';
   ksy[1] = andsy; ksy[2] = arraysy;
   ksy[3] = beginsy; ksy[4] = casesy;
   ksy[5] = constsy; ksy[6] = idiv;
@@ -3355,7 +3376,7 @@ try{
   ksy[23] = tosy; ksy[24] = typesy;
   ksy[25] = untilsy; ksy[26] = varsy;
   ksy[27] = whilesy; ksy[28] = refsy;
-  ksy[29] = stepsy;
+  ksy[29] = stepsy; ksy[30] = returnsy
   sps['+'] = plus; sps['-'] = minus;
   sps['*'] = times; sps['/'] = rdiv;
   sps['('] = lparent; sps[')'] = rparent;
@@ -3386,7 +3407,7 @@ try{
   typebegsys = new ENUM([ident, arraysy, recordsy]);
   blockbegsys = new ENUM([constsy, typesy, varsy, proceduresy, functionsy, beginsy]);
   facbegsys = new ENUM([intcon, realcon, charcon, stringsy, ident, lparent, notsy]);
-  statbegsys = new ENUM([beginsy, ifsy, whilesy, repeatsy, forsy, casesy]);
+  statbegsys = new ENUM([beginsy, ifsy, whilesy, repeatsy, forsy, casesy, returnsy]);
   stantyps = new ENUM([notyp, ints, reals, bools, chars, strings, pointers]);
   lc = 0;
   ll = 0;

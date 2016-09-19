@@ -41,33 +41,6 @@ function RandomGen(seed) {
 	}
 }
 
-function rand(x){
-	var rnd = 314159269 * seed + 453806245;
-	rnd = rnd & 2147483647;
-	seed++;
-	return x == 1 ? rnd / 2147483647 * x : parseInt(rnd / 2147483647 * x);
-}
-
-function testRandom(n){
-	var i = 0, x;
-	var tempo = Date.now();
-	seed = 1;
-	for(i = 0; i < n; i++){
-		rand(1);
-		rand(x);
-	}
-	console.log(Date.now() - tempo);
-	tempo = Date.now();
-	var rr = new RandomGen(1);
-	for(i = 0; i < n; i++){
-		rr.random();
-		rr.random(i);
-	}
-	console.log(Date.now() - tempo)
-
-
-}
-
 
 function time32() {
 	return new Date().getTime() & 0x7fffffff; // getTime() % (2^31) = getTime() % (2^31-1=0x7fffffff)
@@ -688,7 +661,7 @@ function adicionarTabelaPilha(funcao) {
 }
 
 function removerTopoPilha() {
-	document.getElementById("tab_logic").deleteRow(1);
+	document.getElementById("tab_logic").deleteRow(0);
 }
 
 function getNumberStacks(){
@@ -1466,11 +1439,11 @@ function mostraItensDepuracao(bool){
 		document.getElementById("coluna_direita").style.height = "400px";
 
 	} else {
-		document.getElementById("continuar").style.visibility = "hidden";
-		document.getElementById("exe_cursor").style.visibility = "hidden";
-		document.getElementById("prox_funcao").style.visibility = "hidden";
+		//document.getElementById("continuar").style.visibility = "hidden";
+		//document.getElementById("exe_cursor").style.visibility = "hidden";
+		//document.getElementById("prox_funcao").style.visibility = "hidden";
 		// document.getElementById("exe_entrando").style.visibility = "hidden";
-		document.getElementById("exe_saindo").style.visibility = "hidden";
+		//document.getElementById("exe_saindo").style.visibility = "hidden";
 		//document.getElementById("nao_parar").style.visibility = "hidden";
 		//document.getElementById("lb_nao_parar").style.visibility = "hidden";
 		document.getElementById("coluna_direita").style.visibility = "hidden";

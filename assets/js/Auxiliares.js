@@ -165,11 +165,7 @@ function MemoryFree(start, length){
 	i = right;
 	else if(Blocks[right+1] instanceof MemoryBlock && Blocks[right+1].start == start)
 	i = right+1;
-	else{
-		// console.log("Não foi encontrado");
-		debugger;
-		return;
-	}
+	else		return;
 
 	if(start+length <= Blocks[i].start+Blocks[i].size){
 		if(Blocks[i].isAvailable)
@@ -257,7 +253,6 @@ function testAloc(n){
 
 //Função para gerar uma hash do código fonte compilado.
 function GetHashCode(str) {
-	debugger;
 	var hash = 0, i;
 	if (str.length == 0)
 	return hash;

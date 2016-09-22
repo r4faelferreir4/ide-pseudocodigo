@@ -1122,7 +1122,7 @@ function block(fsys, isfun, level){
               if (sy == comma)
                 insymbol();
             }
-            test(new ENUM([ident, varsy]), new ENUM([ident, varsy]), fsys.copy(rparent), 6);
+            test(new ENUM([ident, refsy]), new ENUM([ident, refsy]), fsys.copy(rparent), 6);
           }
         }
         if (sy == rparent){
@@ -3285,11 +3285,18 @@ function block(fsys, isfun, level){
               Error(15);
           else
               Error(0);
+          var len;
           switch (tab[prt].typ) {
-            case reals: dx += TAM_REAL;  break;
+            case reals: len = TAM_REAL;  break;
             case bools:
-            case chars: dx += TAM_CHAR;  break;
-            default:  dx += TAM_INT;
+            case chars: len = TAM_CHAR;  break;
+            default: len = TAM_INT;
+          }
+          dx += len;
+          var prt1 = prt+1;
+          while(prt1 <= t){
+            tab[prt1].adr += len;
+            prt1++;
           }
         }
         else

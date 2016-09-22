@@ -21,7 +21,7 @@
     "strtmo strbusca strins"
   );
 
-  var reservadas = words("xou e retorne arranjo inicio caso const div faca senao fim para funcao se mod " +
+  var reservadas = words("retorne xou e retorne arranjo inicio caso const div faca senao fim para funcao se mod " +
   "nao de procedimento ou programa registro repita entao tipo ate enquanto var passo ref ");
 
 

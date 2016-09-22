@@ -2289,6 +2289,8 @@ function block(fsys, isfun, level){
             f = 0;
           else
             f = 1;
+          if(changed)
+            ln++;
           emit2(ln, f, lv, ad, ints);
           if(sy == ptr){
             insymbol();

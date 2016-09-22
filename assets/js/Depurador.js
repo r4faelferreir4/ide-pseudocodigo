@@ -140,13 +140,14 @@ function byRoutine(){
 	else{
 		if(kode[pc].f == 18){
 			sNumber = getNumberStacks();
-			debug_op = true;
 			stopln = kode[pc].line;
 			bydebug = true;
 			interpret();
 		}
-		else
-		inRoutine();
+		else{
+			bydebug = true;
+			interpret();
+		}
 	}
 
 

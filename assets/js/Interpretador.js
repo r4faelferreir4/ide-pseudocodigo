@@ -875,7 +875,7 @@ function interpreter(){
       var marker = document.getElementById("mk_"+kode[pc].line);
       if(marker != null)
         marker.innerHTML = marker.innerHTML - 1;
-      if(outdebug && sNumber > getNumberStacks()){
+      if(outdebug && sNumber > getNumberStacks() || (indebug || bydebug)){
         stopln = kode[pc].line;
         limpaLinhaDepurador();
         mostraLinhaDepurador(stopln);

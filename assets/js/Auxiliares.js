@@ -656,7 +656,7 @@ function adicionarTabelaPilha(funcao) {
 }
 
 function removerTopoPilha() {
-	document.getElementById("tab_logic").deleteRow(0);
+	document.getElementById("tab_logic").deleteRow(1);
 }
 
 function getNumberStacks(){
@@ -664,7 +664,7 @@ function getNumberStacks(){
 }
 
 function removerTodaPilhaFuncoes(){
-	$("#tab_logic tr:gt(0)").remove();
+	$("#tab_logic tr:gt(1	)").remove();
 }
 
 //fim funcoes para pilha

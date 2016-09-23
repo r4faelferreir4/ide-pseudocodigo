@@ -4,7 +4,7 @@ function interpreter(){
     pc++;
     ocnt++;
     if (debug_op){
-      if(ir.line != linecount){
+      if(ir.line != linecount ){
         incrementar(ir.line);
         linecount = ir.line;
       }
@@ -856,7 +856,7 @@ function interpreter(){
       pc = s.getInt32(b+ir.y);
       removerTopoPilha();
       var last = arrayObjetoTabela[arrayObjetoTabela.length - 1];     //Última variável retirada da pilha
-      while (arrayObjetoTabela.splice(-1,1) instanceof objetoTabela && arrayObjetoTabela.splice(-1,1).lv == last.lv) {
+      while (last instanceof objetoTabela && arrayObjetoTabela[arrayObjetoTabela.length-1].lv == last.lv) {
         if(arrayObjetoTabela[arrayObjetoTabela.length - 1].idtab <= last.idtab){     //Verificação para chamadas recursivas
           removerTopoPilhaVar();
           last = arrayObjetoTabela.pop();

@@ -2318,7 +2318,7 @@ function block(fsys, isfun, level){
               fstring = true;
             selector(fsys.copy([becomes, eql, plus, minus, rdiv, times]), x, true);
           }
-          ln = linecount;
+          //ln = linecount;
           if (sy == becomes)
             insymbol();
           else {

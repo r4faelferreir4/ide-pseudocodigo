@@ -1061,7 +1061,6 @@ function toTab(strTOTAL){
 		adr = toInt(strTOTAL.slice(x, x += 32));
 		tab1[p] = new Ttab(name, link, obj, typ, ref, normal, lev, adr);
 	}
-	debugger;
 	var ix = 0;
 	while(ix < iTab){
 		if (tab[ix].f != tab1[ix].f)
@@ -1072,7 +1071,6 @@ function toTab(strTOTAL){
 		// console.log("Diferença em " + ix + " em y.");
 		ix++;
 	}
-	debugger;
 	//CRIANDO A ESTRUTURA atab
 	atab = [];
 	for (p = 0; p < iAtab; p++){

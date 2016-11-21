@@ -675,8 +675,9 @@ var arrayObjetoTabela = [];
 //Carregar variáveis no depurador
 
 function carregaVariaveis(start){//str_tab
-	var value;
-	// console.log("inicio");
+	var value, itab = start-1;
+	if (tab[itab].lev <= display.length-1)
+		return;
 	while(tab[start] instanceof Ttab && tab[start].obj != "prozedure" && tab[start].obj != "funktion" && tab[start].name != "") {
 		if (tab[start].obj != "prozedure" && tab[start].obj != "funktion"){
 			switch (tab[start].typ) {

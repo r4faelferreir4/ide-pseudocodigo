@@ -3,7 +3,7 @@ function compiladorPascalS(){
   lastCompiledCode = GetHashCode(InputFile);
   InputFile = InputFile.split("\n");
   indexmax = InputFile.length;
-  function ErrorMsg(code){//retorno
+  function Error2(code){
     var k, Msg = [];
     Msg[0] = "Identificador \'"+id+"\' não reconhecido."; Msg[1] = "Declarações múltiplas não são permitidas.";
     Msg[2] = "Está faltando um identificador."; Msg[3] = "Está faltando a palavra reservada \'programa\' no inicio do código." ;
@@ -34,7 +34,7 @@ function compiladorPascalS(){
     Msg[52] = "Entao      "; Msg[53] = "Está faltando a palavra reservada \'ate\'.";
     Msg[54] = "Está faltando a palavra reservada \'faca\'."; Msg[55] = "";
     Msg[56] = "Identificador não permitido nesta posição"; Msg[57] = "Está faltando o delimitador de final de bloco de instruções \'fim\'.";
-    Msg[58] = "É esperado a declaração de variáveis na declaração do procedimento/função após o caracter \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
+    Msg[58] = "É esperado a declaração de variáveis na declaração do procedimento/função após o caractere \'(\'."; Msg[59] = "O valor de índice de uma variável do tipo arranjo ou string precisa ser inteiro.";
     Msg[60] = "Operador aritmético não permitido para variáveis do tipo string.";
     Msg[61] = "Aribuições múltiplas não são permitidas para arranjos e strings.";
     Msg[62] = "Está faltando o "; Msg[63] = "O operador \'^\' só pode ser usado com variáveis do tipo ponteiro.";
@@ -48,6 +48,7 @@ function compiladorPascalS(){
     Msg[71] = "Você está tentando acessar um valor de retorno de um identificador que não é uma função.";
     Msg[72] = "A instrução \'retorna\' só pode ser utilizada em funções.";
     Msg[73] = "Tipo de retorno incompatível com a função.";
+		Msg[74] = "Está faltando a palavra fim ao final da estrutura caso.";
     return Msg[code];
   }
 
@@ -60,7 +61,7 @@ function compiladorPascalS(){
       }
       if (cc == ll){
         if (errpos != 0)
-        errpos = 0;
+        	errpos = 0;
         if (iln < indexmax){
           ll = 0;
           cc = 0;
@@ -83,7 +84,7 @@ function compiladorPascalS(){
     }
     catch(err){
       isOk = false;
-      ErrorMsg = err;
+      MsgErro = err;
     }
   }
   //Função Error
@@ -91,7 +92,7 @@ function compiladorPascalS(){
     try{
       debugger;
       if (isOk){
-        var strError = ErrorMsg(code);
+        var strError = Error2(code);
         var line;
         line = linecount;
         if(changed)
@@ -244,7 +245,7 @@ function compiladorPascalS(){
     }
     catch(err){
       isOk = false;
-      ErrorMsg = err;
+      MsgErro = err;
     }
   }
 
@@ -260,7 +261,7 @@ function compiladorPascalS(){
     }
     catch(err){
       isOk = false;
-      ErrorMsg = err;
+      MsgErro = err;
     }
   }
 
@@ -268,6 +269,7 @@ function compiladorPascalS(){
     var i, j, k, e;
     if(linecount < ilnx){
       if(changed){
+				lineOfLastSymbol = linecount;
         linecount = ilnx;
         changed = false;
       }
@@ -297,7 +299,7 @@ function compiladorPascalS(){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }
 
@@ -332,11 +334,11 @@ function compiladorPascalS(){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }
     try{
-      while(isOk && ch == " " || ch == "\t" || ch == "\n")  //Pula espaços em branco
+      while(isOk && (ch == " " || ch == "\t" || ch == "\n"))  //Pula espaços em branco
         NextCh();
       if(isLetter(ch) || ch == "_"){
         k = 0;
@@ -545,7 +547,7 @@ function compiladorPascalS(){
   }
 }//insymbol
 
-function enter(x0, x1, x2, x3){
+function enter(x0, x1 = "nothing", x2, x3){
   try{
     t++;
     tab[t] = new Ttab;
@@ -693,7 +695,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }
     function test(sx3 ,s1, s2, n){
@@ -704,7 +706,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }
     function TestSemicolon(){
@@ -720,7 +722,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//TestSemicolon
     function enter(id, k){
@@ -745,7 +747,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//enter
 
@@ -766,7 +768,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//loc
 
@@ -782,7 +784,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//entervariable
 
@@ -847,7 +849,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//constant
 
@@ -916,7 +918,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//arraytyp
       try{
@@ -1046,7 +1048,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//typ
 
@@ -1134,7 +1136,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }
 
@@ -1166,7 +1168,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//constantdeclaration
 
@@ -1211,7 +1213,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//typedeclaration
 
@@ -1258,7 +1260,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//variabledeclaration
 
@@ -1290,13 +1292,13 @@ function block(fsys, isfun, level){
             default:  len = TAM_INT ;
           }
         }
-        emit1(linecount-1, 32 + bool, len);
+        emit1(lineOfLastSymbol, 32 + bool, len);
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
-    }//procdeclaration
+    }//procdeclarationbtab
 
     function statement(fsys){
       var i;
@@ -1388,28 +1390,10 @@ function block(fsys, isfun, level){
               }
               if(sy == ptr){
                 insymbol();
-                if(atab[a].eltyp != pointers){
+                if(atab[a].eltyp != pointers)
                   Error(63);
-                }
-                else{
-                  v.typ = atab[a].elxtyp;
-                  v.xtyp = pointers;
-                  if(v.typ != strings || !assign){
-                    var ltyp;
-                    switch (v.typ) {
-                      case reals:
-                        ltyp = TAM_REAL;
-                      break;
-                      case chars:
-                      case bools:
-                        ltyp = TAM_CHAR;
-                      break;
-                      default:
-                        ltyp = TAM_INT;
-                    }
-                    emit1(linecount, 34, ltyp);
-                  }
-                }
+                else
+									emit1(linecount, 34, 4);
               }
             }
           }while(isOk && sy in new ENUM([lbrack, lparent, period]));
@@ -1417,7 +1401,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//Selector
 
@@ -1520,7 +1504,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//call
 
@@ -1557,7 +1541,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//resulttype
 
@@ -1872,7 +1856,7 @@ function block(fsys, isfun, level){
                 }
                 catch(err){
                   isOk = false;
-                  ErrorMsg = err;
+                  MsgErro = err;
                 }
               }//standfct
               try{
@@ -2075,7 +2059,7 @@ function block(fsys, isfun, level){
               }
               catch(err){
                 isOk = false;
-                ErrorMsg = err;
+                MsgErro = err;
               }
             } //factor
             try{
@@ -2140,7 +2124,7 @@ function block(fsys, isfun, level){
             }
             catch(err){
               isOk = false;
-              ErrorMsg = err;
+              MsgErro = err;
             }
           }//term
           try{
@@ -2216,7 +2200,7 @@ function block(fsys, isfun, level){
           }
           catch(err){
             isOk = false;
-            ErrorMsg = err;
+            MsgErro = err;
           }
         }//simpleexpression
         try{
@@ -2275,7 +2259,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//expression
       function assignment(lv, ad){
@@ -2296,18 +2280,6 @@ function block(fsys, isfun, level){
             insymbol();
             if(x.typ == pointers){
               x.typ = tab[i].xtyp;
-              /*var ltyp;
-              switch (x.typ) {
-                case reals:
-                  ltyp = TAM_REAL;
-                break;
-                case bools:
-                case chars:
-                  ltyp = TAM_CHAR;
-                break;
-                default:
-                  ltyp = TAM_INT;
-              }*/
               emit1(ln, 34, 4);
             }
             else
@@ -2318,7 +2290,6 @@ function block(fsys, isfun, level){
               fstring = true;
             selector(fsys.copy([becomes, eql, plus, minus, rdiv, times]), x, true);
           }
-          //ln = linecount;
           if (sy == becomes)
             insymbol();
           else {
@@ -2520,7 +2491,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//assignment
 
@@ -2548,7 +2519,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//compoundstatement
 
@@ -2583,7 +2554,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//ifstatement
 
@@ -2621,7 +2592,7 @@ function block(fsys, isfun, level){
           }
           catch(err){
             isOk = false;
-            ErrorMsg = err;
+            MsgErro = err;
           }
         }//fim caselabel
 
@@ -2654,10 +2625,15 @@ function block(fsys, isfun, level){
               exittab[j] = lc;
               emit(linecount, 10);
             }
+						else
+							if(else_sy)
+								Error(74);
+							else
+								Error(23);
           }
           catch(err){
             isOk = false;
-            ErrorMsg = err;
+            MsgErro = err;
           }
         }//fim onecase
         try{
@@ -2666,6 +2642,7 @@ function block(fsys, isfun, level){
           var i, j, k, lc1;
           var else_sy = false, elselc = 0;   //Senao da instrução caso
           var casetab = new Array(csmax);
+					var endLine = [];
           function CaseRecord(val, lc){
             this.val = val;
             this.lc = lc;
@@ -2690,17 +2667,18 @@ function block(fsys, isfun, level){
           else
             Error(8);
           onecase();
-          while(isOk && sy != endsy && isOk) {
+          while(isOk && sy != endsy)
             onecase();
-          }
           kode[lc1].y = lc;
           for (k = 1; k <= i; k++) {
             emit1(linecount, 13, casetab[k].val);
             emit1(linecount, 13, casetab[k].lc);
           }
           emit1(linecount, 10, elselc);
-          for (k = 1; k <= j; k++)
+          for (k = 1; k <= j; k++){
             kode[exittab[k]].y = lc;
+						kode[exittab[k]].line = linecount;
+					}
           if (sy == endsy)
             insymbol();
           else
@@ -2708,7 +2686,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//casestatement
 
@@ -2743,7 +2721,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//repeatstatement
 
@@ -2773,7 +2751,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }
 
@@ -2818,54 +2796,7 @@ function block(fsys, isfun, level){
             if (p.typ != cvt)
               Error(19, cvt);
             else{
-              if (sy == stepsy){/*
-                insymbol();
-                if (sy == minus){
-                  insymbol();
-                  if (sy == intcon || sy == realcon){
-                    if (sy == intcon){
-                      if (cvt == ints)
-                        emit2(linecount, 24, cvt, inum);
-                      else
-                        Error(19, cvt);
-                    }
-                    else{
-                      if (cvt == reals){
-                        EnterReal(rnum);
-                        emit2(linecount, 24, cvt, c1);
-                        steptyp = TAM_REAL;
-                      }
-                      else
-                        Error(19, cvt);
-                    }
-                  }
-                  emit1(linecount, 36, steptyp);
-                }
-                else {
-                  if (sy == intcon || sy == realcon){
-                    if (sy == intcon){
-                      if (cvt == ints)
-                        emit2(linecount, 24, cvt, inum);
-                      else
-                        Error(19, cvt);
-                    }
-                    else{
-                      if (cvt == reals){
-                        EnterReal(rnum);
-                        emit2(linecount, 24, cvt, c1);
-                        steptyp = TAM_REAL;
-                      }
-                      else
-                        Error(19,cvt);
-                    }
-                  }
-
-                }
-                if (p.typ != cvt) {
-                  Error(19, cvt);
-                }
-                insymbol();
-              */
+              if (sy == stepsy){
                 insymbol();
                 var stepitem = new item;
                 expression(fsys.copy([dosy]), stepitem);
@@ -2900,7 +2831,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }//forstatement
 
@@ -3194,7 +3125,7 @@ function block(fsys, isfun, level){
         }
         catch(err){
           isOk = false;
-          ErrorMsg = err;
+          MsgErro = err;
         }
       }
       try{
@@ -3256,7 +3187,7 @@ function block(fsys, isfun, level){
       }
       catch(err){
         isOk = false;
-        ErrorMsg = err;
+        MsgErro = err;
       }
     }//statement
   try{
@@ -3511,10 +3442,9 @@ try{
   btab[1].vsize = 0;
   block(blockbegsys.copy(statbegsys), false, 1);
   isDone = true;
-  /*if (sy != period)
-    Error(22);*/
   finalInst = lc;
   emit(ilnx, 31);
+
   if (btab[2].vsize > stacksize)
     Error(49);
   }
@@ -3525,6 +3455,8 @@ try{
   finally{
       if (isOk)
         MsgErro = "Compilação finalizada com sucesso.";
+			if(Interpreter.isRunning())
+				Interpreter._crash();
   }
 
 }//CompiladorPascalS

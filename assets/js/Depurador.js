@@ -1,6 +1,6 @@
 //ATALHOS
 //Para depurar
-function depurar(){
+function debug(){
 	if (isOk && isDone){
 		debug_op = true;
 		call_read = false;
@@ -21,7 +21,7 @@ function depurar(){
 		mostraErro();
 	}
 }
-shortcut.add("F6",function() {	depurar();});
+shortcut.add("F6",function() {	debug();});
 
 
 //para compilar
@@ -46,7 +46,7 @@ function reexecute(){
 		limpaConsole();
 		mostrarModalOutput();
 		call_read = false;
-		interpret();
+		Interpreter.init();
 	}
 	else {
 		if (debug_op){
@@ -55,7 +55,7 @@ function reexecute(){
 			stopln = kode[finalInst].line;
 			if(kode[pc].f == 70)
 			pc++;
-			interpret();
+			Interpreter.init();
 		}
 		else if (isOk){
 			MsgErro = "Você precisa compilar o programa antes de executá-lo.";
@@ -73,31 +73,31 @@ function reexecute(){
 shortcut.add("Ctrl+F9",function(){reexecute();});
 
 //Compilar e executar
-shortcut.add("F10",function() {getCode();});
+shortcut.add("F10",function() {compileAndExecute();});
 
 //rodar até o cursor
 function runToCursor(){
 	if(!debug_op){
-		depurar();
+		debug();
 	}
 	stopln = editor.getCursor().line-1;
 	CursorRun = true;
 	debug_op = true;
 	if(!debug_op){
-		depurar();
+		debug();
 		indebug = true;
 		interpret();
 	}
 	interpret();
 
 }
-shortcut.add("F4",function(){runToCursor();});
+shortcut.add("F4",function(){Interpreter._DEBUGGER.Until();});
 
 //passo-a-passo entrando em rotinas (step into)
 function inRoutine(){
 	debugger;
 	if(!debug_op){
-		depurar();
+		debug();
 		indebug = true;
 		interpret();
 	}
@@ -108,7 +108,7 @@ function inRoutine(){
 	}
 
 }
-shortcut.add("F7",function() {inRoutine();});
+shortcut.add("F7",function() {Interpreter._DEBUGGER.In();});
 
 //Executar até o finalInst
 shortcut.add("Ctrl+F7", function(){FinishIt();});
@@ -122,18 +122,17 @@ function FinishIt(){
 
 //Executar até sair da rotina(step out)
 function outRoutine(){
-	debugger;
 	outdebug = true;
 	sNumber = getNumberStacks();
 	debug = false;
 	interpret();
 }
-shortcut.add("Ctrl+F8",function() {outRoutine();});
+shortcut.add("Ctrl+F8",function() {Interpreter._DEBUGGER.Out();});
 
 //passo-a-passo saltando rotinas (step over)
 function byRoutine(){
 	if(!debug_op){
-		depurar();
+		debug();
 		indebug = true;
 		interpret();
 	}
@@ -152,7 +151,7 @@ function byRoutine(){
 
 
 }
-shortcut.add("F8",function() {byRoutine();});
+shortcut.add("F8",function() {Interpreter._DEBUGGER.Over();});
 
 //interromper a depuração e a execução
 function stopDeb(){
@@ -168,6 +167,7 @@ shortcut.add("Ctrl+F2",function() {
 
 //funcao para adicionar linha para o depurador no editor
 function mostraLinhaDepurador(linha){
+	limpaLinhaDepurador();
 	editor.addLineClass(linha, 'background', 'line-depurador');
 	var info = editor.lineInfo(1);
 }

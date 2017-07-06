@@ -32,6 +32,7 @@
   <script async src="assets/js/Depurador.js"></script>
   <script async src="assets/js/Compilador.js"></script>
   <script async src="assets/js/Interpretador.js"></script>
+	<script async src="assets/js/Tips.js"></script>
 </head>
 <body onload="SetTemplate();" style="background-color:#eee">
 
@@ -47,12 +48,6 @@
         <a class="navbar-brand" href="#">Compilador de Pseudo-código</a>
 
       </div>
-      <button type="button" class="btn btn-default pull-right" title="Diminuir fonte" onclick="diminuirTamanho()">
-        <span class="glyphicon glyphicon-zoom-out"></span>
-      </button>
-      <button type="button" class="btn btn-default pull-right" title="Aumentar fonte" onclick="aumentarTamanho()">
-        <span class="glyphicon glyphicon-zoom-in"></span>
-      </button>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <!--<li class="active"><a href="#">Link</a></li>
@@ -77,6 +72,13 @@
           <div class="row">
             <div class="col-md-12">
               <div style="float:right;">
+								<button type="button" class="btn btn-default pull-left" title="Aumentar fonte" onclick="aumentarTamanho()">
+									<span class="glyphicon glyphicon-zoom-in"></span>
+								</button>
+
+								<button type="button" class="btn btn-default pull-left" title="Diminuir fonte" onclick="diminuirTamanho()">
+					        <span class="glyphicon glyphicon-zoom-out"></span>
+					      </button>
 
                 <button  id="continuar" type="button" class="btn btn-default" title="Continuar Execução <Ctrl+F7>" onclick="FinishIt();">
                   <span class="glyphicon glyphicon-step-forward"></span>
@@ -86,11 +88,11 @@
                   <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
 
-                <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função <F8>" onclick ="byRoutine();">
+                <button  id="prox_funcao" type="button" class="btn btn-default" title="Pular próxima função <F8>" onclick ="Interpreter._DEBUGGER.Over();">
                   <span class="glyphicon glyphicon-share-alt"></span>
                 </button>
 
-                <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções <Ctrl+F8>" onclick="outRoutine();">
+                <button id="exe_saindo" type="button" class="btn btn-default" title="Executar linha-a-linha saindo em funções <Ctrl+F8>" onclick="Interpreter._DEBUGGER.Out();">
                   <span class="glyphicon glyphicon-resize-full"></span>
                 </button>
 
@@ -128,7 +130,7 @@
             <span class="glyphicon glyphicon-cog"></span>
           </button>
 
-          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar <F10>" onclick="getCode();">
+          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar <F10>" onclick="compileAndExecute();">
             <span class="glyphicon glyphicon-play"></span>
           </button>
 
@@ -136,56 +138,26 @@
       </div>
     </div>
   </div><!--fim primeira coluna -->
-  <div id="coluna_direita" class="col-md-4"  style="background-color:white; max-height:340px">
-    <!-- <div id="coluna_direita" style="width:295px; height:400px; float:right; visible:none; background-color:white; margin:2px;  overflow: auto;" > -->
-    <div class="row" style="margin-top:5px;">
-      <div class="col-md-6" style="resize:both">
-        <div id="vars">
-          <div class="table-responsive" style="max-height:320px; overflow-y:auto; margin-bottom:5px;border: 1px solid #dddddd;">
-            <table id="tab_var" class="table table-bordered" style="margin-bottom:5px !important;">
-              <thead>
-                <tr >
-                  <th colspan="2">Variáveis</th>
-                </tr>
-                <tr>
-                  <th>Nome</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- inserir linhas pilha variaveis-->
-              </tbody>
-            </table>
-            <button type="button" class="btn btn-default pull-right" onclick="salvar()">Salvar</button>
-            <button type="button" class="btn btn-default pull-right" onclick="ativarTabelaVar()">Editar</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div id="pilha" style="width:100%">
-          <div class="table-responsive" style="max-height:320px; overflow-y:auto;">
-            <table class="table table-bordered" id="tab_logic" style="border: 1px solid #dddddd;">
-              <thead>
-                <tr >
-                  <th colspan="2">Pilha de execução</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- inserir linhas pilha execucao-->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- </div> -->
-  </div><!--fim coluna 2 -->
+	<div id="debug">	</div>
+	<div class="row">
+	  <div class="panel panel-info" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
+	    <div class="panel-heading">Ajuda</div>
+			<div>
+				<div class="panel-body" id="infoPanel" style="width:50%; float:left"></div>
+				<div class="panel-body" id="infoPanel2" style="width:50%; float:right"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+	  <div class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
+	    <div class="panel-heading">Saída do Compilador</div>
+			<div class="panel-body" id="debugPanel"></div>
+		</div>
+	</div>
+
 </div>
-<div class="row">
-  <div id="painelDebug" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
-    <div class="panel-heading">
-      <h3 class="panel-title">Debug</h3>
-    </div>
+
 
     <table class="table table-bordered" id="panel-error">
       <thead>
@@ -218,7 +190,7 @@
       </div>
       <div id="modalBody" class="modal-body">
         <textarea id="output" disabled="true" rows="200"></textarea>
-        <input id="scriptBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
+        <input id="InputBox" type="text" onkeypress="return InputBoxEvent(event)" autofocus="true"/>
       </div>
       <div id="modalFooter" class="modal-footer">
         <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
@@ -265,7 +237,7 @@
 <!--  fim Modal -->
 
 <script>
-document.getElementById("painelDebug").style.visibility = "hidden";
+document.getElementById("debugPanel").style.visibility = "hidden";
 
 var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
   lineNumbers: true,
@@ -282,7 +254,7 @@ editor.on("gutterClick", function(cm, n) {
 });
 </script>
 <script async>
-function getCode(){
+function compileAndExecute(){
   time = new Date().getTime();
   InputFile = editor.getValue();
   isOk = true;
@@ -293,30 +265,13 @@ function getCode(){
   if (isOk && isDone){
     mostraErro();
     mostrarModalOutput();
-    debug_op = false;
-    setTimeout(function(){
-      call_read = false;
-      interpret();
-    }, 300);
+    Interpreter.init();
+		Interpreter.resume();
   }
-  else {
-    if (isOk){
-      mostraErro();
-      mostrarModalOutput();
-      debug_op = false;
-      setTimeout(function(){
-        call_read = false;
-        interpret();
-        scrollOutput();
-      }, 300);
-    }
-    else {
-      if (isDone){
-        mostraErro();
-      }
-    }
-    //alert(text);
-  }
+  else
+    mostraErro();
+
+
 }
 
 </script>

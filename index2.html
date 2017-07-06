@@ -100,7 +100,7 @@
             <span class="glyphicon glyphicon-list-alt"></span>
           </button>
 
-          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar - F6" onclick="depurar();">
+          <button name="depurar" id="depurar" type="button" class="btn btn-default" title="Depurar - F6" onclick="debug();">
             <span class="glyphicon glyphicon-sort"></span>
           </button>
 
@@ -108,7 +108,7 @@
             <span class="glyphicon glyphicon-cog"></span>
           </button>
 
-          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar - F10" onclick="getCode();">
+          <button name="play" id="play" type="button" class="btn btn-default" title="Compilar e executar - F10" onclick="compileAndExecute();">
             <span class="glyphicon glyphicon-play"></span>
           </button>
 
@@ -134,7 +134,7 @@
           </div>
           <div id="modalBody" class="modal-body">
             <textarea id="output" disabled="true" rows="200"></textarea>
-            <input id="scriptBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
+            <input id="InputBox" type="text" onkeypress="return runScript(event)" autofocus="true"/>
           </div>
           <div id="modalFooter" class="modal-footer">
             <!--<button type="button" class="btn btn-default" onclick="limpaConsole()" >Limpar</button>-->
@@ -188,7 +188,7 @@
 <div style="clear:both;"/>
 <br>
 <!--Debug painel -->
-<div id="painelDebug" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
+<div id="debugPanel" class="panel panel-danger" style="max-height: 200px; width:98.5%; margin-left:9px; overflow:auto;">
   <div class="panel-heading">
     <h3 class="panel-title">Debug</h3>
   </div>
@@ -213,7 +213,7 @@
 
 <script>
 
-  document.getElementById("painelDebug").style.visibility = "hidden";
+  document.getElementById("debugPanel").style.visibility = "hidden";
 
   var editor = CodeMirror.fromTextArea(document.getElementById("codebox"), {
     lineNumbers: true,
@@ -242,7 +242,7 @@
 
 </script>
 <script async>
-  function getCode(){
+  function compileAndExecute(){
     time = new Date().getTime();
     InputFile = editor.getValue();
     isOk = true;
